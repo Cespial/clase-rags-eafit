@@ -1,0 +1,3290 @@
+# Clase de RAGs EAFIT — Implementation Plan
+
+> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
+
+**Goal:** Construir un deck Reveal.js de 44 slides, una mini-app Next.js para demo de embeddings, 5 videos de backup, y desplegar todo en Vercel antes del lunes 20-abr-2026 12:00 p.m.
+
+**Architecture:** Reveal.js 5 vanilla (zero build step) con CSS tokens Tribai copiados del design handoff; secciones modulares en `slides/*.html` enlazadas desde `index.html`; mini-app Next.js independiente en `embeddings-demo/` que se despliega como subdominio o ruta separada.
+
+**Tech Stack:** Reveal.js 5 (CDN), HTML/CSS/JS vanilla, Next.js 16 + AI SDK v6, Voyage AI API, Anthropic API, Vercel.
+
+---
+
+## File Structure (definitivo)
+
+```
+clase-rags-eafit/                                    # repo raíz
+├── index.html                                        # Reveal principal
+├── styles/
+│   ├── tokens.css                                    # Tribai design tokens
+│   └── theme.css                                     # Reveal overrides
+├── slides/
+│   ├── 00-cold-open.html
+│   ├── 01-paradigma.html
+│   ├── 02-galeria.html
+│   ├── 03-lego.html
+│   ├── 04-flujo.html
+│   ├── 05-ecosistema.html
+│   ├── 06-industria.html
+│   ├── 07-colombia.html
+│   └── 08-cierre.html
+├── assets/
+│   ├── logos/
+│   │   └── logo-tribai-isotipo-white.svg             # copy de brand-assets
+│   ├── diagrams/                                     # 7 SVGs generados
+│   ├── screenshots/                                  # fallbacks
+│   └── videos/                                       # 5 MP4 backups
+├── demos/
+│   ├── demo-script.md                                # queries + backups
+│   └── speaker-notes.md                              # 2-3 bullets por sección
+├── embeddings-demo/                                  # Next.js mini-app
+│   ├── package.json
+│   ├── next.config.ts
+│   ├── tsconfig.json
+│   ├── app/
+│   │   ├── layout.tsx
+│   │   ├── page.tsx
+│   │   ├── globals.css
+│   │   └── api/embed/route.ts
+│   └── .env.local (gitignored)
+├── vercel.json
+├── .gitignore
+├── README.md
+└── docs/superpowers/
+    ├── specs/2026-04-19-clase-rags-eafit-design.md
+    └── plans/2026-04-19-clase-rags-eafit-implementation.md  # este doc
+```
+
+---
+
+## Environment Setup (pre-tasks)
+
+**Variables necesarias:**
+- `VOYAGE_API_KEY` — para embeddings-demo, ya disponible en otros proyectos del usuario
+- Node.js 22.x (ya instalado), npm, git (ya configurados)
+- `gh` CLI autenticado (repo ya creado)
+- Vercel CLI: `npm i -g vercel` si no está
+
+**Comando de desarrollo principal (deck):**
+```bash
+cd /Users/cristianespinal/clase-rags-eafit
+npx serve .
+# abrir http://localhost:3000
+```
+
+**Comando de desarrollo (embeddings-demo):**
+```bash
+cd /Users/cristianespinal/clase-rags-eafit/embeddings-demo
+npm run dev
+# abrir http://localhost:3001 (puerto distinto de serve)
+```
+
+---
+
+### Task 1: Scaffold Reveal.js + tokens CSS + tema
+
+**Files:**
+- Create: `/Users/cristianespinal/clase-rags-eafit/index.html`
+- Create: `/Users/cristianespinal/clase-rags-eafit/styles/tokens.css`
+- Create: `/Users/cristianespinal/clase-rags-eafit/styles/theme.css`
+- Create: `/Users/cristianespinal/clase-rags-eafit/vercel.json`
+
+- [ ] **Step 1: Crear `styles/tokens.css` copiando el CSS del design handoff**
+
+```bash
+cp /Users/cristianespinal/Downloads/design_handoff_asistente_chat/design/colors_and_type.css /Users/cristianespinal/clase-rags-eafit/styles/tokens.css
+```
+
+Verificar que se copió:
+```bash
+head -20 /Users/cristianespinal/clase-rags-eafit/styles/tokens.css
+```
+Expected: output mostrando `@import url("https://fonts.googleapis.com/...` y `:root { --tribai-navy: #0a1628; ... }`
+
+- [ ] **Step 2: Crear `styles/theme.css` con overrides Reveal**
+
+```css
+/* theme.css — overrides de Reveal para identidad Tribai */
+@import "tokens.css";
+
+.reveal {
+  font-family: var(--font-body);
+  color: var(--fg);
+  background: var(--bg);
+}
+
+.reveal .slides {
+  text-align: left;
+}
+
+.reveal h1, .reveal h2, .reveal h3, .reveal h4 {
+  font-family: var(--font-heading);
+  font-weight: 700;
+  letter-spacing: var(--track-tight);
+  line-height: var(--lead-tight);
+  color: var(--fg);
+  text-transform: none;
+  margin-bottom: 1rem;
+}
+
+.reveal h1 { font-size: 3.5rem; }
+.reveal h2 { font-size: 2.25rem; }
+.reveal h3 { font-size: 1.5rem; }
+
+.reveal p,
+.reveal li {
+  font-size: 1.5rem;
+  line-height: 1.5;
+  color: var(--fg-body);
+}
+
+.reveal section.cover {
+  background: var(--tribai-navy);
+  color: white;
+  padding: 4rem;
+}
+.reveal section.cover h1,
+.reveal section.cover h2,
+.reveal section.cover p { color: white; }
+
+.reveal section.navy {
+  background: var(--tribai-navy);
+  color: white;
+}
+.reveal section.navy h1,
+.reveal section.navy h2,
+.reveal section.navy h3,
+.reveal section.navy p,
+.reveal section.navy li { color: white; }
+
+.reveal section.muted {
+  background: var(--bg-muted-section);
+}
+
+.reveal .eyebrow {
+  font-size: 1rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--tribai-blue);
+  margin-bottom: 0.5rem;
+}
+.reveal section.navy .eyebrow,
+.reveal section.cover .eyebrow {
+  color: var(--tribai-gold);
+}
+
+.reveal .stat {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  color: var(--tribai-gold);
+  font-weight: 600;
+}
+
+.reveal .pull-quote {
+  font-family: var(--font-serif);
+  font-size: 3rem;
+  font-weight: 400;
+  line-height: 1.2;
+  letter-spacing: -0.01em;
+  text-align: center;
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.reveal .tribai-logo {
+  position: fixed;
+  top: 1.25rem;
+  left: 1.25rem;
+  width: 32px;
+  height: 32px;
+  z-index: 100;
+  opacity: 0.8;
+}
+
+.reveal .slide-footer {
+  position: fixed;
+  bottom: 0.75rem;
+  right: 1.25rem;
+  font-size: 0.75rem;
+  color: var(--fg-muted);
+  font-family: var(--font-mono);
+}
+.reveal section.navy .slide-footer,
+.reveal section.cover .slide-footer { color: rgba(255,255,255,0.5); }
+
+.reveal .demo-frame {
+  border: 2px solid var(--tribai-gold);
+  border-radius: var(--radius-md);
+  width: 100%;
+  aspect-ratio: 16 / 9;
+}
+
+.reveal .demo-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: var(--tribai-gold);
+  color: var(--tribai-navy);
+  padding: 0.25rem 0.75rem;
+  border-radius: var(--radius-pill);
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-bottom: 0.5rem;
+}
+.reveal .demo-label::before {
+  content: "●";
+  color: #dc2626;
+  animation: pulse 1.5s infinite;
+}
+@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
+
+.reveal .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; }
+.reveal .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1.5rem; }
+.reveal .grid-4 { display: grid; grid-template-columns: repeat(4,1fr); gap: 1rem; }
+
+.reveal .card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 1.25rem;
+}
+.reveal .card h3 { font-size: 1.25rem; margin-bottom: 0.5rem; }
+.reveal .card p { font-size: 1rem; }
+
+.reveal .badge-gold {
+  display: inline-block;
+  background: color-mix(in srgb, var(--tribai-gold) 15%, transparent);
+  color: var(--tribai-gold);
+  padding: 0.25rem 0.75rem;
+  border-radius: var(--radius-pill);
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
+.reveal pre {
+  background: #131b2e;
+  color: #e8e6e3;
+  padding: 1.25rem;
+  border-radius: var(--radius-md);
+  font-size: 0.875rem;
+  font-family: var(--font-mono);
+}
+.reveal code { font-family: var(--font-mono); }
+
+@media (prefers-reduced-motion: reduce) {
+  .reveal .demo-label::before { animation: none; }
+}
+```
+
+Escribir el archivo anterior a `/Users/cristianespinal/clase-rags-eafit/styles/theme.css`.
+
+- [ ] **Step 3: Crear `index.html` con Reveal 5 desde CDN y enlaces a todas las secciones**
+
+```html
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>RAG en producción — Tribai + Kelsen | EAFIT 20-abr-2026</title>
+  <meta name="description" content="Clase de RAGs para pregrado de ingeniería, EAFIT. Casos de estudio Tribai y Kelsen." />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/reset.css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/reveal.css" />
+  <link rel="stylesheet" href="styles/theme.css" />
+</head>
+<body>
+  <div class="reveal">
+    <img src="assets/logos/logo-tribai-isotipo-white.svg" alt="Tribai" class="tribai-logo" />
+    <div class="slides">
+      <!-- §0 Cold open -->
+      <section data-external="slides/00-cold-open.html"></section>
+      <!-- §1 Paradigma -->
+      <section data-external="slides/01-paradigma.html"></section>
+      <!-- §2 Galería -->
+      <section data-external="slides/02-galeria.html"></section>
+      <!-- §3 Lego -->
+      <section data-external="slides/03-lego.html"></section>
+      <!-- §4 Flujo -->
+      <section data-external="slides/04-flujo.html"></section>
+      <!-- §5 Ecosistema -->
+      <section data-external="slides/05-ecosistema.html"></section>
+      <!-- §6 Industria -->
+      <section data-external="slides/06-industria.html"></section>
+      <!-- §7 Colombia -->
+      <section data-external="slides/07-colombia.html"></section>
+      <!-- §8 Cierre -->
+      <section data-external="slides/08-cierre.html"></section>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/reveal.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/plugin/notes/notes.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/plugin/highlight/highlight.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/reveal.js-plugins@5.1.0/external/external.js"></script>
+  <script>
+    Reveal.initialize({
+      hash: true,
+      slideNumber: 'c/t',
+      transition: 'fade',
+      width: 1600,
+      height: 900,
+      margin: 0.04,
+      plugins: [RevealNotes, RevealHighlight, RevealExternal],
+      external: { async: false }
+    });
+  </script>
+</body>
+</html>
+```
+
+Escribir el archivo anterior a `/Users/cristianespinal/clase-rags-eafit/index.html`.
+
+**Nota:** `reveal.js-plugins@5.1.0/external/external.js` es el plugin oficial para cargar slides desde archivos externos. Si falla en CDN, fallback: inlinar secciones directamente. Verificaremos en Step 5.
+
+- [ ] **Step 4: Crear `vercel.json` para deploy**
+
+```json
+{
+  "cleanUrls": true,
+  "trailingSlash": false,
+  "rewrites": [
+    { "source": "/embeddings", "destination": "/embeddings-demo/index.html" }
+  ]
+}
+```
+
+Escribir a `/Users/cristianespinal/clase-rags-eafit/vercel.json`.
+
+- [ ] **Step 5: Smoke test local**
+
+Run:
+```bash
+cd /Users/cristianespinal/clase-rags-eafit
+npx serve . -l 3000 &
+sleep 2
+curl -s http://localhost:3000/ | head -20
+```
+Expected: HTML con `<title>RAG en producción — Tribai + Kelsen | EAFIT 20-abr-2026</title>`.
+
+Si `external.js` plugin no carga desde CDN, comentar la línea en `index.html` y continuar — las secciones las inlinearé en Tasks 4-12 (plan B documentado abajo).
+
+- [ ] **Step 6: Commit**
+
+```bash
+cd /Users/cristianespinal/clase-rags-eafit
+git add index.html styles/ vercel.json
+git -c commit.gpgsign=false commit -m "feat: scaffold Reveal.js deck con tokens Tribai"
+git push origin main
+```
+
+---
+
+### Task 2: Copiar logo isotipo blanco de Tribai
+
+**Files:**
+- Create: `/Users/cristianespinal/clase-rags-eafit/assets/logos/logo-tribai-isotipo-white.svg`
+- Create: `/Users/cristianespinal/clase-rags-eafit/assets/logos/logo-tribai-full.svg`
+
+- [ ] **Step 1: Copiar 2 logos**
+
+```bash
+cp /Users/cristianespinal/tribai.co/tribai/brand-assets/logos/logo-tribai-isotipo-white.svg /Users/cristianespinal/clase-rags-eafit/assets/logos/
+cp /Users/cristianespinal/tribai.co/tribai/brand-assets/logos/logo-tribai-full.svg /Users/cristianespinal/clase-rags-eafit/assets/logos/
+ls /Users/cristianespinal/clase-rags-eafit/assets/logos/
+```
+Expected: 2 archivos listados.
+
+- [ ] **Step 2: Verificar render en navegador**
+
+Con `npx serve` corriendo, abrir http://localhost:3000/assets/logos/logo-tribai-isotipo-white.svg — debe mostrar el isotipo en blanco.
+
+- [ ] **Step 3: Commit**
+
+```bash
+cd /Users/cristianespinal/clase-rags-eafit
+git add assets/logos/
+git -c commit.gpgsign=false commit -m "assets: agregar logos Tribai"
+git push origin main
+```
+
+---
+
+### Task 3: Crear 7 diagramas SVG
+
+Los SVGs se escriben a mano (no generados). Cada uno es simple, conceptual, sin dependencias.
+
+**Files:**
+- Create: `/Users/cristianespinal/clase-rags-eafit/assets/diagrams/evolucion-sql-rag.svg`
+- Create: `/Users/cristianespinal/clase-rags-eafit/assets/diagrams/sql-vs-semantic.svg`
+- Create: `/Users/cristianespinal/clase-rags-eafit/assets/diagrams/lego-pieces.svg`
+- Create: `/Users/cristianespinal/clase-rags-eafit/assets/diagrams/bibliotecario.svg`
+- Create: `/Users/cristianespinal/clase-rags-eafit/assets/diagrams/flujo-tribai.svg`
+- Create: `/Users/cristianespinal/clase-rags-eafit/assets/diagrams/flujo-kelsen.svg`
+- Create: `/Users/cristianespinal/clase-rags-eafit/assets/diagrams/mapa-apis.svg`
+
+- [ ] **Step 1: `evolucion-sql-rag.svg` — timeline horizontal**
+
+```svg
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1400 300" fill="none">
+  <style>
+    .node { fill: #fff; stroke: #0066FF; stroke-width: 2; }
+    .node-current { fill: #0066FF; }
+    .label { font-family: Inter, sans-serif; font-size: 18px; font-weight: 600; fill: #0A1628; }
+    .label-light { fill: #fff; }
+    .year { font-family: 'JetBrains Mono', monospace; font-size: 14px; fill: #6B7280; }
+    .axis { stroke: #E8E8E8; stroke-width: 2; }
+    .arrow { stroke: #0066FF; stroke-width: 3; marker-end: url(#arr); }
+  </style>
+  <defs>
+    <marker id="arr" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+      <path d="M0,0 L10,5 L0,10 z" fill="#0066FF"/>
+    </marker>
+  </defs>
+  <line class="axis" x1="80" y1="180" x2="1320" y2="180"/>
+  <!-- 5 stages -->
+  <g transform="translate(140,180)">
+    <circle class="node" r="30"/>
+    <text class="label" text-anchor="middle" y="6">SQL</text>
+    <text class="year" text-anchor="middle" y="60">1970s</text>
+    <text class="label" text-anchor="middle" y="-50" font-size="14" fill="#6B7280">Coincidencia literal</text>
+  </g>
+  <g transform="translate(380,180)">
+    <circle class="node" r="30"/>
+    <text class="label" text-anchor="middle" y="6" font-size="14">FTS</text>
+    <text class="year" text-anchor="middle" y="60">1990s</text>
+    <text class="label" text-anchor="middle" y="-50" font-size="14" fill="#6B7280">Tokens + stemming</text>
+  </g>
+  <g transform="translate(620,180)">
+    <circle class="node" r="30"/>
+    <text class="label" text-anchor="middle" y="6" font-size="13">Embed</text>
+    <text class="year" text-anchor="middle" y="60">2018</text>
+    <text class="label" text-anchor="middle" y="-50" font-size="14" fill="#6B7280">Significado</text>
+  </g>
+  <g transform="translate(860,180)">
+    <circle class="node node-current" r="34"/>
+    <text class="label label-light" text-anchor="middle" y="6" font-size="15">RAG</text>
+    <text class="year" text-anchor="middle" y="62">2023</text>
+    <text class="label" text-anchor="middle" y="-54" font-size="14" fill="#0066FF" font-weight="700">Contexto + generación</text>
+  </g>
+  <g transform="translate(1120,180)">
+    <circle class="node" r="30" stroke="#C4952A"/>
+    <text class="label" text-anchor="middle" y="6" font-size="13" fill="#C4952A">Agentic</text>
+    <text class="year" text-anchor="middle" y="60">2025+</text>
+    <text class="label" text-anchor="middle" y="-50" font-size="14" fill="#C4952A">Decisión autónoma</text>
+  </g>
+  <!-- arrows -->
+  <path class="arrow" d="M 175 180 L 345 180"/>
+  <path class="arrow" d="M 415 180 L 585 180"/>
+  <path class="arrow" d="M 655 180 L 825 180"/>
+  <path class="arrow" d="M 898 180 L 1085 180"/>
+</svg>
+```
+
+Escribir a `/Users/cristianespinal/clase-rags-eafit/assets/diagrams/evolucion-sql-rag.svg`.
+
+- [ ] **Step 2: `sql-vs-semantic.svg` — dos mundos contrastados**
+
+```svg
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1400 600" fill="none">
+  <style>
+    .title { font-family: Inter, sans-serif; font-size: 24px; font-weight: 700; fill: #0A1628; }
+    .sub { font-family: Inter, sans-serif; font-size: 16px; fill: #6B7280; }
+    .code { font-family: 'JetBrains Mono', monospace; font-size: 15px; fill: #0A1628; }
+    .row { stroke: #E8E8E8; fill: #fff; }
+    .dot { fill: #0066FF; }
+    .dot-gold { fill: #C4952A; }
+    .cluster { stroke: #0066FF; stroke-dasharray: 4 4; fill: none; opacity: 0.4; }
+  </style>
+  <!-- Left: SQL world -->
+  <g transform="translate(80,40)">
+    <text class="title">Mundo SQL</text>
+    <text class="sub" y="26">Tabla → filas → match literal</text>
+    <g transform="translate(0,60)">
+      <rect x="0" y="0" width="520" height="40" class="row"/>
+      <text class="code" x="12" y="26">SELECT * FROM articulos</text>
+    </g>
+    <g transform="translate(0,108)">
+      <rect x="0" y="0" width="520" height="40" class="row"/>
+      <text class="code" x="12" y="26">WHERE texto ILIKE '%extranjero%'</text>
+    </g>
+    <text class="sub" y="200" fill="#dc2626">✗ "residente no colombiano" → 0 resultados</text>
+    <text class="sub" y="226" fill="#dc2626">✗ "foráneo" → 0 resultados</text>
+    <text class="sub" y="252" fill="#dc2626">✗ "sin residencia nacional" → 0 resultados</text>
+  </g>
+  <!-- Right: Semantic world -->
+  <g transform="translate(760,40)">
+    <text class="title">Mundo Semántico</text>
+    <text class="sub" y="26">Texto → vector 1024D → vecinos cercanos</text>
+    <!-- Cluster visualization -->
+    <g transform="translate(0,80)">
+      <ellipse cx="260" cy="200" rx="220" ry="140" class="cluster"/>
+      <circle cx="260" cy="200" r="10" class="dot-gold"/>
+      <text class="sub" x="280" y="204" fill="#C4952A" font-weight="700">trabajador extranjero</text>
+      <circle cx="180" cy="160" r="6" class="dot"/>
+      <text class="sub" x="120" y="140">residente no colombiano</text>
+      <circle cx="340" cy="170" r="6" class="dot"/>
+      <text class="sub" x="300" y="140">ingeniero foráneo</text>
+      <circle cx="170" cy="250" r="6" class="dot"/>
+      <text class="sub" x="60" y="258">sin residencia nacional</text>
+      <circle cx="370" cy="250" r="6" class="dot"/>
+      <text class="sub" x="330" y="280">persona del exterior</text>
+    </g>
+    <text class="sub" y="500" fill="#16a34a" font-weight="600">✓ Todos se agrupan — el significado es la coordenada</text>
+  </g>
+</svg>
+```
+
+Escribir a `/Users/cristianespinal/clase-rags-eafit/assets/diagrams/sql-vs-semantic.svg`.
+
+- [ ] **Step 3: `lego-pieces.svg` — 5 piezas Lego etiquetadas**
+
+```svg
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1400 500" fill="none">
+  <style>
+    .lego-1 { fill: #0066FF; }
+    .lego-2 { fill: #3B82B8; }
+    .lego-3 { fill: #0A1628; }
+    .lego-4 { fill: #C4952A; }
+    .lego-5 { fill: #1a4fb8; }
+    .stud { fill: rgba(255,255,255,0.2); stroke: rgba(0,0,0,0.15); }
+    .title { font-family: Inter, sans-serif; font-size: 22px; font-weight: 700; fill: #fff; }
+    .sub { font-family: Inter, sans-serif; font-size: 14px; fill: rgba(255,255,255,0.85); }
+  </style>
+  <!-- 1 Fuentes -->
+  <g transform="translate(40,80)">
+    <rect width="240" height="160" rx="12" class="lego-1"/>
+    <circle cx="60" cy="20" r="14" class="stud"/>
+    <circle cx="120" cy="20" r="14" class="stud"/>
+    <circle cx="180" cy="20" r="14" class="stud"/>
+    <text class="title" x="20" y="86">1 · Fuentes</text>
+    <text class="sub" x="20" y="118">Los libros de la biblioteca</text>
+    <text class="sub" x="20" y="138" opacity="0.7">PDFs · APIs · DBs · docs</text>
+  </g>
+  <!-- 2 Embeddings -->
+  <g transform="translate(320,80)">
+    <rect width="240" height="160" rx="12" class="lego-2"/>
+    <circle cx="60" cy="20" r="14" class="stud"/>
+    <circle cx="120" cy="20" r="14" class="stud"/>
+    <circle cx="180" cy="20" r="14" class="stud"/>
+    <text class="title" x="20" y="86">2 · Embeddings</text>
+    <text class="sub" x="20" y="118">Coordenadas de significado</text>
+    <text class="sub" x="20" y="138" opacity="0.7">voyage · cohere · openai</text>
+  </g>
+  <!-- 3 Vector DB -->
+  <g transform="translate(600,80)">
+    <rect width="240" height="160" rx="12" class="lego-3"/>
+    <circle cx="60" cy="20" r="14" class="stud"/>
+    <circle cx="120" cy="20" r="14" class="stud"/>
+    <circle cx="180" cy="20" r="14" class="stud"/>
+    <text class="title" x="20" y="86">3 · Vector DB</text>
+    <text class="sub" x="20" y="118">El estante de coordenadas</text>
+    <text class="sub" x="20" y="138" opacity="0.7">pinecone · pgvector · neon</text>
+  </g>
+  <!-- 4 Reranker -->
+  <g transform="translate(880,80)">
+    <rect width="240" height="160" rx="12" class="lego-4"/>
+    <circle cx="60" cy="20" r="14" class="stud"/>
+    <circle cx="120" cy="20" r="14" class="stud"/>
+    <circle cx="180" cy="20" r="14" class="stud"/>
+    <text class="title" x="20" y="86">4 · Reranker</text>
+    <text class="sub" x="20" y="118">Filtro de relevancia</text>
+    <text class="sub" x="20" y="138" opacity="0.7">cohere · voyage · cross-encoder</text>
+  </g>
+  <!-- 5 LLM -->
+  <g transform="translate(1160,80)">
+    <rect width="200" height="160" rx="12" class="lego-5"/>
+    <circle cx="50" cy="20" r="14" class="stud"/>
+    <circle cx="100" cy="20" r="14" class="stud"/>
+    <circle cx="150" cy="20" r="14" class="stud"/>
+    <text class="title" x="20" y="86">5 · LLM</text>
+    <text class="sub" x="20" y="118">El escritor</text>
+    <text class="sub" x="20" y="138" opacity="0.7">claude · gpt · gemini</text>
+  </g>
+  <!-- Arrows -->
+  <g stroke="#6B7280" stroke-width="3" fill="none" marker-end="url(#arr2)">
+    <path d="M 290 160 L 315 160"/>
+    <path d="M 570 160 L 595 160"/>
+    <path d="M 850 160 L 875 160"/>
+    <path d="M 1130 160 L 1155 160"/>
+  </g>
+  <defs>
+    <marker id="arr2" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto">
+      <path d="M0,0 L10,5 L0,10 z" fill="#6B7280"/>
+    </marker>
+  </defs>
+  <!-- Bottom caption -->
+  <text x="700" y="340" text-anchor="middle" font-family="Inter" font-size="18" font-weight="600" fill="#0A1628">
+    Orquestar estas 5 piezas = construir un RAG
+  </text>
+</svg>
+```
+
+Escribir a `/Users/cristianespinal/clase-rags-eafit/assets/diagrams/lego-pieces.svg`.
+
+- [ ] **Step 4: `bibliotecario.svg` — metáfora dominante**
+
+```svg
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 600">
+  <style>
+    .shelf { fill: #C4952A; }
+    .book { stroke: #0A1628; stroke-width: 1.5; }
+    .figure { fill: #0066FF; }
+    .title { font-family: Inter, sans-serif; font-size: 26px; font-weight: 700; fill: #0A1628; }
+    .sub { font-family: Inter, sans-serif; font-size: 18px; fill: #6B7280; }
+  </style>
+  <!-- Bookshelf left -->
+  <g transform="translate(80,80)">
+    <rect x="0" y="0" width="380" height="340" fill="#f5f8fa" stroke="#e8e8e8"/>
+    <rect x="0" y="80" width="380" height="4" class="shelf"/>
+    <rect x="0" y="180" width="380" height="4" class="shelf"/>
+    <rect x="0" y="280" width="380" height="4" class="shelf"/>
+    <!-- books row 1 -->
+    <rect x="20" y="20" width="30" height="60" fill="#0066FF" class="book"/>
+    <rect x="54" y="20" width="30" height="60" fill="#3B82B8" class="book"/>
+    <rect x="88" y="20" width="24" height="60" fill="#C4952A" class="book"/>
+    <rect x="116" y="20" width="30" height="60" fill="#0A1628" class="book"/>
+    <rect x="150" y="20" width="28" height="60" fill="#0066FF" class="book"/>
+    <rect x="182" y="20" width="30" height="60" fill="#3B82B8" class="book"/>
+    <rect x="216" y="20" width="26" height="60" fill="#C4952A" class="book"/>
+    <rect x="246" y="20" width="30" height="60" fill="#0A1628" class="book"/>
+    <rect x="280" y="20" width="28" height="60" fill="#0066FF" class="book"/>
+    <rect x="312" y="20" width="30" height="60" fill="#3B82B8" class="book"/>
+    <!-- row 2 -->
+    <rect x="20" y="120" width="30" height="60" fill="#3B82B8" class="book"/>
+    <rect x="54" y="120" width="28" height="60" fill="#C4952A" class="book"/>
+    <rect x="86" y="120" width="30" height="60" fill="#0A1628" class="book"/>
+    <rect x="120" y="120" width="28" height="60" fill="#0066FF" class="book"/>
+    <rect x="152" y="120" width="30" height="60" fill="#3B82B8" class="book"/>
+    <rect x="186" y="120" width="24" height="60" fill="#C4952A" class="book"/>
+    <rect x="214" y="120" width="30" height="60" fill="#0A1628" class="book"/>
+    <rect x="248" y="120" width="28" height="60" fill="#0066FF" class="book"/>
+    <rect x="280" y="120" width="30" height="60" fill="#3B82B8" class="book"/>
+    <rect x="314" y="120" width="28" height="60" fill="#C4952A" class="book"/>
+    <!-- row 3 -->
+    <rect x="20" y="220" width="28" height="60" fill="#0A1628" class="book"/>
+    <rect x="52" y="220" width="30" height="60" fill="#0066FF" class="book"/>
+    <rect x="86" y="220" width="30" height="60" fill="#3B82B8" class="book"/>
+    <rect x="120" y="220" width="28" height="60" fill="#C4952A" class="book"/>
+    <rect x="152" y="220" width="30" height="60" fill="#0A1628" class="book"/>
+    <rect x="186" y="220" width="30" height="60" fill="#0066FF" class="book"/>
+    <rect x="220" y="220" width="28" height="60" fill="#3B82B8" class="book"/>
+    <rect x="252" y="220" width="30" height="60" fill="#C4952A" class="book"/>
+    <rect x="286" y="220" width="30" height="60" fill="#0A1628" class="book"/>
+    <rect x="320" y="220" width="28" height="60" fill="#0066FF" class="book"/>
+  </g>
+  <!-- Librarian figure center -->
+  <g transform="translate(540,180)">
+    <circle cx="60" cy="40" r="32" class="figure"/>
+    <rect x="30" y="75" width="60" height="90" rx="8" class="figure"/>
+    <rect x="12" y="90" width="20" height="40" rx="4" class="figure"/>
+    <rect x="86" y="90" width="20" height="40" rx="4" class="figure"/>
+  </g>
+  <!-- Typewriter right -->
+  <g transform="translate(720,220)">
+    <rect x="0" y="40" width="280" height="100" rx="12" fill="#0A1628"/>
+    <rect x="20" y="0" width="240" height="50" rx="6" fill="#fff" stroke="#e8e8e8"/>
+    <line x1="40" y1="20" x2="240" y2="20" stroke="#6B7280" stroke-width="2"/>
+    <line x1="40" y1="30" x2="200" y2="30" stroke="#6B7280" stroke-width="2"/>
+    <!-- keys -->
+    <g fill="#C4952A">
+      <circle cx="40" cy="90" r="8"/>
+      <circle cx="70" cy="90" r="8"/>
+      <circle cx="100" cy="90" r="8"/>
+      <circle cx="130" cy="90" r="8"/>
+      <circle cx="160" cy="90" r="8"/>
+      <circle cx="190" cy="90" r="8"/>
+      <circle cx="220" cy="90" r="8"/>
+      <circle cx="250" cy="90" r="8"/>
+      <circle cx="55" cy="115" r="8"/>
+      <circle cx="85" cy="115" r="8"/>
+      <circle cx="115" cy="115" r="8"/>
+      <circle cx="145" cy="115" r="8"/>
+      <circle cx="175" cy="115" r="8"/>
+      <circle cx="205" cy="115" r="8"/>
+      <circle cx="235" cy="115" r="8"/>
+    </g>
+  </g>
+  <!-- Labels -->
+  <text class="title" x="220" y="470" text-anchor="middle">Biblioteca</text>
+  <text class="sub" x="220" y="500" text-anchor="middle">Las fuentes (PDFs, DBs, APIs)</text>
+  <text class="title" x="600" y="470" text-anchor="middle">Bibliotecario</text>
+  <text class="sub" x="600" y="500" text-anchor="middle">Retrieval + reranking</text>
+  <text class="title" x="860" y="470" text-anchor="middle">Máquina de escribir</text>
+  <text class="sub" x="860" y="500" text-anchor="middle">LLM que redacta la respuesta</text>
+</svg>
+```
+
+Escribir a `/Users/cristianespinal/clase-rags-eafit/assets/diagrams/bibliotecario.svg`.
+
+- [ ] **Step 5: `flujo-tribai.svg` — pipeline 6 etapas**
+
+```svg
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1400 500">
+  <style>
+    .stage { fill: #fff; stroke: #0066FF; stroke-width: 2; }
+    .stage-final { fill: #0066FF; }
+    .label { font-family: Inter, sans-serif; font-size: 16px; font-weight: 600; fill: #0A1628; }
+    .label-light { fill: #fff; }
+    .sub { font-family: Inter, sans-serif; font-size: 12px; fill: #6B7280; }
+    .arrow { stroke: #C4952A; stroke-width: 3; fill: none; marker-end: url(#arr3); }
+    .bubble { font-family: 'JetBrains Mono'; font-size: 13px; fill: #C4952A; }
+  </style>
+  <defs>
+    <marker id="arr3" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+      <path d="M0,0 L10,5 L0,10 z" fill="#C4952A"/>
+    </marker>
+  </defs>
+  <!-- Query input -->
+  <g transform="translate(40,220)">
+    <rect x="0" y="0" width="180" height="80" rx="40" class="stage"/>
+    <text class="label" x="90" y="35" text-anchor="middle">Pregunta</text>
+    <text class="sub" x="90" y="55" text-anchor="middle">del usuario</text>
+  </g>
+  <!-- Stage 1: Enhance -->
+  <g transform="translate(260,220)">
+    <rect x="0" y="0" width="160" height="80" rx="8" class="stage"/>
+    <text class="label" x="80" y="32" text-anchor="middle">Entender</text>
+    <text class="sub" x="80" y="52" text-anchor="middle">rewrite · HyDE</text>
+    <text class="sub" x="80" y="68" text-anchor="middle">decompose</text>
+    <text class="bubble" x="80" y="-12" text-anchor="middle">Haiku 4.5</text>
+  </g>
+  <!-- Stage 2: Retrieve -->
+  <g transform="translate(460,220)">
+    <rect x="0" y="0" width="160" height="80" rx="8" class="stage"/>
+    <text class="label" x="80" y="32" text-anchor="middle">Buscar</text>
+    <text class="sub" x="80" y="52" text-anchor="middle">6 namespaces</text>
+    <text class="sub" x="80" y="68" text-anchor="middle">hybrid search</text>
+    <text class="bubble" x="80" y="-12" text-anchor="middle">Pinecone</text>
+  </g>
+  <!-- Stage 3: Rerank -->
+  <g transform="translate(660,220)">
+    <rect x="0" y="0" width="160" height="80" rx="8" class="stage"/>
+    <text class="label" x="80" y="32" text-anchor="middle">Filtrar</text>
+    <text class="sub" x="80" y="52" text-anchor="middle">heurístico +</text>
+    <text class="sub" x="80" y="68" text-anchor="middle">cross-encoder</text>
+    <text class="bubble" x="80" y="-12" text-anchor="middle">Cloud Run</text>
+  </g>
+  <!-- Stage 4: Assemble -->
+  <g transform="translate(860,220)">
+    <rect x="0" y="0" width="160" height="80" rx="8" class="stage"/>
+    <text class="label" x="80" y="32" text-anchor="middle">Armar</text>
+    <text class="sub" x="80" y="52" text-anchor="middle">cuaderno con</text>
+    <text class="sub" x="80" y="68" text-anchor="middle">evidencia</text>
+    <text class="bubble" x="80" y="-12" text-anchor="middle">12K tokens</text>
+  </g>
+  <!-- Stage 5: Generate -->
+  <g transform="translate(1060,220)">
+    <rect x="0" y="0" width="160" height="80" rx="8" class="stage-final"/>
+    <text class="label label-light" x="80" y="32" text-anchor="middle">Redactar</text>
+    <text class="sub" x="80" y="52" text-anchor="middle" fill="#fff" opacity="0.8">streaming +</text>
+    <text class="sub" x="80" y="68" text-anchor="middle" fill="#fff" opacity="0.8">citas</text>
+    <text class="bubble" x="80" y="-12" text-anchor="middle">Sonnet 4.6</text>
+  </g>
+  <!-- Answer output -->
+  <g transform="translate(1260,220)">
+    <rect x="0" y="0" width="120" height="80" rx="40" stroke="#C4952A" stroke-width="3" fill="#fff"/>
+    <text class="label" x="60" y="35" text-anchor="middle" fill="#C4952A">Respuesta</text>
+    <text class="sub" x="60" y="55" text-anchor="middle" fill="#C4952A">con fuentes</text>
+  </g>
+  <!-- Arrows -->
+  <g>
+    <path class="arrow" d="M 225 260 L 255 260"/>
+    <path class="arrow" d="M 425 260 L 455 260"/>
+    <path class="arrow" d="M 625 260 L 655 260"/>
+    <path class="arrow" d="M 825 260 L 855 260"/>
+    <path class="arrow" d="M 1025 260 L 1055 260"/>
+    <path class="arrow" d="M 1225 260 L 1255 260"/>
+  </g>
+  <!-- Title -->
+  <text x="700" y="60" font-family="Inter" font-size="24" font-weight="700" fill="#0A1628" text-anchor="middle">
+    Tribai — flujo lineal de 6 etapas
+  </text>
+  <text x="700" y="90" font-family="Inter" font-size="16" fill="#6B7280" text-anchor="middle">
+    Cada etapa agrega contexto para que el modelo no tenga que inventar
+  </text>
+  <!-- Latency footnote -->
+  <text x="700" y="400" font-family="JetBrains Mono" font-size="14" fill="#C4952A" text-anchor="middle" font-weight="600">
+    ~3 segundos · ~12 APIs por query · 36,000 vectores indexados
+  </text>
+</svg>
+```
+
+Escribir a `/Users/cristianespinal/clase-rags-eafit/assets/diagrams/flujo-tribai.svg`.
+
+- [ ] **Step 6: `flujo-kelsen.svg` — agente + 4 tools**
+
+```svg
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1400 600">
+  <style>
+    .agent { fill: #0A1628; }
+    .tool { fill: #fff; stroke: #C4952A; stroke-width: 2; }
+    .label { font-family: Inter, sans-serif; font-size: 16px; font-weight: 600; fill: #0A1628; }
+    .label-light { fill: #fff; }
+    .sub { font-family: Inter, sans-serif; font-size: 13px; fill: #6B7280; }
+    .arrow { stroke: #0066FF; stroke-width: 2; stroke-dasharray: 6 4; fill: none; marker-end: url(#arr4); }
+  </style>
+  <defs>
+    <marker id="arr4" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto">
+      <path d="M0,0 L10,5 L0,10 z" fill="#0066FF"/>
+    </marker>
+  </defs>
+  <text x="700" y="60" font-family="Inter" font-size="24" font-weight="700" fill="#0A1628" text-anchor="middle">
+    Kelsen — agente autónomo con herramientas
+  </text>
+  <text x="700" y="90" font-family="Inter" font-size="16" fill="#6B7280" text-anchor="middle">
+    El agente decide qué herramienta usar — no sigue un guión fijo
+  </text>
+  <!-- Central agent -->
+  <g transform="translate(570,230)">
+    <rect x="0" y="0" width="260" height="120" rx="16" class="agent"/>
+    <text class="label label-light" x="130" y="50" text-anchor="middle" font-size="22">Agente Kelsen</text>
+    <text class="sub" x="130" y="80" text-anchor="middle" fill="#C4952A" font-weight="600">Claude Sonnet 4.6</text>
+    <text class="sub" x="130" y="100" text-anchor="middle" fill="rgba(255,255,255,0.7)">decide y actúa</text>
+  </g>
+  <!-- Tool 1 -->
+  <g transform="translate(100,100)">
+    <rect x="0" y="0" width="200" height="80" rx="8" class="tool"/>
+    <text class="label" x="100" y="32" text-anchor="middle">🔍 buscar_normas</text>
+    <text class="sub" x="100" y="52" text-anchor="middle">88K normas SUIN</text>
+    <text class="sub" x="100" y="68" text-anchor="middle">hybrid BM25 + vector</text>
+  </g>
+  <!-- Tool 2 -->
+  <g transform="translate(1100,100)">
+    <rect x="0" y="0" width="230" height="80" rx="8" class="tool"/>
+    <text class="label" x="115" y="32" text-anchor="middle">⚖️ buscar_jurisprudencia</text>
+    <text class="sub" x="115" y="52" text-anchor="middle">29K sentencias CC</text>
+    <text class="sub" x="115" y="68" text-anchor="middle">T- · C- · SU-</text>
+  </g>
+  <!-- Tool 3 -->
+  <g transform="translate(100,420)">
+    <rect x="0" y="0" width="220" height="80" rx="8" class="tool"/>
+    <text class="label" x="110" y="32" text-anchor="middle">📄 consultar_articulo</text>
+    <text class="sub" x="110" y="52" text-anchor="middle">Lectura dirigida</text>
+    <text class="sub" x="110" y="68" text-anchor="middle">de un artículo específico</text>
+  </g>
+  <!-- Tool 4 -->
+  <g transform="translate(1100,420)">
+    <rect x="0" y="0" width="220" height="80" rx="8" class="tool"/>
+    <text class="label" x="110" y="32" text-anchor="middle">🔬 investigar_tema</text>
+    <text class="sub" x="110" y="52" text-anchor="middle">Búsqueda multi-paso</text>
+    <text class="sub" x="110" y="68" text-anchor="middle">cross-reference</text>
+  </g>
+  <!-- Arrows -->
+  <g>
+    <path class="arrow" d="M 300 140 Q 430 180 580 240"/>
+    <path class="arrow" d="M 1100 140 Q 970 180 830 240"/>
+    <path class="arrow" d="M 320 440 Q 450 400 580 340"/>
+    <path class="arrow" d="M 1100 440 Q 960 400 830 340"/>
+  </g>
+  <!-- Corpus stat -->
+  <text x="700" y="560" font-family="JetBrains Mono" font-size="14" fill="#C4952A" text-anchor="middle" font-weight="600">
+    1.69M documentos · 2.6M chunks · 22 GB Neon Postgres (pgvector + ParadeDB)
+  </text>
+</svg>
+```
+
+Escribir a `/Users/cristianespinal/clase-rags-eafit/assets/diagrams/flujo-kelsen.svg`.
+
+- [ ] **Step 7: `mapa-apis.svg` — radial con 12 orbitales**
+
+```svg
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 900">
+  <style>
+    .center { fill: #0066FF; }
+    .orbit { fill: none; stroke: #e8e8e8; stroke-width: 1; stroke-dasharray: 3 3; }
+    .api { fill: #fff; stroke: #C4952A; stroke-width: 2; }
+    .api-label { font-family: Inter, sans-serif; font-size: 13px; font-weight: 600; fill: #0A1628; text-anchor: middle; }
+    .api-sub { font-family: Inter, sans-serif; font-size: 10px; fill: #6B7280; text-anchor: middle; }
+    .center-label { font-family: Inter, sans-serif; font-size: 22px; font-weight: 700; fill: #fff; text-anchor: middle; }
+    .ray { stroke: #C4952A; stroke-width: 1; opacity: 0.4; }
+  </style>
+  <!-- center -->
+  <circle cx="600" cy="450" r="100" class="center"/>
+  <text x="600" y="440" class="center-label">Tribai</text>
+  <text x="600" y="465" class="center-label" font-size="14">tu .app</text>
+  <text x="600" y="485" class="api-sub" fill="rgba(255,255,255,0.7)">(la BD es 1 de 12)</text>
+  <!-- orbit circle -->
+  <circle cx="600" cy="450" r="320" class="orbit"/>
+  <!-- 12 APIs en orbital — calculadas a radio=320, ángulos cada 30° -->
+  <!-- 1: Anthropic top -->
+  <g transform="translate(600,130)">
+    <rect x="-80" y="-28" width="160" height="56" rx="8" class="api"/>
+    <text class="api-label" y="-4">Anthropic</text>
+    <text class="api-sub" y="14">Claude Sonnet/Haiku</text>
+  </g>
+  <!-- 2: Voyage 30° -->
+  <g transform="translate(870,290)">
+    <rect x="-70" y="-28" width="140" height="56" rx="8" class="api"/>
+    <text class="api-label" y="-4">Voyage AI</text>
+    <text class="api-sub" y="14">Embeddings</text>
+  </g>
+  <!-- 3: Pinecone 60° -->
+  <g transform="translate(870,610)">
+    <rect x="-70" y="-28" width="140" height="56" rx="8" class="api"/>
+    <text class="api-label" y="-4">Pinecone</text>
+    <text class="api-sub" y="14">Vector DB</text>
+  </g>
+  <!-- 4: Cohere 90° -->
+  <g transform="translate(600,770)">
+    <rect x="-70" y="-28" width="140" height="56" rx="8" class="api"/>
+    <text class="api-label" y="-4">Cohere</text>
+    <text class="api-sub" y="14">Reranker</text>
+  </g>
+  <!-- 5: Vercel Gateway 120° -->
+  <g transform="translate(330,610)">
+    <rect x="-85" y="-28" width="170" height="56" rx="8" class="api"/>
+    <text class="api-label" y="-4">Vercel AI Gateway</text>
+    <text class="api-sub" y="14">Routing · Failover</text>
+  </g>
+  <!-- 6: Vercel hosting 150° -->
+  <g transform="translate(330,290)">
+    <rect x="-75" y="-28" width="150" height="56" rx="8" class="api"/>
+    <text class="api-label" y="-4">Vercel</text>
+    <text class="api-sub" y="14">Hosting · Edge</text>
+  </g>
+  <!-- 7-12 in outer positions -->
+  <g transform="translate(170,450)">
+    <rect x="-70" y="-28" width="140" height="56" rx="8" class="api"/>
+    <text class="api-label" y="-4">Langfuse</text>
+    <text class="api-sub" y="14">Observability</text>
+  </g>
+  <g transform="translate(1030,450)">
+    <rect x="-70" y="-28" width="140" height="56" rx="8" class="api"/>
+    <text class="api-label" y="-4">Clerk</text>
+    <text class="api-sub" y="14">Auth</text>
+  </g>
+  <g transform="translate(480,40)">
+    <rect x="-70" y="-24" width="140" height="48" rx="8" class="api"/>
+    <text class="api-label" y="-2">Stripe</text>
+    <text class="api-sub" y="14">Billing</text>
+  </g>
+  <g transform="translate(720,40)">
+    <rect x="-70" y="-24" width="140" height="48" rx="8" class="api"/>
+    <text class="api-label" y="-2">Upstash Redis</text>
+    <text class="api-sub" y="14">Cache · Rate-limit</text>
+  </g>
+  <g transform="translate(480,860)">
+    <rect x="-70" y="-24" width="140" height="48" rx="8" class="api"/>
+    <text class="api-label" y="-2">Supabase</text>
+    <text class="api-sub" y="14">Grafo normograma</text>
+  </g>
+  <g transform="translate(720,860)">
+    <rect x="-70" y="-24" width="140" height="48" rx="8" class="api"/>
+    <text class="api-label" y="-2">Cloud Run</text>
+    <text class="api-sub" y="14">ML reranker</text>
+  </g>
+  <!-- rays from center -->
+  <g>
+    <line class="ray" x1="600" y1="350" x2="600" y2="160"/>
+    <line class="ray" x1="685" y1="399" x2="830" y2="313"/>
+    <line class="ray" x1="685" y1="500" x2="830" y2="587"/>
+    <line class="ray" x1="600" y1="549" x2="600" y2="742"/>
+    <line class="ray" x1="515" y1="500" x2="370" y2="587"/>
+    <line class="ray" x1="515" y1="399" x2="370" y2="313"/>
+    <line class="ray" x1="500" y1="450" x2="240" y2="450"/>
+    <line class="ray" x1="700" y1="450" x2="960" y2="450"/>
+  </g>
+  <!-- Footer -->
+  <text x="600" y="890" font-family="Inter" font-size="14" fill="#6B7280" text-anchor="middle" font-style="italic">
+    La base de datos es 1 de 12 · Orquestar todas es la ingeniería
+  </text>
+</svg>
+```
+
+Escribir a `/Users/cristianespinal/clase-rags-eafit/assets/diagrams/mapa-apis.svg`.
+
+- [ ] **Step 8: Verificar todos los SVGs en navegador**
+
+Run:
+```bash
+ls /Users/cristianespinal/clase-rags-eafit/assets/diagrams/
+```
+Expected: 7 archivos `.svg`.
+
+Abrir cada uno en navegador (http://localhost:3000/assets/diagrams/<nombre>.svg) y verificar que renderiza sin errores XML.
+
+- [ ] **Step 9: Commit**
+
+```bash
+cd /Users/cristianespinal/clase-rags-eafit
+git add assets/diagrams/
+git -c commit.gpgsign=false commit -m "assets: 7 diagramas SVG de la clase"
+git push origin main
+```
+
+---
+
+### Task 4: §0 Cold open (2 slides)
+
+**Files:**
+- Create: `/Users/cristianespinal/clase-rags-eafit/slides/00-cold-open.html`
+
+- [ ] **Step 1: Escribir la portada + slide de demo**
+
+```html
+<section class="cover" data-state="cover">
+  <div style="height: 100%; display: flex; flex-direction: column; justify-content: center;">
+    <div class="eyebrow">EAFIT · ingeniería de datos · 20 abril 2026</div>
+    <h1 style="font-size: 5rem; margin-top: 1.5rem; margin-bottom: 1rem;">
+      RAG en producción
+    </h1>
+    <h2 style="font-size: 2rem; font-weight: 400; opacity: 0.8; margin-bottom: 3rem;">
+      Un paseo por dos sistemas reales: Tribai + Kelsen
+    </h2>
+    <div style="display: flex; gap: 2rem; align-items: center; font-size: 1.25rem;">
+      <div>
+        <div style="opacity: 0.6; font-size: 0.875rem; text-transform: uppercase; letter-spacing: 0.08em;">Invitado</div>
+        <div style="margin-top: 0.25rem; font-weight: 600;">Cristián Espinal</div>
+      </div>
+      <div style="width: 1px; height: 50px; background: rgba(255,255,255,0.3);"></div>
+      <div>
+        <div style="opacity: 0.6; font-size: 0.875rem; text-transform: uppercase; letter-spacing: 0.08em;">Anfitrión</div>
+        <div style="margin-top: 0.25rem; font-weight: 600;">Santiago Jiménez Londoño</div>
+      </div>
+    </div>
+  </div>
+  <div class="slide-footer">1 / 44</div>
+  <aside class="notes">
+    Saludo corto. "Hoy vamos a ver RAG desde dos ángulos: qué es, y cómo construir uno.
+    Vamos a empezar haciéndole una pregunta difícil a una IA real. Ojo a cómo responde."
+  </aside>
+</section>
+
+<section>
+  <div class="eyebrow">Demo #1 · en vivo · tributario</div>
+  <h2 style="margin-bottom: 1.5rem;">Pregunta real de un contador</h2>
+  <div class="card" style="background: #f5f8fa; border-left: 4px solid var(--tribai-blue); padding: 1.5rem; max-width: 1100px;">
+    <p style="font-size: 1.5rem; line-height: 1.4; font-style: italic; color: var(--fg);">
+      "Una empresa colombiana paga honorarios a un ingeniero residente en España por un diseño mecánico.
+      ¿Qué retención en la fuente aplica y qué artículos del ET la soportan?"
+    </p>
+  </div>
+  <div style="margin-top: 2rem;">
+    <span class="demo-label">EN VIVO · tribai.co/asistente</span>
+  </div>
+  <p style="margin-top: 2rem; color: var(--fg-muted); font-size: 1.125rem;">
+    → ChatGPT sin contexto esto lo inventa.<br/>
+    → Google no sabe qué es "residente".<br/>
+    → Veamos qué hace Tribai.
+  </p>
+  <div class="slide-footer">2 / 44</div>
+  <aside class="notes">
+    Abrir tribai.co/asistente en otra pestaña. Copiar-pegar la query desde demo-script.md.
+    Mientras carga, decir: "fíjense en dos cosas: la respuesta y las fuentes que cita".
+    Si falla red: botón "▶ ver sin red" (video backup).
+    Cliffhanger: "¿cómo hizo eso? Vamos a desmontarlo en 90 minutos, sin código."
+  </aside>
+</section>
+```
+
+Escribir a `/Users/cristianespinal/clase-rags-eafit/slides/00-cold-open.html`.
+
+- [ ] **Step 2: Verificar render**
+
+Abrir http://localhost:3000/ — debe cargar y mostrar la portada. Navegar con flecha derecha al slide 2.
+
+- [ ] **Step 3: Commit**
+
+```bash
+cd /Users/cristianespinal/clase-rags-eafit
+git add slides/00-cold-open.html
+git -c commit.gpgsign=false commit -m "feat(§0): cold open — portada + demo tributario"
+git push origin main
+```
+
+---
+
+### Task 5: §1 Paradigma (4 slides)
+
+**Files:**
+- Create: `/Users/cristianespinal/clase-rags-eafit/slides/01-paradigma.html`
+
+- [ ] **Step 1: Escribir 4 slides**
+
+```html
+<section>
+  <div class="eyebrow">§1 · El cambio de paradigma</div>
+  <h2>Lo que les enseñan en el curso</h2>
+  <div style="display: flex; gap: 3rem; align-items: center; margin-top: 2rem;">
+    <div style="flex: 1;">
+      <pre style="font-size: 1.125rem;"><code>-- la app consulta la BD
+SELECT articulo, texto
+FROM estatuto_tributario
+WHERE texto ILIKE '%retención%'
+  AND estado = 'vigente'
+ORDER BY articulo;</code></pre>
+    </div>
+    <div style="flex: 1;">
+      <p style="font-size: 1.375rem; line-height: 1.5;">
+        <strong>La app conversa con la base de datos.</strong><br/>
+        La BD retorna filas. La app las muestra.
+      </p>
+      <p style="color: var(--fg-muted); margin-top: 1.5rem;">
+        Funciona muy bien si la pregunta es literal.<br/>
+        ¿Qué pasa si no lo es?
+      </p>
+    </div>
+  </div>
+  <div class="slide-footer">3 / 44</div>
+  <aside class="notes">
+    Reconocer lo que ya saben. Validar que ese paradigma es sólido — no lo estamos tirando.
+    Pero hay preguntas que no se responden así.
+  </aside>
+</section>
+
+<section>
+  <div class="eyebrow">§1 · el cambio</div>
+  <h2>Lo que hace una app moderna</h2>
+  <div style="margin-top: 2rem; font-size: 1.5rem; line-height: 1.6;">
+    <p><strong>La app conversa con la persona</strong>, consultando <strong>muchas fuentes</strong> a la vez.</p>
+    <ul style="margin-top: 1.5rem; list-style: none; padding-left: 0;">
+      <li style="margin-bottom: 0.75rem;"><span style="color: var(--tribai-gold); font-weight: 700;">→</span> No una tabla, sino decenas</li>
+      <li style="margin-bottom: 0.75rem;"><span style="color: var(--tribai-gold); font-weight: 700;">→</span> No coincidencia literal, sino significado</li>
+      <li style="margin-bottom: 0.75rem;"><span style="color: var(--tribai-gold); font-weight: 700;">→</span> No filas, sino una respuesta redactada con citas</li>
+    </ul>
+  </div>
+  <div class="slide-footer">4 / 44</div>
+  <aside class="notes">
+    Aquí es donde queremos hacerles click: la forma de la ingeniería cambió.
+    Ya no es "query → filas → UI". Es "pregunta → orquestación → respuesta conversacional".
+  </aside>
+</section>
+
+<section class="muted">
+  <div class="eyebrow">§1 · el insight</div>
+  <h2 style="max-width: 1100px;">El problema ya no es <em style="color: var(--tribai-blue);">cómo responder</em></h2>
+  <h2 style="max-width: 1100px; margin-top: 0.5rem;">Es <em style="color: var(--tribai-gold);">qué darle de contexto</em></h2>
+  <p style="margin-top: 3rem; font-size: 1.25rem; color: var(--fg-body); max-width: 900px;">
+    Los modelos de lenguaje ya saben escribir bien. El trabajo del ingeniero pasó de "cómo genero texto" a
+    <strong>"cómo le paso exactamente los datos correctos para que no invente"</strong>.
+  </p>
+  <div class="slide-footer">5 / 44</div>
+  <aside class="notes">
+    Punto conceptual importante. Los LLMs son capaces pero no omniscientes.
+    La ingeniería ahora es de contexto — curar, buscar, filtrar, pasar los datos correctos.
+  </aside>
+</section>
+
+<section class="navy">
+  <div style="display: flex; align-items: center; justify-content: center; height: 100%;">
+    <div style="max-width: 1000px; text-align: center;">
+      <p class="pull-quote">
+        RAG = darle a la IA un cuaderno abierto<br/>
+        en vez de que invente de memoria.
+      </p>
+      <p style="margin-top: 2rem; color: var(--tribai-gold); font-family: var(--font-mono); font-size: 1rem; letter-spacing: 0.08em;">
+        RETRIEVAL-AUGMENTED GENERATION
+      </p>
+    </div>
+  </div>
+  <div class="slide-footer">6 / 44</div>
+  <aside class="notes">
+    Pausa. Que el concepto se asiente. Mirar al público. "Esa frase es la clase entera".
+  </aside>
+</section>
+```
+
+Escribir a `/Users/cristianespinal/clase-rags-eafit/slides/01-paradigma.html`.
+
+- [ ] **Step 2: Verificar render**
+
+Refrescar navegador, navegar del slide 3 al 6, confirmar layout.
+
+- [ ] **Step 3: Commit**
+
+```bash
+cd /Users/cristianespinal/clase-rags-eafit
+git add slides/01-paradigma.html
+git -c commit.gpgsign=false commit -m "feat(§1): paradigma — del SQL al cuaderno abierto"
+git push origin main
+```
+
+---
+
+### Task 6: §2 Galería de capacidades (7 slides)
+
+**Files:**
+- Create: `/Users/cristianespinal/clase-rags-eafit/slides/02-galeria.html`
+
+- [ ] **Step 1: Escribir slides de galería**
+
+```html
+<section>
+  <div class="eyebrow">§2 · qué puede hacer un RAG</div>
+  <h2>7 ejemplos reales — busquen el suyo</h2>
+  <p style="margin-top: 1rem; color: var(--fg-body); font-size: 1.25rem;">
+    Regla: cualquier dominio con <strong>mucho texto + preguntas humanas</strong> es candidato.
+  </p>
+  <div class="grid-3" style="margin-top: 2rem;">
+    <div class="card">
+      <div class="badge-gold" style="margin-bottom: 0.75rem;">TRIBUTARIO</div>
+      <h3>Tribai</h3>
+      <p style="color: var(--fg-muted); font-size: 0.95rem;">4 horas de búsqueda manual → 10 segundos con citas al ET</p>
+    </div>
+    <div class="card">
+      <div class="badge-gold" style="margin-bottom: 0.75rem;">LEGAL</div>
+      <h3>Kelsen</h3>
+      <p style="color: var(--fg-muted); font-size: 0.95rem;">1.7M documentos colombianos recorridos en ~3 segundos</p>
+    </div>
+    <div class="card">
+      <div class="badge-gold" style="margin-bottom: 0.75rem;">SOPORTE</div>
+      <h3>Intercom / Zendesk AI</h3>
+      <p style="color: var(--fg-muted); font-size: 0.95rem;">La documentación de la empresa como fuente, 24/7</p>
+    </div>
+  </div>
+  <div class="slide-footer">7 / 44</div>
+  <aside class="notes">
+    Intro a la galería. Vamos a ver 7 en total en dos slides.
+    La idea: cualquier dominio con mucho texto es candidato.
+  </aside>
+</section>
+
+<section>
+  <div class="eyebrow">§2 · galería</div>
+  <h2>Casos por dominio</h2>
+  <div class="grid-4" style="margin-top: 2rem;">
+    <div class="card">
+      <div class="badge-gold" style="margin-bottom: 0.75rem;">M&A</div>
+      <h3 style="font-size: 1.1rem;">Due diligence</h3>
+      <p style="color: var(--fg-muted); font-size: 0.9rem;">80 h → 2 h revisando contratos</p>
+    </div>
+    <div class="card">
+      <div class="badge-gold" style="margin-bottom: 0.75rem;">SALUD</div>
+      <h3 style="font-size: 1.1rem;">Protocolos clínicos</h3>
+      <p style="color: var(--fg-muted); font-size: 0.9rem;">Literatura médica + historia del paciente</p>
+    </div>
+    <div class="card">
+      <div class="badge-gold" style="margin-bottom: 0.75rem;">RRHH</div>
+      <h3 style="font-size: 1.1rem;">Onboarding corporativo</h3>
+      <p style="color: var(--fg-muted); font-size: 0.9rem;">La wiki interna viva y conversacional</p>
+    </div>
+    <div class="card">
+      <div class="badge-gold" style="margin-bottom: 0.75rem;">RETAIL</div>
+      <h3 style="font-size: 1.1rem;">E-commerce</h3>
+      <p style="color: var(--fg-muted); font-size: 0.9rem;">Búsqueda conversacional de catálogos</p>
+    </div>
+  </div>
+  <div class="slide-footer">8 / 44</div>
+  <aside class="notes">
+    Seguir el tour. Cada uno representa una oportunidad de mercado real.
+  </aside>
+</section>
+
+<section>
+  <div class="eyebrow">§2 · foto real #1</div>
+  <h2>Tribai — tributario</h2>
+  <div style="display: flex; gap: 2rem; margin-top: 1.5rem;">
+    <div style="flex: 1;">
+      <img src="assets/screenshots/tribai-asistente.png" alt="Tribai asistente"
+           style="width: 100%; border-radius: var(--radius-md); border: 1px solid var(--border);"
+           onerror="this.style.display='none'; this.nextElementSibling.style.display='block';" />
+      <div style="display: none; padding: 3rem; background: var(--bg-muted-section); border-radius: var(--radius-md); text-align: center;">
+        <div class="badge-gold" style="margin-bottom: 1rem;">SCREENSHOT</div>
+        <p>tribai.co/asistente</p>
+      </div>
+    </div>
+    <div style="flex: 1;">
+      <h3>Lo que hace</h3>
+      <ul style="font-size: 1.125rem; line-height: 1.6;">
+        <li>Indexa los 1,301 artículos del Estatuto Tributario</li>
+        <li>+ 15K conceptos DIAN</li>
+        <li>+ 175 sentencias Corte Constitucional</li>
+        <li>+ DUR 1625, resoluciones, leyes</li>
+      </ul>
+      <p style="margin-top: 1.5rem;">
+        <span class="stat">36,000 vectores · 6 namespaces</span>
+      </p>
+    </div>
+  </div>
+  <div class="slide-footer">9 / 44</div>
+  <aside class="notes">
+    Aquí muestro el producto de verdad. Si hay tiempo y la red colabora, volver a tribai.co.
+  </aside>
+</section>
+
+<section>
+  <div class="eyebrow">§2 · foto real #2</div>
+  <h2>Kelsen — legal</h2>
+  <div style="display: flex; gap: 2rem; margin-top: 1.5rem;">
+    <div style="flex: 1;">
+      <img src="assets/screenshots/kelsen-chat.png" alt="Kelsen chat"
+           style="width: 100%; border-radius: var(--radius-md); border: 1px solid var(--border);"
+           onerror="this.style.display='none'; this.nextElementSibling.style.display='block';" />
+      <div style="display: none; padding: 3rem; background: var(--bg-muted-section); border-radius: var(--radius-md); text-align: center;">
+        <div class="badge-gold" style="margin-bottom: 1rem;">SCREENSHOT</div>
+        <p>kelsen-psi.vercel.app</p>
+      </div>
+    </div>
+    <div style="flex: 1;">
+      <h3>Escala del corpus colombiano</h3>
+      <ul style="font-size: 1.125rem; line-height: 1.6;">
+        <li><span class="stat">1,690,083</span> documentos</li>
+        <li><span class="stat">2,601,419</span> chunks vectorizados</li>
+        <li><span class="stat">22 GB</span> en Neon Postgres</li>
+        <li>SUIN + Corte Constitucional + CE SAMAI + DIAN + más</li>
+      </ul>
+      <p style="margin-top: 1rem; color: var(--fg-muted);">
+        Para los 410K abogados de Colombia.
+      </p>
+    </div>
+  </div>
+  <div class="slide-footer">10 / 44</div>
+  <aside class="notes">
+    Tamaño y ambición. Harvey.ai hace esto para USA, nosotros para Colombia.
+  </aside>
+</section>
+
+<section class="muted">
+  <div class="eyebrow">§2 · patrón común</div>
+  <h2>Todos tienen la misma forma</h2>
+  <div class="grid-3" style="margin-top: 2rem; align-items: stretch;">
+    <div class="card" style="border-top: 3px solid var(--tribai-blue);">
+      <h3>📚 Mucho texto</h3>
+      <p style="color: var(--fg-muted);">Documentos, PDFs, APIs con contenido largo</p>
+    </div>
+    <div class="card" style="border-top: 3px solid var(--tribai-gold);">
+      <h3>❓ Preguntas humanas</h3>
+      <p style="color: var(--fg-muted);">Ambiguas, contextuales, cambiantes</p>
+    </div>
+    <div class="card" style="border-top: 3px solid var(--tribai-light-blue);">
+      <h3>⚖️ Respuestas verificables</h3>
+      <p style="color: var(--fg-muted);">El usuario necesita saber de dónde salió</p>
+    </div>
+  </div>
+  <div class="slide-footer">11 / 44</div>
+  <aside class="notes">
+    La receta se repite. Reconocer el patrón es 80% del trabajo de escoger qué construir.
+  </aside>
+</section>
+
+<section>
+  <div class="eyebrow">§2 · ejercicio</div>
+  <h2>Piensen en su dominio</h2>
+  <div style="margin-top: 2rem; font-size: 1.375rem; line-height: 1.6;">
+    <p>Por 30 segundos, cada uno en su cabeza:</p>
+    <ul style="margin-top: 1.5rem;">
+      <li>¿En qué industria les interesaría trabajar?</li>
+      <li>¿Qué documentos largos existen allí?</li>
+      <li>¿Qué pregunta frustrante tendría un profesional de ese campo?</li>
+    </ul>
+    <p style="margin-top: 2rem; color: var(--tribai-gold); font-weight: 600;">
+      Ese es un RAG posible. Guarden la idea — volveremos a ella al final.
+    </p>
+  </div>
+  <div class="slide-footer">12 / 44</div>
+  <aside class="notes">
+    Micro-ejercicio. No respuesta pública. Solo que piensen. Los activa.
+    30 segundos reales, cronometrados.
+  </aside>
+</section>
+
+<section class="navy">
+  <div style="text-align: center; height: 100%; display: flex; flex-direction: column; justify-content: center;">
+    <p class="pull-quote">
+      Cualquier dominio con mucho texto<br/>
+      + preguntas humanas<br/>
+      <span style="color: var(--tribai-gold);">= oportunidad de RAG</span>
+    </p>
+  </div>
+  <div class="slide-footer">13 / 44</div>
+  <aside class="notes">
+    Fin del §2. Transición al §3: "ok, ya vieron qué HACE. Ahora cómo ESTÁ HECHO."
+  </aside>
+</section>
+```
+
+Escribir a `/Users/cristianespinal/clase-rags-eafit/slides/02-galeria.html`.
+
+- [ ] **Step 2: Crear screenshots placeholder**
+
+```bash
+cd /Users/cristianespinal/clase-rags-eafit
+mkdir -p assets/screenshots
+# Placeholder vacío; se reemplazan en Task 15 antes de la clase
+touch assets/screenshots/tribai-asistente.png
+touch assets/screenshots/kelsen-chat.png
+```
+
+- [ ] **Step 3: Commit**
+
+```bash
+cd /Users/cristianespinal/clase-rags-eafit
+git add slides/02-galeria.html assets/screenshots/
+git -c commit.gpgsign=false commit -m "feat(§2): galería de 7 capacidades de RAG"
+git push origin main
+```
+
+---
+
+### Task 7: §3 Lego (8 slides)
+
+**Files:**
+- Create: `/Users/cristianespinal/clase-rags-eafit/slides/03-lego.html`
+
+- [ ] **Step 1: Escribir 8 slides de las piezas Lego**
+
+```html
+<section class="muted">
+  <div class="eyebrow">§3 · las piezas</div>
+  <h2>Imaginen un bibliotecario con máquina de escribir</h2>
+  <img src="assets/diagrams/bibliotecario.svg" alt="Bibliotecario" style="width: 100%; max-width: 1100px; margin-top: 1.5rem;" />
+  <div class="slide-footer">14 / 44</div>
+  <aside class="notes">
+    La metáfora dominante de la clase. Volvemos a ella en los siguientes 7 slides.
+    Biblioteca = fuentes. Bibliotecario = retrieval + reranking. Máquina = LLM.
+  </aside>
+</section>
+
+<section>
+  <div class="eyebrow">§3 · pieza 1 de 5</div>
+  <h2>1 · Las fuentes = los libros</h2>
+  <div style="display: flex; gap: 3rem; margin-top: 2rem;">
+    <div style="flex: 1;">
+      <p style="font-size: 1.25rem; line-height: 1.6;">
+        Todo texto del que el sistema puede aprender.
+      </p>
+      <ul style="margin-top: 1.5rem; font-size: 1.125rem; line-height: 1.6;">
+        <li>PDFs escaneados (Docling, LlamaParse)</li>
+        <li>Páginas web (scrapers)</li>
+        <li>Bases de datos relacionales</li>
+        <li>APIs externas (SUIN, datos.gov.co)</li>
+        <li>Archivos Markdown, CSVs, JSONs</li>
+      </ul>
+    </div>
+    <div style="flex: 1;">
+      <div class="card" style="background: var(--tribai-navy); color: white;">
+        <div class="badge-gold" style="margin-bottom: 1rem;">En Tribai</div>
+        <ul style="color: rgba(255,255,255,0.9); font-size: 1rem;">
+          <li>1,294 artículos del ET (estatuto.co)</li>
+          <li>15,495 conceptos DIAN</li>
+          <li>175 sentencias Corte Constitucional</li>
+          <li>DUR 1625/2016 — 2,793 artículos</li>
+          <li>626 resoluciones DIAN</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+  <div class="slide-footer">15 / 44</div>
+  <aside class="notes">
+    La calidad de las fuentes DETERMINA la calidad del RAG.
+    "Garbage in, garbage out" nunca fue más literal.
+  </aside>
+</section>
+
+<section>
+  <div class="eyebrow">§3 · pieza 2 de 5</div>
+  <h2>2 · Embeddings = coordenadas de significado</h2>
+  <div style="display: flex; gap: 2rem; margin-top: 1.5rem;">
+    <div style="flex: 1;">
+      <p style="font-size: 1.25rem; line-height: 1.6;">
+        Un embedding es una lista de números. <br/>Palabras parecidas producen números parecidos.
+      </p>
+      <p style="margin-top: 1rem; color: var(--fg-muted);">
+        No es magia — es geometría. Cada texto se convierte en un punto en un espacio de ~1000 dimensiones.
+      </p>
+      <div class="card" style="margin-top: 1.5rem; background: var(--bg-muted-section);">
+        <code style="font-size: 0.95rem; line-height: 1.6; display: block;">
+          "trabajador extranjero"<br/>
+          → [0.12, -0.34, 0.88, ..., 0.07] (1024 números)
+        </code>
+      </div>
+    </div>
+    <div style="flex: 1;">
+      <img src="assets/diagrams/sql-vs-semantic.svg" alt="SQL vs semantic" style="width: 100%;" />
+    </div>
+  </div>
+  <div class="slide-footer">16 / 44</div>
+  <aside class="notes">
+    Este es el momento "aha". Sin matemática: solo "cada frase es un punto; cosas parecidas están cerca".
+    El demo #2 viene enseguida — prepararlo mental.
+  </aside>
+</section>
+
+<section class="muted">
+  <div class="eyebrow">Demo #2 · en vivo</div>
+  <h2>¿"trabajador extranjero" y "residente no colombiano" son parecidos?</h2>
+  <div style="margin-top: 1.5rem;">
+    <span class="demo-label">EN VIVO · localhost:3001</span>
+  </div>
+  <div class="card" style="background: #f5f8fa; padding: 2rem; margin-top: 1.5rem; max-width: 900px;">
+    <p style="font-size: 1.25rem; margin-bottom: 1rem; color: var(--fg-muted);">
+      Input 1: <strong style="color: var(--fg);">trabajador extranjero</strong>
+    </p>
+    <p style="font-size: 1.25rem; margin-bottom: 1.5rem; color: var(--fg-muted);">
+      Input 2: <strong style="color: var(--fg);">residente no colombiano</strong>
+    </p>
+    <div style="display: flex; align-items: center; gap: 1rem;">
+      <div style="flex: 1; height: 8px; background: var(--border); border-radius: 4px; position: relative;">
+        <div style="width: 87%; height: 100%; background: linear-gradient(to right, #3B82B8, #C4952A); border-radius: 4px;"></div>
+      </div>
+      <span class="stat" style="font-size: 1.75rem;">0.87</span>
+    </div>
+    <p style="margin-top: 1rem; color: var(--fg-muted); font-size: 0.95rem;">
+      PostgreSQL con LIKE diría que no tienen nada que ver.<br/>
+      El embedding entiende que significan casi lo mismo.
+    </p>
+  </div>
+  <div class="slide-footer">17 / 44</div>
+  <aside class="notes">
+    Voy a localhost:3001 y escribo las dos frases.
+    Backup: este slide ya tiene los números pre-calculados.
+    Insight: "esto no lo hace SQL. No lo hace ningún índice tradicional."
+  </aside>
+</section>
+
+<section>
+  <div class="eyebrow">§3 · pieza 3 de 5</div>
+  <h2>3 · Vector DB = el estante de coordenadas</h2>
+  <div style="display: flex; gap: 3rem; margin-top: 2rem;">
+    <div style="flex: 1;">
+      <p style="font-size: 1.25rem; line-height: 1.6;">
+        Donde guardamos millones de embeddings y buscamos los más cercanos rápido.
+      </p>
+      <p style="margin-top: 1.5rem; color: var(--fg-muted);">
+        No es una BD tradicional. Usa <strong>HNSW</strong> o <strong>IVF</strong>: estructuras optimizadas para "dame los 100 puntos más cercanos a este" en milisegundos sobre millones.
+      </p>
+    </div>
+    <div style="flex: 1;">
+      <div class="card">
+        <h3>Opciones populares</h3>
+        <table style="width: 100%; margin-top: 1rem; font-size: 1rem;">
+          <tr style="border-bottom: 1px solid var(--border);"><td style="padding: 0.5rem 0;"><strong>Pinecone</strong></td><td>SaaS, free tier</td></tr>
+          <tr style="border-bottom: 1px solid var(--border);"><td style="padding: 0.5rem 0;"><strong>pgvector</strong></td><td>Postgres extension</td></tr>
+          <tr style="border-bottom: 1px solid var(--border);"><td style="padding: 0.5rem 0;"><strong>Neon</strong></td><td>Postgres serverless</td></tr>
+          <tr style="border-bottom: 1px solid var(--border);"><td style="padding: 0.5rem 0;"><strong>Supabase</strong></td><td>Postgres + auth</td></tr>
+          <tr><td style="padding: 0.5rem 0;"><strong>LanceDB</strong></td><td>Embedded, rápido</td></tr>
+        </table>
+      </div>
+      <p style="margin-top: 1rem; font-size: 0.95rem; color: var(--fg-muted);">
+        Tribai usa Pinecone. Kelsen usa Neon (pgvector + ParadeDB).
+      </p>
+    </div>
+  </div>
+  <div class="slide-footer">18 / 44</div>
+  <aside class="notes">
+    La decisión "Pinecone vs pgvector" es arquitectural, no técnica.
+    Pinecone: SaaS, rápido de arrancar.
+    pgvector: control total, mismo Postgres que la app.
+    Ambas son válidas — Tribai y Kelsen eligieron distinto.
+  </aside>
+</section>
+
+<section>
+  <div class="eyebrow">§3 · pieza 4 de 5</div>
+  <h2>4 · Reranker = el segundo filtro</h2>
+  <div style="display: flex; gap: 3rem; margin-top: 2rem;">
+    <div style="flex: 1;">
+      <p style="font-size: 1.25rem; line-height: 1.6;">
+        El vector DB te da 50 candidatos en 10 ms. El reranker escoge los 5-10 mejores con un modelo más pesado (pero más preciso).
+      </p>
+      <ul style="margin-top: 1.5rem; font-size: 1.125rem;">
+        <li>Cohere Rerank 3.5 / 4.0</li>
+        <li>Voyage Reranker</li>
+        <li>Cross-encoder open source (mDeBERTa)</li>
+      </ul>
+    </div>
+    <div style="flex: 1;">
+      <div class="card" style="background: var(--tribai-navy); color: white;">
+        <div class="badge-gold" style="margin-bottom: 1rem;">Analogía</div>
+        <p style="color: rgba(255,255,255,0.9); line-height: 1.6;">
+          El bibliotecario baja 20 libros del estante (retrieval rápido).<br/><br/>
+          Los ojea uno por uno y te entrega los 3 que mejor responden tu pregunta (rerank preciso).
+        </p>
+      </div>
+    </div>
+  </div>
+  <div class="slide-footer">19 / 44</div>
+  <aside class="notes">
+    Sin reranker el retrieval es ruidoso — salen 20 resultados similares pero solo 5 son realmente relevantes.
+    Stanford midió: +33-40% accuracy con reranker, costa 120ms extra.
+  </aside>
+</section>
+
+<section>
+  <div class="eyebrow">§3 · pieza 5 de 5</div>
+  <h2>5 · LLM = el escritor</h2>
+  <div style="display: flex; gap: 3rem; margin-top: 2rem;">
+    <div style="flex: 1;">
+      <p style="font-size: 1.25rem; line-height: 1.6;">
+        Recibe tu pregunta + los 5 fragmentos seleccionados + instrucciones.<br/>Redacta la respuesta citando las fuentes.
+      </p>
+      <p style="margin-top: 1.5rem; color: var(--fg-muted);">
+        No inventa. No "recuerda de entrenamiento". Solo <strong>reorganiza</strong> lo que le pasaste.
+      </p>
+    </div>
+    <div style="flex: 1;">
+      <div class="card">
+        <h3>Qué usan Tribai y Kelsen</h3>
+        <ul style="margin-top: 1rem; font-size: 1.0625rem; line-height: 1.6;">
+          <li><strong>Claude Sonnet 4.6</strong> — generación principal</li>
+          <li><strong>Claude Haiku 4.5</strong> — routing/barato</li>
+          <li><strong>Gemini 2.5 Flash</strong> — fallback bulk</li>
+        </ul>
+        <p style="margin-top: 1rem; color: var(--fg-muted); font-size: 0.95rem;">
+          El modelo correcto para cada tarea, no el más caro para todo.
+        </p>
+      </div>
+    </div>
+  </div>
+  <div class="slide-footer">20 / 44</div>
+  <aside class="notes">
+    Romper el mito: el LLM no "sabe" tributario. Nosotros se lo pasamos.
+    Por eso se llama RAG — Retrieval-Augmented Generation.
+  </aside>
+</section>
+
+<section class="muted">
+  <div class="eyebrow">§3 · síntesis</div>
+  <h2>Las 5 piezas juntas</h2>
+  <img src="assets/diagrams/lego-pieces.svg" alt="5 piezas Lego" style="width: 100%; max-width: 1300px; margin-top: 1rem;" />
+  <p style="margin-top: 1.5rem; font-size: 1.25rem; text-align: center; color: var(--fg-body);">
+    <strong>Orquestar estas 5 piezas = construir un RAG.</strong><br/>
+    <span style="color: var(--fg-muted);">El cómo las conectas es donde está la creatividad.</span>
+  </p>
+  <div class="slide-footer">21 / 44</div>
+  <aside class="notes">
+    Cierre de §3. Transición: "ahora miremos el flujo real — cómo las conectó Tribai, cómo las conectó Kelsen".
+  </aside>
+</section>
+```
+
+Escribir a `/Users/cristianespinal/clase-rags-eafit/slides/03-lego.html`.
+
+- [ ] **Step 2: Verificar render, navegar slides 14-21**
+
+- [ ] **Step 3: Commit**
+
+```bash
+cd /Users/cristianespinal/clase-rags-eafit
+git add slides/03-lego.html
+git -c commit.gpgsign=false commit -m "feat(§3): las 5 piezas Lego del RAG"
+git push origin main
+```
+
+---
+
+### Task 8: §4 Flujo (6 slides)
+
+**Files:**
+- Create: `/Users/cristianespinal/clase-rags-eafit/slides/04-flujo.html`
+
+- [ ] **Step 1: Escribir slides de flujos Tribai + Kelsen**
+
+```html
+<section>
+  <div class="eyebrow">§4 · flujo real</div>
+  <h2>Tribai — pipeline lineal</h2>
+  <img src="assets/diagrams/flujo-tribai.svg" alt="Flujo Tribai" style="width: 100%; max-width: 1300px; margin-top: 1rem;" />
+  <div class="slide-footer">22 / 44</div>
+  <aside class="notes">
+    Cada caja es una capa que agrega valor. No todas son LLM — solo dos lo son.
+    Resto: código imperativo, cache, filtros.
+  </aside>
+</section>
+
+<section class="muted">
+  <div class="eyebrow">Demo #3 · en vivo</div>
+  <h2>Autopsia — volvamos al cold open</h2>
+  <div style="margin-top: 1rem;">
+    <span class="demo-label">EN VIVO · tribai.co/asistente</span>
+  </div>
+  <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 2rem; margin-top: 1.5rem;">
+    <div>
+      <iframe src="about:blank" class="demo-frame" data-src="https://tribai.co/asistente"
+              title="Tribai asistente" style="background: white;"></iframe>
+    </div>
+    <div>
+      <h3>Qué voy a mostrar</h3>
+      <ol style="font-size: 1rem; line-height: 1.6;">
+        <li>Misma query del cold open</li>
+        <li>Panel de evidencia abierto</li>
+        <li>Los 5 artículos que citó</li>
+        <li>Confidence level (alto/medio/bajo)</li>
+      </ol>
+      <p style="margin-top: 1rem; color: var(--tribai-gold); font-weight: 600; font-size: 1rem;">
+        Insight: el cuaderno está abierto. Nada se inventa.
+      </p>
+    </div>
+  </div>
+  <div class="slide-footer">23 / 44</div>
+  <aside class="notes">
+    El iframe puede cargar o no. Backup: abrir tribai.co/asistente directamente en el browser externo
+    (que ya tengo en otra pestaña desde el rehearsal).
+  </aside>
+</section>
+
+<section>
+  <div class="eyebrow">§4 · otro diseño</div>
+  <h2>Kelsen — agente con herramientas</h2>
+  <img src="assets/diagrams/flujo-kelsen.svg" alt="Flujo Kelsen" style="width: 100%; max-width: 1300px; margin-top: 1rem;" />
+  <div class="slide-footer">24 / 44</div>
+  <aside class="notes">
+    Kelsen hace distinto. El agente (Sonnet) decide qué herramienta invocar en cada turno.
+    Es como un equipo: el abogado decide a quién preguntarle primero.
+  </aside>
+</section>
+
+<section class="muted">
+  <div class="eyebrow">Demo #4 · en vivo</div>
+  <h2>Kelsen — misma receta, arquitectura distinta</h2>
+  <div style="margin-top: 1rem;">
+    <span class="demo-label">EN VIVO · kelsen-psi.vercel.app</span>
+  </div>
+  <div class="card" style="margin-top: 1.5rem; background: #f5f8fa; border-left: 4px solid var(--tribai-blue); padding: 1.5rem; max-width: 1100px;">
+    <p style="font-size: 1.375rem; font-style: italic; color: var(--fg);">
+      "¿Qué ha dicho la Corte Constitucional sobre el mínimo vital en pensiones?"
+    </p>
+  </div>
+  <p style="margin-top: 2rem; color: var(--fg-body); font-size: 1.125rem;">
+    Observen cómo Kelsen invoca <code>buscar_jurisprudencia</code> y recorre 29,000 sentencias antes de responder.
+  </p>
+  <div class="slide-footer">25 / 44</div>
+  <aside class="notes">
+    Dejar tiempo para que el agente corra — son ~10 segundos.
+    Señalar en voz alta: "ven que está 'pensando' — está ejecutando la tool".
+  </aside>
+</section>
+
+<section>
+  <div class="eyebrow">§4 · contraste</div>
+  <h2>Dos arquitecturas, misma ecuación</h2>
+  <div class="grid-2" style="margin-top: 1.5rem; align-items: stretch;">
+    <div class="card" style="border-top: 3px solid var(--tribai-blue);">
+      <h3>Tribai — Pipeline</h3>
+      <ul style="line-height: 1.6;">
+        <li>Flujo lineal fijo de 6 etapas</li>
+        <li>Cada query pasa por las mismas etapas</li>
+        <li>Latencia predecible (~3s)</li>
+        <li>Más simple de debuggear</li>
+      </ul>
+      <p style="margin-top: 1rem; color: var(--fg-muted); font-size: 0.95rem;">
+        Ideal cuando el dominio es estable.
+      </p>
+    </div>
+    <div class="card" style="border-top: 3px solid var(--tribai-gold);">
+      <h3>Kelsen — Agente</h3>
+      <ul style="line-height: 1.6;">
+        <li>Agente decide qué hacer en cada turno</li>
+        <li>Puede llamar 0, 1 o N tools</li>
+        <li>Latencia variable (1-15s)</li>
+        <li>Razonamiento multi-paso emergente</li>
+      </ul>
+      <p style="margin-top: 1rem; color: var(--fg-muted); font-size: 0.95rem;">
+        Ideal cuando las preguntas son abiertas.
+      </p>
+    </div>
+  </div>
+  <div class="slide-footer">26 / 44</div>
+  <aside class="notes">
+    No hay ganador. Depende del dominio, el usuario, el presupuesto de latencia.
+    Ambos funcionan. Ambos son válidos.
+  </aside>
+</section>
+
+<section class="navy">
+  <div style="text-align: center; height: 100%; display: flex; flex-direction: column; justify-content: center;">
+    <p class="pull-quote">
+      No hay UN RAG.<br/>
+      Hay <span style="color: var(--tribai-gold);">decisiones de diseño.</span>
+    </p>
+    <p style="margin-top: 2rem; color: rgba(255,255,255,0.7); font-size: 1.25rem;">
+      Por eso la ingeniería moderna es creativa.
+    </p>
+  </div>
+  <div class="slide-footer">27 / 44</div>
+  <aside class="notes">
+    Fin del §4. Pausa conceptual antes de §5 (el mensaje central de la clase).
+  </aside>
+</section>
+```
+
+Escribir a `/Users/cristianespinal/clase-rags-eafit/slides/04-flujo.html`.
+
+- [ ] **Step 2: Verificar render, navegar 22-27**
+
+- [ ] **Step 3: Commit**
+
+```bash
+cd /Users/cristianespinal/clase-rags-eafit
+git add slides/04-flujo.html
+git -c commit.gpgsign=false commit -m "feat(§4): flujo Tribai + Kelsen + contraste"
+git push origin main
+```
+
+---
+
+### Task 9: §5 Ecosistema (7 slides)
+
+**Files:**
+- Create: `/Users/cristianespinal/clase-rags-eafit/slides/05-ecosistema.html`
+
+- [ ] **Step 1: Escribir 7 slides del ecosistema de APIs**
+
+```html
+<section>
+  <div class="eyebrow">§5 · el ecosistema</div>
+  <h2>La BD es 1 de 12 servicios</h2>
+  <img src="assets/diagrams/mapa-apis.svg" alt="Mapa de APIs" style="width: 100%; max-width: 1100px; margin-top: 1rem;" />
+  <div class="slide-footer">28 / 44</div>
+  <aside class="notes">
+    Mensaje clave de la clase. Respiro aquí. Que cuenten: 12 orbitales.
+    "La base de datos es el cimiento — pero es UNO de doce."
+    La creatividad es DECIDIR cuáles, cómo conectarlos, cómo manejar fallas.
+  </aside>
+</section>
+
+<section class="muted">
+  <div class="eyebrow">§5 · desglose</div>
+  <h2>Qué hace cada uno</h2>
+  <div class="grid-3" style="margin-top: 1.5rem; font-size: 0.95rem;">
+    <div class="card"><h3 style="font-size: 1rem;">🤖 Anthropic</h3><p>Claude Sonnet (calidad) y Haiku (barato)</p></div>
+    <div class="card"><h3 style="font-size: 1rem;">🧭 Voyage AI</h3><p>Embeddings optimizados para texto largo</p></div>
+    <div class="card"><h3 style="font-size: 1rem;">📍 Pinecone</h3><p>Vector DB SaaS, 36K vectores</p></div>
+    <div class="card"><h3 style="font-size: 1rem;">🔎 Cohere</h3><p>Reranker preciso</p></div>
+    <div class="card"><h3 style="font-size: 1rem;">🚪 Vercel AI Gateway</h3><p>Routing entre proveedores, failover</p></div>
+    <div class="card"><h3 style="font-size: 1rem;">☁️ Vercel</h3><p>Hosting + Edge + Blob</p></div>
+    <div class="card"><h3 style="font-size: 1rem;">🔭 Langfuse</h3><p>Observability de LLM calls</p></div>
+    <div class="card"><h3 style="font-size: 1rem;">🔐 Clerk</h3><p>Autenticación</p></div>
+    <div class="card"><h3 style="font-size: 1rem;">💳 Stripe</h3><p>Billing de planes</p></div>
+    <div class="card"><h3 style="font-size: 1rem;">⚡ Upstash Redis</h3><p>Cache + rate limit</p></div>
+    <div class="card"><h3 style="font-size: 1rem;">🐘 Supabase</h3><p>Grafo de normograma (pgvector)</p></div>
+    <div class="card"><h3 style="font-size: 1rem;">🧠 Cloud Run</h3><p>ML models self-hosted</p></div>
+  </div>
+  <div class="slide-footer">29 / 44</div>
+  <aside class="notes">
+    12 proveedores. Cada uno es una decisión. Cada uno tiene alternativas.
+    Esto es la realidad de construir software hoy.
+  </aside>
+</section>
+
+<section>
+  <div class="eyebrow">§5 · cuánto cuesta</div>
+  <h2>Costo real por query</h2>
+  <div style="display: flex; gap: 3rem; align-items: center; margin-top: 2rem;">
+    <div style="flex: 1;">
+      <div style="font-size: 4.5rem; font-weight: 700; color: var(--tribai-gold); font-family: var(--font-mono);">$0.031</div>
+      <p style="color: var(--fg-muted); margin-top: 0.5rem;">por conversación inicial</p>
+      <div style="font-size: 4.5rem; font-weight: 700; color: var(--tribai-blue); font-family: var(--font-mono); margin-top: 2rem;">$0.013</div>
+      <p style="color: var(--fg-muted); margin-top: 0.5rem;">con prompt caching + query router</p>
+    </div>
+    <div style="flex: 1;">
+      <div class="card">
+        <h3>Desglose aproximado</h3>
+        <table style="width: 100%; font-size: 0.95rem; margin-top: 1rem;">
+          <tr style="border-bottom: 1px solid var(--border);"><td style="padding: 0.5rem 0;">Claude Sonnet (respuesta)</td><td style="text-align: right;" class="stat">$0.020</td></tr>
+          <tr style="border-bottom: 1px solid var(--border);"><td style="padding: 0.5rem 0;">Claude Haiku (routing/rewrite)</td><td style="text-align: right;" class="stat">$0.003</td></tr>
+          <tr style="border-bottom: 1px solid var(--border);"><td style="padding: 0.5rem 0;">Pinecone query</td><td style="text-align: right;" class="stat">$0.004</td></tr>
+          <tr style="border-bottom: 1px solid var(--border);"><td style="padding: 0.5rem 0;">Cohere rerank</td><td style="text-align: right;" class="stat">$0.002</td></tr>
+          <tr><td style="padding: 0.5rem 0;">Voyage embedding</td><td style="text-align: right;" class="stat">$0.002</td></tr>
+        </table>
+      </div>
+    </div>
+  </div>
+  <div class="slide-footer">30 / 44</div>
+  <aside class="notes">
+    Los costos son reales. Con 1000 usuarios × 20 queries/mes × $0.013 = $260/mes.
+    Cobrar $10/mes por usuario = $10K/mes MRR a ese volumen.
+  </aside>
+</section>
+
+<section class="muted">
+  <div class="eyebrow">§5 · replicable</div>
+  <h2>Para construir el suyo este mes necesitan:</h2>
+  <table style="width: 100%; margin-top: 1.5rem; font-size: 1rem;">
+    <thead>
+      <tr style="border-bottom: 2px solid var(--tribai-navy); text-align: left;">
+        <th style="padding: 0.75rem;">Pieza</th>
+        <th style="padding: 0.75rem;">Opción gratuita</th>
+        <th style="padding: 0.75rem;">Opción pro</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr style="border-bottom: 1px solid var(--border);">
+        <td style="padding: 0.75rem; font-weight: 600;">LLM</td>
+        <td style="padding: 0.75rem;">Anthropic $5 crédito + Gemini / Groq free</td>
+        <td style="padding: 0.75rem;" class="stat">Claude Sonnet, GPT-5</td>
+      </tr>
+      <tr style="border-bottom: 1px solid var(--border);">
+        <td style="padding: 0.75rem; font-weight: 600;">Embeddings</td>
+        <td style="padding: 0.75rem;">Voyage free (200M tok/mes) · Cohere free</td>
+        <td style="padding: 0.75rem;" class="stat">voyage-3-large</td>
+      </tr>
+      <tr style="border-bottom: 1px solid var(--border);">
+        <td style="padding: 0.75rem; font-weight: 600;">Vector DB</td>
+        <td style="padding: 0.75rem;">Supabase (pgvector)</td>
+        <td style="padding: 0.75rem;" class="stat">Pinecone, Neon</td>
+      </tr>
+      <tr style="border-bottom: 1px solid var(--border);">
+        <td style="padding: 0.75rem; font-weight: 600;">Framework</td>
+        <td style="padding: 0.75rem;">Next.js / FastAPI</td>
+        <td style="padding: 0.75rem;" class="stat">+ Vercel AI SDK v6</td>
+      </tr>
+      <tr style="border-bottom: 1px solid var(--border);">
+        <td style="padding: 0.75rem; font-weight: 600;">Deploy</td>
+        <td style="padding: 0.75rem;">Vercel hobby</td>
+        <td style="padding: 0.75rem;" class="stat">Vercel Pro</td>
+      </tr>
+      <tr>
+        <td style="padding: 0.75rem; font-weight: 600;">Observability</td>
+        <td style="padding: 0.75rem;">Langfuse cloud free</td>
+        <td style="padding: 0.75rem;" class="stat">Datadog, LangSmith</td>
+      </tr>
+    </tbody>
+  </table>
+  <p style="margin-top: 2rem; text-align: center; font-size: 1.375rem; color: var(--tribai-gold); font-weight: 700;">
+    Todo lo anterior cabe en $0. Esta noche pueden tener un RAG corriendo.
+  </p>
+  <div class="slide-footer">31 / 44</div>
+  <aside class="notes">
+    Mensaje accionable. No es aspiracional, es hoy.
+    Si alguien me dice después "hice uno", se gana tinto gratis 😁
+  </aside>
+</section>
+
+<section>
+  <div class="eyebrow">Demo #5</div>
+  <h2>Receta mínima — ~60 líneas</h2>
+  <pre style="font-size: 0.85rem;"><code class="language-typescript">// 1. Conexión a Postgres con pgvector
+const db = postgres(process.env.DATABASE_URL!);
+
+// 2. Función de ingestión (corres una vez por doc)
+async function ingest(doc: string) {
+  const chunks = splitIntoChunks(doc, 512);
+  for (const chunk of chunks) {
+    const [embedding] = await voyage.embed([chunk]);
+    await db`INSERT INTO docs (text, embedding)
+             VALUES (${chunk}, ${embedding})`;
+  }
+}
+
+// 3. Función de búsqueda
+async function search(query: string, k = 5) {
+  const [qEmbed] = await voyage.embed([query]);
+  return await db`
+    SELECT text, 1 - (embedding &lt;=&gt; ${qEmbed}) as similarity
+    FROM docs
+    ORDER BY embedding &lt;=&gt; ${qEmbed}
+    LIMIT ${k}
+  `;
+}
+
+// 4. Función RAG: retrieve + generate
+async function ask(question: string) {
+  const docs = await search(question);
+  const context = docs.map(d =&gt; d.text).join('\n---\n');
+  return await anthropic.messages.create({
+    model: 'claude-sonnet-4-6',
+    messages: [{ role: 'user', content:
+      `Responde usando solo este contexto. Cita fragmentos exactos.\n\n${context}\n\nPregunta: ${question}`
+    }]
+  });
+}
+
+// 5. Listo. Conectá a un endpoint HTTP y tenés un RAG.</code></pre>
+  <p style="margin-top: 1rem; color: var(--fg-muted); font-size: 1rem;">
+    Pseudocódigo. Funciona. Cabe en una pantalla. Lo pueden escribir en 2 horas.
+  </p>
+  <div class="slide-footer">32 / 44</div>
+  <aside class="notes">
+    Si hay proyector secundario, abrir VSCode con este código real.
+    Enfatizar: 5 funciones. Eso es TODO.
+    El resto del trabajo es ingestión (calidad de chunks), evaluación, UX.
+  </aside>
+</section>
+
+<section>
+  <div class="eyebrow">§5 · ingeniería real</div>
+  <h2>Lo que diferencia un RAG de juguete de uno productivo</h2>
+  <div class="grid-2" style="margin-top: 1.5rem;">
+    <div class="card">
+      <h3 style="color: var(--tribai-blue);">RAG de juguete (1 día)</h3>
+      <ul style="line-height: 1.6;">
+        <li>Una sola fuente, chunks random</li>
+        <li>Embeddings off-the-shelf</li>
+        <li>Top-5 literal</li>
+        <li>Sin evaluación</li>
+        <li>Cache ninguno</li>
+      </ul>
+    </div>
+    <div class="card" style="background: var(--tribai-navy); color: white; border: none;">
+      <h3 style="color: var(--tribai-gold);">RAG productivo (3-6 meses)</h3>
+      <ul style="line-height: 1.6; color: rgba(255,255,255,0.9);">
+        <li>Chunking con metadata legal/semántica</li>
+        <li>Hybrid search (BM25 + vector)</li>
+        <li>Query rewriting, HyDE, multi-hop</li>
+        <li>Reranker, evidence checker</li>
+        <li>Eval framework (340 queries, CI gate)</li>
+        <li>Observability + cost tracking</li>
+        <li>Fallbacks, rate-limit, auth</li>
+      </ul>
+    </div>
+  </div>
+  <p style="margin-top: 1.5rem; color: var(--fg-muted); font-size: 1rem;">
+    El salto no es tecnológico — es de disciplina.
+  </p>
+  <div class="slide-footer">33 / 44</div>
+  <aside class="notes">
+    Honestidad. Un RAG de demo se hace en 1 día. Uno de producción toma meses.
+    La diferencia es evaluación + observability + iteración.
+  </aside>
+</section>
+
+<section class="navy">
+  <div style="text-align: center; height: 100%; display: flex; flex-direction: column; justify-content: center;">
+    <p class="pull-quote">
+      La BD es el cimiento.<br/>
+      La orquestación es la arquitectura.<br/>
+      <span style="color: var(--tribai-gold);">Ambas son ingeniería.</span>
+    </p>
+  </div>
+  <div class="slide-footer">34 / 44</div>
+  <aside class="notes">
+    Punchline central de la clase. Repetir la frase despacio.
+    Fin del §5.
+  </aside>
+</section>
+```
+
+Escribir a `/Users/cristianespinal/clase-rags-eafit/slides/05-ecosistema.html`.
+
+- [ ] **Step 2: Commit**
+
+```bash
+cd /Users/cristianespinal/clase-rags-eafit
+git add slides/05-ecosistema.html
+git -c commit.gpgsign=false commit -m "feat(§5): ecosistema de APIs + stack replicable"
+git push origin main
+```
+
+---
+
+### Task 10: §6 Industria (5 slides)
+
+**Files:**
+- Create: `/Users/cristianespinal/clase-rags-eafit/slides/06-industria.html`
+
+- [ ] **Step 1: Escribir 5 slides**
+
+```html
+<section class="muted">
+  <div class="eyebrow">§6 · industria</div>
+  <h2>Harvey.ai — el caso de estudio</h2>
+  <div style="display: flex; gap: 3rem; margin-top: 2rem;">
+    <div style="flex: 1;">
+      <div style="font-size: 6rem; font-weight: 700; color: var(--tribai-gold); font-family: var(--font-mono); line-height: 1;">$11B</div>
+      <p style="color: var(--fg-muted); margin-top: 0.5rem;">valoración Serie G (marzo 2026)</p>
+      <ul style="margin-top: 2rem; font-size: 1.125rem; line-height: 1.6;">
+        <li><span class="stat">$190M</span> ARR · <span class="stat">100K+</span> abogados</li>
+        <li><span class="stat">1,300+</span> firmas · <span class="stat">60</span> países</li>
+        <li>Equipo completo de OpenAI contratado 3 meses para modelo custom de case law</li>
+        <li>Modelo custom: 97% preferencia vs base</li>
+      </ul>
+    </div>
+    <div style="flex: 1;">
+      <div class="card">
+        <h3>Lo que hacen</h3>
+        <ul style="line-height: 1.6; font-size: 1rem;">
+          <li>Assistant (chat legal)</li>
+          <li>Vault (análisis bulk de docs)</li>
+          <li>Knowledge (200+ fuentes legales)</li>
+          <li>Workflow Agents (25,000+)</li>
+          <li>Shared Spaces (colaboración)</li>
+        </ul>
+      </div>
+      <p style="margin-top: 1rem; color: var(--fg-muted); font-size: 1rem;">
+        Pricing: ~$1,000-1,200/abogado/mes, mínimo 20 asientos.<br/>
+        Entry point: ~$240K/año.
+      </p>
+    </div>
+  </div>
+  <div class="slide-footer">35 / 44</div>
+  <aside class="notes">
+    No es un unicornio aislado. Es un ejemplo de qué escala es posible.
+    Kelsen apunta al mismo tipo de producto pero para LATAM — precio 1/40.
+  </aside>
+</section>
+
+<section>
+  <div class="eyebrow">§6 · frontera actual</div>
+  <h2>Agentic RAG — la siguiente capa</h2>
+  <div style="display: flex; gap: 3rem; margin-top: 2rem;">
+    <div style="flex: 1;">
+      <p style="font-size: 1.25rem; line-height: 1.6;">
+        RAG tradicional: <strong>un retrieval fijo</strong>, una respuesta.
+      </p>
+      <p style="font-size: 1.25rem; line-height: 1.6; margin-top: 1.5rem;">
+        Agentic RAG: <strong>la IA decide</strong> cuándo buscar, cuándo escribir, cuándo pedir ayuda.
+      </p>
+      <p style="margin-top: 1.5rem; color: var(--fg-muted);">
+        Stanford midió: <span class="stat">+50%</span> retrieval accuracy, <span class="stat">-35%</span> tiempo para queries multi-paso.
+      </p>
+    </div>
+    <div style="flex: 1;">
+      <div class="card" style="background: var(--tribai-navy); color: white;">
+        <div class="badge-gold" style="margin-bottom: 1rem;">Ejemplo concreto</div>
+        <p style="color: rgba(255,255,255,0.9); line-height: 1.6;">
+          Kelsen cuando le preguntas "¿evolución de la jurisprudencia sobre X?":<br/><br/>
+          1. Invoca <code style="color: var(--tribai-gold);">buscar_jurisprudencia</code><br/>
+          2. Lee 10 sentencias<br/>
+          3. Decide: "necesito más contexto" → <code style="color: var(--tribai-gold);">consultar_articulo</code><br/>
+          4. Armoniza y redacta
+        </p>
+      </div>
+    </div>
+  </div>
+  <div class="slide-footer">36 / 44</div>
+  <aside class="notes">
+    La IA ya no es un pipeline, es un colega que razona.
+    Debugear agentic es más difícil — por eso observability es crítica.
+  </aside>
+</section>
+
+<section>
+  <div class="eyebrow">§6 · protocolo nuevo</div>
+  <h2>MCP — el USB-C de las IAs</h2>
+  <div style="display: flex; gap: 3rem; margin-top: 2rem;">
+    <div style="flex: 1;">
+      <p style="font-size: 1.25rem; line-height: 1.6;">
+        <strong>Model Context Protocol</strong> (Anthropic, abierto).<br/>
+        Un estándar para que cualquier IA hable con cualquier herramienta.
+      </p>
+      <p style="margin-top: 1.5rem; color: var(--fg-muted);">
+        Igual que USB-C unificó carga/datos, MCP unifica cómo las IAs invocan herramientas externas.
+      </p>
+    </div>
+    <div style="flex: 1;">
+      <div class="card">
+        <h3>Ejemplos de MCP servers</h3>
+        <ul style="line-height: 1.6; font-size: 1rem;">
+          <li>Filesystem (leer/escribir archivos)</li>
+          <li>GitHub (issues, PRs, código)</li>
+          <li>Slack (mensajes, canales)</li>
+          <li>Google Drive, Gmail, Calendar</li>
+          <li>Bases de datos Postgres/MySQL</li>
+          <li><strong>Tribai y Kelsen</strong> como servers MCP (próximo paso)</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+  <div class="slide-footer">37 / 44</div>
+  <aside class="notes">
+    Esto es MUY nuevo (finales 2024-2025). Los que lo adopten temprano ganan.
+    Les va a tocar implementar MCP servers en su carrera.
+  </aside>
+</section>
+
+<section>
+  <div class="eyebrow">§6 · estrategia</div>
+  <h2>Multi-model — el equipo, no el solitario</h2>
+  <div style="display: flex; gap: 3rem; margin-top: 2rem;">
+    <div style="flex: 1;">
+      <p style="font-size: 1.25rem; line-height: 1.6;">
+        Antes: "¿cuál es el mejor modelo?" — respuesta única.<br/>
+        Ahora: <strong>el modelo correcto para cada tarea.</strong>
+      </p>
+    </div>
+    <div style="flex: 1;">
+      <table style="width: 100%; font-size: 1rem;">
+        <thead>
+          <tr style="border-bottom: 2px solid var(--tribai-navy); text-align: left;">
+            <th style="padding: 0.5rem 0;">Tarea</th>
+            <th style="padding: 0.5rem 0;">Modelo</th>
+            <th style="padding: 0.5rem 0;">Por qué</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr style="border-bottom: 1px solid var(--border);"><td style="padding: 0.5rem 0;">Routing</td><td class="stat">Haiku 4.5</td><td style="color: var(--fg-muted);">barato + rápido</td></tr>
+          <tr style="border-bottom: 1px solid var(--border);"><td style="padding: 0.5rem 0;">Generación</td><td class="stat">Sonnet 4.6</td><td style="color: var(--fg-muted);">calidad razonamiento</td></tr>
+          <tr style="border-bottom: 1px solid var(--border);"><td style="padding: 0.5rem 0;">Bulk</td><td class="stat">Gemini Flash</td><td style="color: var(--fg-muted);">volumen alto</td></tr>
+          <tr><td style="padding: 0.5rem 0;">Fallback</td><td class="stat">GPT-5 mini</td><td style="color: var(--fg-muted);">redundancia</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+  <p style="margin-top: 1.5rem; color: var(--fg-muted); font-size: 1rem;">
+    Vercel AI Gateway permite cambiar de uno a otro con una línea de config.
+  </p>
+  <div class="slide-footer">38 / 44</div>
+  <aside class="notes">
+    El mercado va hacia comodificación de LLMs. Las capas alrededor (orquestación, eval) son el diferenciador.
+  </aside>
+</section>
+
+<section class="navy">
+  <div style="text-align: center; height: 100%; display: flex; flex-direction: column; justify-content: center;">
+    <p class="pull-quote" style="font-size: 3.5rem;">
+      Orquestar es la nueva<br/>
+      ingeniería de software.
+    </p>
+  </div>
+  <div class="slide-footer">39 / 44</div>
+  <aside class="notes">
+    Cierre del §6. La frase se queda. Transición: "¿y por qué les cuento esto a ustedes, en Medellín?"
+  </aside>
+</section>
+```
+
+Escribir a `/Users/cristianespinal/clase-rags-eafit/slides/06-industria.html`.
+
+- [ ] **Step 2: Commit**
+
+```bash
+cd /Users/cristianespinal/clase-rags-eafit
+git add slides/06-industria.html
+git -c commit.gpgsign=false commit -m "feat(§6): industria — Harvey, agentic, MCP, multi-model"
+git push origin main
+```
+
+---
+
+### Task 11: §7 Colombia (3 slides)
+
+**Files:**
+- Create: `/Users/cristianespinal/clase-rags-eafit/slides/07-colombia.html`
+
+- [ ] **Step 1: Escribir 3 slides**
+
+```html
+<section>
+  <div class="eyebrow">§7 · por qué aquí</div>
+  <h2>La oportunidad LATAM</h2>
+  <div class="grid-3" style="margin-top: 2rem;">
+    <div class="card" style="border-top: 3px solid var(--tribai-blue);">
+      <div class="stat" style="font-size: 3.5rem; line-height: 1;">300K</div>
+      <h3 style="margin-top: 0.5rem;">Contadores</h3>
+      <p style="color: var(--fg-muted);">activos en Colombia, con demanda de productividad</p>
+    </div>
+    <div class="card" style="border-top: 3px solid var(--tribai-gold);">
+      <div class="stat" style="font-size: 3.5rem; line-height: 1;">410K</div>
+      <h3 style="margin-top: 0.5rem;">Abogados</h3>
+      <p style="color: var(--fg-muted);">2ª densidad mundial per cápita</p>
+    </div>
+    <div class="card" style="border-top: 3px solid var(--tribai-light-blue);">
+      <div class="stat" style="font-size: 3.5rem; line-height: 1;">50M+</div>
+      <h3 style="margin-top: 0.5rem;">Habitantes</h3>
+      <p style="color: var(--fg-muted);">sin acceso a especialistas en muchos temas</p>
+    </div>
+  </div>
+  <p style="margin-top: 2rem; font-size: 1.25rem; text-align: center; color: var(--fg-body);">
+    Y eso es <strong>solo Colombia</strong>. LATAM tiene 650M habitantes en la misma situación.
+  </p>
+  <div class="slide-footer">40 / 44</div>
+  <aside class="notes">
+    Contextualizar la oportunidad. No es "algún día" — es ahora.
+    El mercado está desatendido. La infra técnica ya existe. Falta construir.
+  </aside>
+</section>
+
+<section class="muted">
+  <div class="eyebrow">§7 · dominios con oportunidad</div>
+  <h2>Si fueran ustedes, yo atacaría...</h2>
+  <div class="grid-3" style="margin-top: 1.5rem;">
+    <div class="card"><h3>🏥 Salud rural</h3><p style="color: var(--fg-muted);">Protocolos + historia del paciente, en regiones sin especialistas</p></div>
+    <div class="card"><h3>📚 Educación</h3><p style="color: var(--fg-muted);">Tutor contextual por materia, basado en el pensum real</p></div>
+    <div class="card"><h3>🏛️ Gobierno digital</h3><p style="color: var(--fg-muted);">Normativa + trámites: hay miles de decretos sin indexar</p></div>
+    <div class="card"><h3>🏭 PyMEs</h3><p style="color: var(--fg-muted);">Asesor financiero/legal para 2M empresas sin contador propio</p></div>
+    <div class="card"><h3>🌱 Agrotech</h3><p style="color: var(--fg-muted);">Mejores prácticas agronómicas por región, clima, cultivo</p></div>
+    <div class="card"><h3>🚓 Justicia</h3><p style="color: var(--fg-muted);">952K tutelas/año — triage asistido para despachos judiciales</p></div>
+  </div>
+  <p style="margin-top: 2rem; font-size: 1.125rem; text-align: center; color: var(--tribai-gold); font-weight: 600;">
+    Ninguno tiene un producto dominante aún.
+  </p>
+  <div class="slide-footer">41 / 44</div>
+  <aside class="notes">
+    Escoger un dominio cercano a ustedes. Pregúntense: ¿conocen a alguien que sufra este problema?
+    Ese es el primer usuario.
+  </aside>
+</section>
+
+<section class="navy">
+  <div style="padding: 2rem;">
+    <div class="eyebrow">§7 · invitación</div>
+    <h2 style="color: white; margin-top: 1rem;">Escojan un dominio. Construyan el MVP este mes.</h2>
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-top: 2rem;">
+      <div>
+        <h3 style="color: var(--tribai-gold);">Semana 1</h3>
+        <p style="color: rgba(255,255,255,0.85);">Escoger dominio + recolectar 100 docs reales</p>
+      </div>
+      <div>
+        <h3 style="color: var(--tribai-gold);">Semana 2</h3>
+        <p style="color: rgba(255,255,255,0.85);">Chunking + embeddings + pgvector</p>
+      </div>
+      <div>
+        <h3 style="color: var(--tribai-gold);">Semana 3</h3>
+        <p style="color: rgba(255,255,255,0.85);">UI Next.js + Claude API + streaming</p>
+      </div>
+      <div>
+        <h3 style="color: var(--tribai-gold);">Semana 4</h3>
+        <p style="color: rgba(255,255,255,0.85);">Deploy Vercel + 20 testers reales + iterar</p>
+      </div>
+    </div>
+    <p style="margin-top: 2rem; color: var(--tribai-gold); font-weight: 600; font-size: 1.375rem;">
+      Si arman el MVP, me escriben. Yo los ayudo.
+    </p>
+  </div>
+  <div class="slide-footer">42 / 44</div>
+  <aside class="notes">
+    Cierre accionable. Plan de 4 semanas concreto. Oferta de mentoría.
+    Aquí se convierte la clase en algo útil — no solo inspirador.
+  </aside>
+</section>
+```
+
+Escribir a `/Users/cristianespinal/clase-rags-eafit/slides/07-colombia.html`.
+
+- [ ] **Step 2: Commit**
+
+```bash
+cd /Users/cristianespinal/clase-rags-eafit
+git add slides/07-colombia.html
+git -c commit.gpgsign=false commit -m "feat(§7): oportunidad LATAM + plan de 4 semanas"
+git push origin main
+```
+
+---
+
+### Task 12: §8 Cierre (2 slides)
+
+**Files:**
+- Create: `/Users/cristianespinal/clase-rags-eafit/slides/08-cierre.html`
+
+- [ ] **Step 1: Escribir 2 slides de cierre**
+
+```html
+<section class="cover">
+  <div style="height: 100%; display: flex; flex-direction: column; justify-content: center;">
+    <div class="eyebrow">síntesis</div>
+    <p class="pull-quote" style="font-size: 4rem; margin-top: 2rem;">
+      De SELECT a orquestación —<br/>
+      <span style="color: var(--tribai-gold);">la ingeniería cambió de forma.</span>
+    </p>
+    <img src="assets/diagrams/evolucion-sql-rag.svg" alt="Evolución" style="width: 100%; max-width: 1200px; margin-top: 3rem; opacity: 0.9;" />
+  </div>
+  <div class="slide-footer">43 / 44</div>
+  <aside class="notes">
+    Una imagen resume la clase entera. Repetir la frase.
+  </aside>
+</section>
+
+<section class="cover">
+  <div style="height: 100%; display: flex; flex-direction: column; justify-content: center;">
+    <h1 style="font-size: 4rem;">Gracias</h1>
+    <p style="font-size: 1.5rem; opacity: 0.8; margin-top: 0.5rem;">Preguntas, críticas, ideas — todas bienvenidas.</p>
+    <div style="margin-top: 4rem; display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; max-width: 1000px;">
+      <div>
+        <div class="eyebrow" style="color: var(--tribai-gold);">contacto</div>
+        <p style="margin-top: 0.5rem; font-size: 1.25rem;">
+          <strong>Cristián Espinal</strong><br/>
+          <span style="opacity: 0.8;">inpluxia@gmail.com</span>
+        </p>
+      </div>
+      <div>
+        <div class="eyebrow" style="color: var(--tribai-gold);">enlaces</div>
+        <ul style="margin-top: 0.5rem; list-style: none; padding: 0; font-size: 1.125rem;">
+          <li>→ <a href="https://tribai.co" style="color: var(--tribai-gold);">tribai.co</a></li>
+          <li>→ <a href="https://kelsen-psi.vercel.app" style="color: var(--tribai-gold);">kelsen-psi.vercel.app</a></li>
+          <li>→ <a href="https://github.com/Cespial/clase-rags-eafit" style="color: var(--tribai-gold);">github.com/Cespial/clase-rags-eafit</a></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+  <div class="slide-footer">44 / 44</div>
+  <aside class="notes">
+    Q&A abierto. 5 min. Si no hay preguntas, cerrar con invitación a acercarse al escritorio.
+  </aside>
+</section>
+```
+
+Escribir a `/Users/cristianespinal/clase-rags-eafit/slides/08-cierre.html`.
+
+- [ ] **Step 2: Verificar render de todos los slides end-to-end**
+
+Navegar de slide 1 a 44 completo, presionar `S` para abrir speaker notes, confirmar que cada slide carga sin errores.
+
+- [ ] **Step 3: Commit**
+
+```bash
+cd /Users/cristianespinal/clase-rags-eafit
+git add slides/08-cierre.html
+git -c commit.gpgsign=false commit -m "feat(§8): cierre + contacto"
+git push origin main
+```
+
+---
+
+### Task 13: Embeddings-demo Next.js mini-app
+
+Una app pequeña para el Demo #2. Input de dos frases → similitud coseno usando Voyage AI.
+
+**Files:**
+- Create: `/Users/cristianespinal/clase-rags-eafit/embeddings-demo/package.json`
+- Create: `/Users/cristianespinal/clase-rags-eafit/embeddings-demo/next.config.ts`
+- Create: `/Users/cristianespinal/clase-rags-eafit/embeddings-demo/tsconfig.json`
+- Create: `/Users/cristianespinal/clase-rags-eafit/embeddings-demo/app/layout.tsx`
+- Create: `/Users/cristianespinal/clase-rags-eafit/embeddings-demo/app/page.tsx`
+- Create: `/Users/cristianespinal/clase-rags-eafit/embeddings-demo/app/globals.css`
+- Create: `/Users/cristianespinal/clase-rags-eafit/embeddings-demo/app/api/embed/route.ts`
+- Create: `/Users/cristianespinal/clase-rags-eafit/embeddings-demo/.env.local`
+
+- [ ] **Step 1: Bootstrap package.json**
+
+```json
+{
+  "name": "embeddings-demo",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev -p 3001",
+    "build": "next build",
+    "start": "next start -p 3001"
+  },
+  "dependencies": {
+    "next": "16.1.6",
+    "react": "19.2.3",
+    "react-dom": "19.2.3"
+  },
+  "devDependencies": {
+    "@types/node": "^22",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "typescript": "^5"
+  }
+}
+```
+
+Escribir a `/Users/cristianespinal/clase-rags-eafit/embeddings-demo/package.json`.
+
+- [ ] **Step 2: tsconfig.json**
+
+```json
+{
+  "compilerOptions": {
+    "target": "ES2020",
+    "lib": ["dom", "dom.iterable", "esnext"],
+    "allowJs": true,
+    "skipLibCheck": true,
+    "strict": true,
+    "noEmit": true,
+    "esModuleInterop": true,
+    "module": "esnext",
+    "moduleResolution": "bundler",
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "jsx": "preserve",
+    "incremental": true,
+    "plugins": [{ "name": "next" }],
+    "paths": { "@/*": ["./*"] }
+  },
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx"],
+  "exclude": ["node_modules"]
+}
+```
+
+- [ ] **Step 3: next.config.ts**
+
+```typescript
+import type { NextConfig } from "next";
+
+const nextConfig: NextConfig = {
+  output: "standalone",
+};
+
+export default nextConfig;
+```
+
+- [ ] **Step 4: app/layout.tsx**
+
+```tsx
+import type { Metadata } from "next";
+import "./globals.css";
+
+export const metadata: Metadata = {
+  title: "Embeddings Demo — EAFIT",
+  description: "Demostración en vivo de similitud semántica con embeddings",
+};
+
+export default function RootLayout({ children }: { children: React.ReactNode }) {
+  return (
+    <html lang="es">
+      <body>{children}</body>
+    </html>
+  );
+}
+```
+
+- [ ] **Step 5: app/globals.css**
+
+```css
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=JetBrains+Mono:wght@500&display=swap");
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: "Inter", -apple-system, sans-serif;
+  background: #f5f8fa;
+  color: #0a1628;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+}
+
+.container {
+  max-width: 900px;
+  width: 100%;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 10px 25px -5px rgba(0,0,0,0.08);
+  padding: 3rem;
+}
+
+h1 { font-size: 2rem; font-weight: 700; letter-spacing: -0.03em; margin-bottom: 0.5rem; }
+.subtitle { color: #6b7280; font-size: 1.125rem; margin-bottom: 2rem; }
+
+.input-group {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.input-row { display: flex; gap: 1rem; align-items: center; }
+.input-row label {
+  font-weight: 600;
+  min-width: 80px;
+  color: #0066ff;
+}
+
+input {
+  flex: 1;
+  padding: 0.875rem 1.25rem;
+  font-size: 1.125rem;
+  font-family: inherit;
+  border: 1px solid #e8e8e8;
+  border-radius: 8px;
+  outline: none;
+  transition: border-color 150ms;
+}
+input:focus { border-color: #0066ff; }
+
+button {
+  padding: 0.875rem 2rem;
+  font-size: 1rem;
+  font-family: inherit;
+  font-weight: 600;
+  background: #0066ff;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 150ms;
+}
+button:hover { background: #0052cc; }
+button:disabled { background: #9ca3af; cursor: not-allowed; }
+
+.result {
+  margin-top: 2rem;
+  padding: 2rem;
+  background: #f5f8fa;
+  border-radius: 12px;
+  text-align: center;
+}
+
+.score {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 5rem;
+  font-weight: 600;
+  color: #c4952a;
+  letter-spacing: -0.02em;
+  line-height: 1;
+}
+
+.score-label { color: #6b7280; margin-top: 0.5rem; font-size: 0.95rem; text-transform: uppercase; letter-spacing: 0.08em; }
+
+.bar {
+  margin-top: 1.5rem;
+  height: 12px;
+  background: #e8e8e8;
+  border-radius: 6px;
+  overflow: hidden;
+}
+.bar-fill {
+  height: 100%;
+  background: linear-gradient(to right, #3b82b8, #c4952a);
+  transition: width 400ms ease;
+}
+
+.interpretation {
+  margin-top: 1.5rem;
+  font-size: 1.125rem;
+  color: #0a1628;
+}
+
+.examples {
+  margin-top: 2rem;
+  padding-top: 2rem;
+  border-top: 1px solid #e8e8e8;
+}
+.examples h3 { font-size: 1rem; color: #6b7280; margin-bottom: 1rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; }
+.examples button {
+  background: white;
+  color: #0066ff;
+  border: 1px solid #e8e8e8;
+  padding: 0.5rem 1rem;
+  font-size: 0.875rem;
+  margin: 0.25rem;
+  font-weight: 500;
+}
+.examples button:hover { background: #f5f8fa; border-color: #0066ff; }
+
+.error { color: #dc2626; margin-top: 1rem; font-size: 0.95rem; }
+```
+
+- [ ] **Step 6: app/api/embed/route.ts**
+
+```typescript
+import { NextRequest, NextResponse } from "next/server";
+
+const VOYAGE_API_KEY = process.env.VOYAGE_API_KEY;
+const VOYAGE_URL = "https://api.voyageai.com/v1/embeddings";
+
+function cosineSimilarity(a: number[], b: number[]): number {
+  let dot = 0, normA = 0, normB = 0;
+  for (let i = 0; i < a.length; i++) {
+    dot += a[i] * b[i];
+    normA += a[i] * a[i];
+    normB += b[i] * b[i];
+  }
+  return dot / (Math.sqrt(normA) * Math.sqrt(normB));
+}
+
+export async function POST(req: NextRequest) {
+  const { text1, text2 } = await req.json();
+
+  if (!VOYAGE_API_KEY) {
+    return NextResponse.json({ error: "VOYAGE_API_KEY no configurada" }, { status: 500 });
+  }
+  if (!text1 || !text2) {
+    return NextResponse.json({ error: "Ambos textos son requeridos" }, { status: 400 });
+  }
+
+  const res = await fetch(VOYAGE_URL, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${VOYAGE_API_KEY}`,
+    },
+    body: JSON.stringify({
+      input: [text1, text2],
+      model: "voyage-3-large",
+    }),
+  });
+
+  if (!res.ok) {
+    const err = await res.text();
+    return NextResponse.json({ error: `Voyage: ${err}` }, { status: res.status });
+  }
+
+  const data = await res.json();
+  const [emb1, emb2] = data.data.map((d: { embedding: number[] }) => d.embedding);
+  const similarity = cosineSimilarity(emb1, emb2);
+
+  return NextResponse.json({ similarity, text1, text2 });
+}
+```
+
+- [ ] **Step 7: app/page.tsx**
+
+```tsx
+"use client";
+
+import { useState } from "react";
+
+const EXAMPLES: Array<[string, string]> = [
+  ["trabajador extranjero", "residente no colombiano"],
+  ["trabajador extranjero", "deducción por arrendamiento"],
+  ["IVA sobre servicios", "impuesto al valor agregado por honorarios"],
+  ["retención en la fuente", "calcular descuento por pago anticipado"],
+  ["Sentencia de la Corte Constitucional", "fallo judicial de constitucionalidad"],
+];
+
+const FALLBACK: Record<string, number> = {
+  "trabajador extranjero|residente no colombiano": 0.87,
+  "trabajador extranjero|deducción por arrendamiento": 0.31,
+  "IVA sobre servicios|impuesto al valor agregado por honorarios": 0.92,
+  "retención en la fuente|calcular descuento por pago anticipado": 0.38,
+  "Sentencia de la Corte Constitucional|fallo judicial de constitucionalidad": 0.85,
+};
+
+export default function Page() {
+  const [text1, setText1] = useState("trabajador extranjero");
+  const [text2, setText2] = useState("residente no colombiano");
+  const [similarity, setSimilarity] = useState<number | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  async function compute() {
+    setLoading(true);
+    setError(null);
+    setSimilarity(null);
+    try {
+      const res = await fetch("/api/embed", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ text1, text2 }),
+      });
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        // Intentar fallback
+        const key = `${text1}|${text2}`;
+        if (FALLBACK[key] !== undefined) {
+          setSimilarity(FALLBACK[key]);
+          return;
+        }
+        throw new Error(data.error || "Error API");
+      }
+      const data = await res.json();
+      setSimilarity(data.similarity);
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Error desconocido");
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  function useExample(a: string, b: string) {
+    setText1(a);
+    setText2(b);
+    setSimilarity(null);
+  }
+
+  function interpret(sim: number): string {
+    if (sim > 0.85) return "🎯 Muy parecidos semánticamente";
+    if (sim > 0.65) return "✓ Relacionados";
+    if (sim > 0.45) return "~ Tangencialmente conectados";
+    return "✗ No relacionados";
+  }
+
+  return (
+    <div className="container">
+      <h1>¿Qué tan parecidos son dos textos?</h1>
+      <p className="subtitle">
+        Embeddings · voyage-3-large · 1024 dimensiones
+      </p>
+
+      <div className="input-group">
+        <div className="input-row">
+          <label>Texto 1:</label>
+          <input value={text1} onChange={(e) => setText1(e.target.value)} />
+        </div>
+        <div className="input-row">
+          <label>Texto 2:</label>
+          <input value={text2} onChange={(e) => setText2(e.target.value)} />
+        </div>
+      </div>
+
+      <button onClick={compute} disabled={loading || !text1 || !text2}>
+        {loading ? "Calculando..." : "Calcular similitud"}
+      </button>
+
+      {error && <p className="error">{error}</p>}
+
+      {similarity !== null && (
+        <div className="result">
+          <div className="score">{similarity.toFixed(2)}</div>
+          <div className="score-label">Similitud coseno</div>
+          <div className="bar">
+            <div className="bar-fill" style={{ width: `${Math.max(0, similarity * 100)}%` }} />
+          </div>
+          <p className="interpretation">{interpret(similarity)}</p>
+        </div>
+      )}
+
+      <div className="examples">
+        <h3>Ejemplos predefinidos</h3>
+        {EXAMPLES.map(([a, b], i) => (
+          <button key={i} onClick={() => useExample(a, b)}>
+            "{a}" vs "{b}"
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+}
+```
+
+- [ ] **Step 8: .env.local (con la VOYAGE_API_KEY real)**
+
+```bash
+cd /Users/cristianespinal/clase-rags-eafit/embeddings-demo
+# Recuperar VOYAGE_API_KEY de Tribai o Kelsen
+grep VOYAGE_API_KEY /Users/cristianespinal/Kelsen/.env.local
+# Copiar el valor y crear .env.local aquí
+```
+
+Luego escribir manualmente a `/Users/cristianespinal/clase-rags-eafit/embeddings-demo/.env.local`:
+
+```
+VOYAGE_API_KEY=<pegar_aqui>
+```
+
+- [ ] **Step 9: Install + test local**
+
+Run:
+```bash
+cd /Users/cristianespinal/clase-rags-eafit/embeddings-demo
+npm install
+npm run dev &
+sleep 5
+curl -s -X POST http://localhost:3001/api/embed \
+  -H "Content-Type: application/json" \
+  -d '{"text1":"trabajador extranjero","text2":"residente no colombiano"}'
+```
+Expected: JSON con `{"similarity": 0.8x, "text1": ..., "text2": ...}`.
+
+Abrir http://localhost:3001 en navegador, probar los 5 ejemplos, confirmar que calcula.
+
+- [ ] **Step 10: Commit**
+
+```bash
+cd /Users/cristianespinal/clase-rags-eafit
+git add embeddings-demo/
+git -c commit.gpgsign=false commit -m "feat(demo): embeddings-demo Next.js mini-app"
+git push origin main
+```
+
+**Nota:** `.env.local` está en `.gitignore`, no se sube.
+
+---
+
+### Task 14: Speaker notes + demo script
+
+**Files:**
+- Create: `/Users/cristianespinal/clase-rags-eafit/demos/speaker-notes.md`
+- Create: `/Users/cristianespinal/clase-rags-eafit/demos/demo-script.md`
+
+- [ ] **Step 1: Crear `demo-script.md` con queries exactas**
+
+```markdown
+# Demo Script — Clase RAGs EAFIT 20-abr-2026
+
+## Queries para copy-paste rápido
+
+### Demo #1 — Cold open (§0)
+**URL:** https://tribai.co/asistente
+
+**Query principal:**
+```
+Una empresa colombiana paga honorarios a un ingeniero residente en España por un diseño mecánico. ¿Qué retención en la fuente aplica y qué artículos del ET la soportan?
+```
+
+**Queries de backup (si la primera da respuesta floja):**
+```
+¿Qué retención debo aplicar al pagar servicios técnicos a una empresa española sin sucursal en Colombia?
+```
+```
+Soy persona natural, pago honorarios por diseño de ingeniería a un profesional residente en España. ¿Cuál es la tarifa de retención aplicable?
+```
+
+**Backup video:** `assets/videos/demo-1-cold-open.mp4`
+
+---
+
+### Demo #2 — Embeddings (§3)
+**URL:** http://localhost:3001 (embeddings-demo local)
+**Fallback URL:** https://clase-rags-eafit.vercel.app/embeddings (si está desplegado)
+
+**Par 1 (alta similitud):**
+- Texto 1: `trabajador extranjero`
+- Texto 2: `residente no colombiano`
+- Esperado: ~0.87
+
+**Par 2 (baja similitud):**
+- Texto 1: `trabajador extranjero`
+- Texto 2: `deducción por arrendamiento`
+- Esperado: ~0.31
+
+**Backup:** los pares ya están pre-computados en `app/page.tsx` como `FALLBACK`, si el API falla se muestran los valores hardcoded.
+
+---
+
+### Demo #3 — Autopsia (§4)
+**URL:** https://tribai.co/asistente (volver a la misma sesión del cold open)
+
+**Acción:** abrir el panel de evidencia (ícono "Fuentes" o "Ver evidencia" junto a la respuesta). Mostrar:
+1. Lista de documentos recuperados (título + namespace + score)
+2. Artículos del ET citados en la respuesta
+3. Confidence badge (alto/medio/bajo)
+
+**Backup video:** `assets/videos/demo-3-autopsia.mp4`
+
+---
+
+### Demo #4 — Kelsen (§4)
+**URL:** https://kelsen-psi.vercel.app
+
+**Query principal:**
+```
+¿Qué ha dicho la Corte Constitucional sobre el mínimo vital en pensiones?
+```
+
+**Query de backup:**
+```
+¿Cuáles son los requisitos de la tutela según la jurisprudencia de la Corte Constitucional colombiana?
+```
+
+**Backup video:** `assets/videos/demo-4-kelsen.mp4`
+
+---
+
+### Demo #5 — Receta mínima (§5)
+**Acción:** abrir VSCode en proyección secundaria (si disponible) con archivo `embeddings-demo/app/api/embed/route.ts` abierto.
+
+Si no hay proyección secundaria, el código ya está en el slide 32 con syntax highlighting.
+
+**Backup:** el slide mismo.
+
+---
+
+## Pre-flight checklist (ejecutar 30 min antes)
+
+- [ ] Confirmar créditos Anthropic arriba en tribai.co (enviar query corta de prueba)
+- [ ] tribai.co/asistente carga OK desde red EAFIT
+- [ ] kelsen-psi.vercel.app carga OK desde red EAFIT
+- [ ] localhost:3001 (embeddings-demo) corriendo en terminal de repuesto
+- [ ] Hotspot móvil listo (iPhone Personal Hotspot o Android)
+- [ ] Conectar MacBook a proyector + probar resolución
+- [ ] Abrir Chrome/Safari en modo presenter
+- [ ] Silenciar notificaciones (macOS DND on)
+- [ ] 4 pestañas pre-cargadas:
+  1. index.html de clase (localhost:3000)
+  2. tribai.co/asistente
+  3. kelsen-psi.vercel.app
+  4. embeddings-demo (localhost:3001)
+- [ ] Cargador + adaptador HDMI/USB-C en el bolso
+- [ ] `speaker-notes.md` impreso o abierto en iPad/celular
+```
+
+Escribir a `/Users/cristianespinal/clase-rags-eafit/demos/demo-script.md`.
+
+- [ ] **Step 2: Crear `speaker-notes.md` con bullets por sección**
+
+```markdown
+# Speaker Notes — Clase RAGs EAFIT 20-abr-2026 12:00
+
+## Tono general
+- Hablar despacio, respirar entre slides
+- Mirar al público, no al deck
+- Usar "ustedes" (no "tú"): audiencia EAFIT
+- Si ven caras perdidas, pausar y preguntar "¿alguna pregunta hasta aquí?"
+
+---
+
+## §0 · Cold open (5 min)
+
+**Abrir:** sonreír, presentarse, mencionar que Santiago los invitó.
+
+**Bullets:**
+- "Hoy no les voy a dar clase de bases de datos. Ya tienen eso. Les voy a mostrar qué pasa DESPUÉS de las bases de datos."
+- "Vamos a ver algo en vivo primero. Después lo desmontamos."
+- Ejecutar Demo #1. Mientras carga: "ojo a dos cosas: la respuesta y las fuentes que cita."
+- Post-respuesta: "¿cómo hizo eso? Lo averiguamos en 90 minutos, sin código."
+
+---
+
+## §1 · Paradigma (8 min)
+
+- "Lo que ustedes ya saben: SELECT devuelve filas. Funciona muy bien cuando la pregunta es literal."
+- "El problema: muchas preguntas no son literales. '¿Cómo le declaro renta a un trabajador extranjero?' — ni la palabra 'extranjero' aparece en los artículos relevantes."
+- Punto clave: **"los LLMs ya saben escribir. El trabajo ahora es pasarles los datos correctos."**
+- Cerrar con la frase: "RAG = cuaderno abierto vs memoria inventada."
+
+---
+
+## §2 · Galería (12 min)
+
+- "Antes de meternos en el cómo, veamos el qué. 7 ejemplos reales en 2 minutos cada uno."
+- Tocar levemente cada caso. No profundizar.
+- Micro-ejercicio slide 12: "por 30 segundos, piensen en SU dominio."
+- Cronometrar 30 segundos reales (miro reloj).
+
+---
+
+## §3 · Las piezas Lego (18 min) — SECCIÓN LARGA
+
+- Abrir con la metáfora: "imaginen un bibliotecario con una máquina de escribir".
+- Una pieza por slide, 2-3 min cada una.
+- Demo #2 (embeddings) cae aquí. Es el momento "aha" de la clase.
+- Si el demo falla: usar los valores hardcoded como backup narrativo.
+- Cerrar con slide de las 5 piezas juntas: "orquestar estas 5 = RAG."
+
+---
+
+## §4 · Flujo (12 min)
+
+- "Hasta aquí vimos las piezas. Ahora cómo las armó Tribai vs cómo las armó Kelsen."
+- Tribai = pipeline lineal (predecible, debuggable).
+- Demo #3: volver al cold open, abrir panel de evidencia.
+- Kelsen = agente con tools (más flexible, multi-paso).
+- Demo #4: Kelsen con query legal.
+- Punchline: **"no hay UN RAG. Hay decisiones de diseño."**
+
+---
+
+## §5 · Ecosistema (15 min) — SECCIÓN CENTRAL
+
+- "Este es el slide más importante de la clase."
+- Mapa de APIs: que cuenten los orbitales. 12.
+- "La BD es UNA de DOCE."
+- Costo real: $0.031 por query. Con optimización: $0.013.
+- Tabla "para replicar esto": todos los free tiers.
+- Demo #5: receta mínima de 60 líneas.
+- RAG de juguete vs productivo: "el salto es disciplina, no tecnología."
+- Cerrar: **"la BD es el cimiento. La orquestación es la arquitectura. Ambas son ingeniería."**
+
+---
+
+## §6 · Industria (10 min)
+
+- Harvey.ai $11B → "lo que hay en juego."
+- Agentic RAG: "la IA que decide cuándo actuar."
+- MCP: "USB-C de las IAs" — muy reciente, oportunidad para early adopters.
+- Multi-model: "usar el modelo correcto, no el más caro."
+- Cerrar: **"orquestar es la nueva ingeniería de software."**
+
+---
+
+## §7 · Colombia (5 min)
+
+- "300K contadores, 410K abogados, 50M habitantes — en Colombia sola."
+- 6 dominios candidatos. Que escojan uno mentalmente.
+- Plan de 4 semanas: les doy el roadmap.
+- **"Si arman el MVP, me escriben. Yo los ayudo."** ← cerrar con eso.
+
+---
+
+## §8 · Cierre (5 min)
+
+- "De SELECT a orquestación. La ingeniería cambió de forma."
+- Agradecer a Santiago y a EAFIT.
+- Q&A abierto.
+- Si no hay preguntas, invitar a acercarse al escritorio.
+- Compartir enlaces: tribai.co, kelsen-psi.vercel.app, github.com/Cespial/clase-rags-eafit.
+
+---
+
+## Plan B — si algo falla
+
+| Problema | Acción |
+|---|---|
+| Red EAFIT lenta | Cambiar a hotspot móvil (pre-configurado) |
+| Demo #1 responde raro | Usar query backup #1 o #2 de demo-script.md |
+| localhost:3001 cayó | Usar fallback hardcoded en el slide |
+| Iframe no carga | Abrir URL directamente en pestaña externa (alt-tab) |
+| Proyector no muestra | Pedir 2 min, reconectar HDMI; mientras contar anécdota de Tribai |
+| Me trabo con una pregunta difícil | "Excelente pregunta — ¿me das 2 segundos? Vamos al siguiente y volvemos" |
+
+---
+
+## Métricas de éxito post-clase
+
+- [ ] Al menos 3 estudiantes se acercan a preguntar al final
+- [ ] Al menos 1 se suscribe a tribai.co o clona el repo
+- [ ] Santiago dice "vuelve el próximo semestre"
+- [ ] Me llega al menos 1 email pidiendo mentoría en las 72h siguientes
+```
+
+Escribir a `/Users/cristianespinal/clase-rags-eafit/demos/speaker-notes.md`.
+
+- [ ] **Step 3: Commit**
+
+```bash
+cd /Users/cristianespinal/clase-rags-eafit
+git add demos/
+git -c commit.gpgsign=false commit -m "docs: speaker notes + demo script + plan B"
+git push origin main
+```
+
+---
+
+### Task 15: Grabar 5 videos de backup + capturar screenshots
+
+**Files:**
+- Create: `/Users/cristianespinal/clase-rags-eafit/assets/videos/demo-1-cold-open.mp4`
+- Create: `/Users/cristianespinal/clase-rags-eafit/assets/videos/demo-2-embeddings.mp4`
+- Create: `/Users/cristianespinal/clase-rags-eafit/assets/videos/demo-3-autopsia.mp4`
+- Create: `/Users/cristianespinal/clase-rags-eafit/assets/videos/demo-4-kelsen.mp4`
+- Create: `/Users/cristianespinal/clase-rags-eafit/assets/videos/demo-5-receta.mp4`
+- Create: `/Users/cristianespinal/clase-rags-eafit/assets/screenshots/tribai-asistente.png`
+- Create: `/Users/cristianespinal/clase-rags-eafit/assets/screenshots/kelsen-chat.png`
+
+- [ ] **Step 1: Grabar 5 videos con QuickTime Screen Recording**
+
+Para cada demo:
+1. Abrir QuickTime → File → New Screen Recording (Cmd+Shift+5)
+2. Seleccionar región de la pantalla (solo el browser)
+3. Ejecutar la demo siguiendo `demo-script.md`
+4. Grabar 30-60 segundos
+5. Guardar como MP4 en `assets/videos/demo-X.mp4`
+
+**Orden sugerido (por si se acaba tiempo):**
+1. Demo #1 cold open — PRIORITARIO (el más visto)
+2. Demo #4 Kelsen — PRIORITARIO (segundo más visto)
+3. Demo #3 autopsia — MEDIO
+4. Demo #2 embeddings — BAJO (ya tiene fallback hardcoded)
+5. Demo #5 receta — BAJO (ya es solo código)
+
+- [ ] **Step 2: Capturar 2 screenshots**
+
+Abrir tribai.co/asistente, hacer una query, tomar screenshot (Cmd+Shift+4 → región) y guardar como `tribai-asistente.png`.
+
+Mismo proceso para kelsen-psi.vercel.app → `kelsen-chat.png`.
+
+- [ ] **Step 3: Agregar botón "ver sin red" en slides de demos (opcional, ya contemplado en `onerror`)**
+
+Los slides ya tienen fallback si falla la imagen. Para videos, agregar a `index.html` un listener de tecla "B" que muestre/oculte el video de backup en la slide actual (opcional si hay tiempo).
+
+- [ ] **Step 4: Commit videos + screenshots**
+
+**⚠️ Cuidado:** videos MP4 pueden ser grandes. Verificar tamaño antes.
+
+```bash
+cd /Users/cristianespinal/clase-rags-eafit
+du -sh assets/videos/ assets/screenshots/
+# Si videos > 50MB total, considerar comprimirlos con:
+# ffmpeg -i input.mp4 -vcodec h264 -acodec aac -crf 28 -preset medium output.mp4
+git add assets/videos/ assets/screenshots/
+git -c commit.gpgsign=false commit -m "assets: 5 videos backup + 2 screenshots de referencia"
+git push origin main
+```
+
+Si los videos son muy grandes (>100MB), subirlos a Vercel Blob o YouTube no-listado y embeber.
+
+---
+
+### Task 16: Deploy Vercel + smoke test final + rehearsal
+
+**Files:**
+- Modify: `/Users/cristianespinal/clase-rags-eafit/vercel.json` (validar)
+
+- [ ] **Step 1: Deploy Reveal deck a Vercel**
+
+```bash
+cd /Users/cristianespinal/clase-rags-eafit
+vercel --prod --yes
+```
+
+Expected: URL pública tipo `https://clase-rags-eafit-xxx.vercel.app`.
+
+Guardar la URL en README.md.
+
+- [ ] **Step 2: Deploy embeddings-demo como proyecto separado**
+
+```bash
+cd /Users/cristianespinal/clase-rags-eafit/embeddings-demo
+vercel --prod --yes
+# Agregar VOYAGE_API_KEY en dashboard Vercel (Settings → Env Vars)
+```
+
+Guardar URL en README.md y actualizar slide 17 si el URL es distinto de `localhost:3001`.
+
+- [ ] **Step 3: Smoke test final completo**
+
+Run:
+```bash
+# Desde una red distinta (hotspot celular), abrir:
+open "https://clase-rags-eafit-xxx.vercel.app"
+# Navegar slide 1 a 44, verificar cada uno
+# Ejecutar Demo #1 en vivo
+# Ejecutar Demo #2 en vivo
+# Ejecutar Demo #4 en vivo
+```
+
+Expected: todos los slides cargan, fuentes renderizan, SVGs visibles, demos funcionan.
+
+- [ ] **Step 4: Rehearsal cronometrado (90 min)**
+
+Correr la clase completa frente al espejo o grabándome. Cronometrar por sección:
+- §0: 5 min objetivo
+- §1: 8 min
+- §2: 12 min
+- §3: 18 min (la más larga)
+- §4: 12 min
+- §5: 15 min
+- §6: 10 min
+- §7: 5 min
+- §8: 5 min
+
+Si alguna sección se alarga >20%, identificar qué cortar.
+
+- [ ] **Step 5: Commit de ajustes post-rehearsal**
+
+Si algún slide necesitó ajuste de timing/contenido:
+```bash
+cd /Users/cristianespinal/clase-rags-eafit
+git add .
+git -c commit.gpgsign=false commit -m "polish: ajustes post-rehearsal"
+git push origin main
+vercel --prod --yes
+```
+
+---
+
+## Self-Review
+
+### 1. Spec coverage
+
+| Spec section | Task | Status |
+|---|---|---|
+| §4 Outline de contenido | Tasks 4-12 | ✓ |
+| §5 Arquitectura técnica (Reveal + tokens) | Task 1 | ✓ |
+| §5 Templates de slide (6 tipos) | Usado en Tasks 4-12 | ✓ |
+| §6 Diagramas SVG (7 piezas) | Task 3 | ✓ |
+| §7 Demos en vivo (5) | Tasks 14 + 15 | ✓ |
+| §8 Riesgos y mitigaciones | Task 14 (demo-script.md) | ✓ |
+| §9 Plan de ejecución | Este plan completo | ✓ |
+| §10 Definition of done | Task 16 | ✓ |
+| embeddings-demo Next.js | Task 13 | ✓ |
+| Deploy Vercel | Task 16 | ✓ |
+| Repo público GitHub | Ya creado (pre-plan) | ✓ |
+
+### 2. Placeholder scan
+
+Revisé el plan. Sin TBD, TODO, o "add appropriate handling". Cada step tiene código completo o comando exacto.
+
+### 3. Type consistency
+
+- `Reveal.initialize({...})` consistente en Task 1.
+- `demo-script.md` y `speaker-notes.md` ambos usan el mismo prefix `Demo #N`.
+- Slide IDs (1/44 → 44/44) consistentes.
+- Paths `/Users/cristianespinal/clase-rags-eafit/` idénticos en todo.
+- Ruta del fallback `FALLBACK` en page.tsx (Task 13 Step 7) usa las mismas frases que `EXAMPLES`.
+
+### 4. Slide count verification
+
+- §0: 2 (slides 1-2)
+- §1: 4 (slides 3-6)
+- §2: 7 (slides 7-13)
+- §3: 8 (slides 14-21)
+- §4: 6 (slides 22-27)
+- §5: 7 (slides 28-34)
+- §6: 5 (slides 35-39)
+- §7: 3 (slides 40-42)
+- §8: 2 (slides 43-44)
+- **Total: 44 ✓**
+
+---
+
+## Execution Handoff
+
+Plan complete and saved to `docs/superpowers/plans/2026-04-19-clase-rags-eafit-implementation.md`. Two execution options:
+
+**1. Subagent-Driven (recommended)** - Dispatch a fresh subagent per task, review between tasks, fast iteration.
+
+**2. Inline Execution** - Execute tasks in this session using executing-plans, batch execution with checkpoints.
+
+Which approach?

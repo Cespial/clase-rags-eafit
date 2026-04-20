@@ -522,7 +522,35 @@ blockquote {
   </aside>
 </section>
       <!-- §1 Paradigma -->
-      <section>
+      <section class="muted">
+  <div class="eyebrow">§1 · antes de empezar</div>
+  <h2>Una pregunta para ustedes</h2>
+  <div style="margin-top: 2rem; max-width: 1100px;">
+    <p style="font-size: 1.5rem; line-height: 1.6; color: var(--fg);">
+      ¿Alguna vez le preguntaron algo técnico a ChatGPT, respondió muy seguro…
+      <br/>
+      y cuando lo revisaron con calma, estaba <strong style="color: #dc2626;">mal</strong>?
+    </p>
+    <p style="margin-top: 2rem; font-size: 1.25rem; color: var(--fg-body);">
+      Un artículo inventado. Un año que no existe. Una fórmula que no cuadra.
+    </p>
+    <p style="margin-top: 1.5rem; font-size: 1.25rem; color: var(--fg-body);">
+      <em>A todos nos ha pasado.</em>
+    </p>
+    <div class="card" style="margin-top: 2rem; background: var(--tribai-navy); color: white; border: none;">
+      <p style="color: rgba(255,255,255,0.9); font-size: 1.25rem; line-height: 1.5;">
+        Los próximos 90 minutos van a ser sobre <strong style="color: var(--tribai-gold);">por qué pasa eso</strong> — y sobre la técnica que lo resuelve.
+      </p>
+    </div>
+  </div>
+  <aside class="notes">
+    Pregunta en voz alta. Espero 2-3 segundos. Ver cabezas asintiendo.
+    "Esta clase es sobre POR QUÉ pasa eso y cómo lo resolvemos en productos reales."
+    Engancha desde lo personal antes de entrar a lo técnico.
+  </aside>
+</section>
+
+<section>
   <div class="eyebrow">§1 · El cambio de paradigma</div>
   <h2>Lo que les enseñan en el curso</h2>
   <div style="display: flex; gap: 3rem; align-items: center; margin-top: 2rem;">
@@ -1475,6 +1503,104 @@ PREGUNTA DEL USUARIO:
 </section>
 
 <section class="muted">
+  <div class="eyebrow">§4 · cámara lenta</div>
+  <h2>Sigamos una query, milisegundo por milisegundo</h2>
+  <p style="margin-top: 0.5rem; color: var(--fg-muted); font-size: 1.125rem;">
+    Juan, contador en Cali, escribe su pregunta y presiona Enter. <strong>Son 2,780 milisegundos.</strong> Esto es lo que pasa:
+  </p>
+  <div style="margin-top: 1.25rem; font-size: 0.95rem;">
+    <div style="display: grid; grid-template-columns: 80px 1fr 120px; gap: 1rem; align-items: center; padding: 0.6rem 0; border-bottom: 1px solid var(--border);">
+      <span class="stat" style="font-size: 1rem;">0 ms</span>
+      <span>El browser de Juan envía la pregunta a <code>tribai.co/api/chat</code>.</span>
+      <span style="color: var(--fg-muted); font-size: 0.85rem;">Edge runtime</span>
+    </div>
+    <div style="display: grid; grid-template-columns: 80px 1fr 120px; gap: 1rem; align-items: center; padding: 0.6rem 0; border-bottom: 1px solid var(--border);">
+      <span class="stat" style="font-size: 1rem;">40 ms</span>
+      <span>Se revisa el <strong>cache LRU</strong> (500 preguntas frecuentes). Esta no está cacheada.</span>
+      <span style="color: var(--fg-muted); font-size: 0.85rem;">in-memory</span>
+    </div>
+    <div style="display: grid; grid-template-columns: 80px 1fr 120px; gap: 1rem; align-items: center; padding: 0.6rem 0; border-bottom: 1px solid var(--border);">
+      <span class="stat" style="font-size: 1rem;">380 ms</span>
+      <span><strong>Haiku 4.5</strong> reescribe la pregunta + genera 2 "respuestas hipotéticas" (HyDE).</span>
+      <span style="color: var(--fg-muted); font-size: 0.85rem;">Anthropic</span>
+    </div>
+    <div style="display: grid; grid-template-columns: 80px 1fr 120px; gap: 1rem; align-items: center; padding: 0.6rem 0; border-bottom: 1px solid var(--border);">
+      <span class="stat" style="font-size: 1rem;">520 ms</span>
+      <span>Pinecone busca en <strong>6 namespaces</strong> en paralelo: ET + doctrina + jurisprudencia + decretos + resoluciones + leyes.</span>
+      <span style="color: var(--fg-muted); font-size: 0.85rem;">Pinecone</span>
+    </div>
+    <div style="display: grid; grid-template-columns: 80px 1fr 120px; gap: 1rem; align-items: center; padding: 0.6rem 0; border-bottom: 1px solid var(--border);">
+      <span class="stat" style="font-size: 1rem;">720 ms</span>
+      <span>Cross-encoder en Cloud Run hace <strong>rerank</strong> de 60 candidatos → 15 finales.</span>
+      <span style="color: var(--fg-muted); font-size: 0.85rem;">Cloud Run</span>
+    </div>
+    <div style="display: grid; grid-template-columns: 80px 1fr 120px; gap: 1rem; align-items: center; padding: 0.6rem 0; border-bottom: 1px solid var(--border);">
+      <span class="stat" style="font-size: 1rem;">780 ms</span>
+      <span>Se arma el contexto XML: 12 KB de evidencia seleccionada + reglas del contrato.</span>
+      <span style="color: var(--fg-muted); font-size: 0.85rem;">código local</span>
+    </div>
+    <div style="display: grid; grid-template-columns: 80px 1fr 120px; gap: 1rem; align-items: center; padding: 0.6rem 0;">
+      <span class="stat" style="font-size: 1rem;">2,780 ms</span>
+      <span><strong>Sonnet 4.6</strong> redacta la respuesta y la envía por streaming a la pantalla de Juan.</span>
+      <span style="color: var(--fg-muted); font-size: 0.85rem;">Anthropic</span>
+    </div>
+  </div>
+  <p style="margin-top: 1rem; font-size: 1rem; color: var(--fg-muted); text-align: center;">
+    Juan ve la primera palabra en su pantalla <strong>aproximadamente al segundo 1</strong>. El resto llega en streaming mientras lee.
+  </p>
+  <aside class="notes">
+    Narración en voz alta, lenta. "Juan en Cali, 9 am. Escribe. Enter."
+    "Nada de magia — cada caja del diagrama anterior es una llamada HTTP real que cuesta plata."
+    Dejar que sientan la orquestación paso a paso.
+  </aside>
+</section>
+
+<section>
+  <div class="eyebrow">§4 · la vez que algo salió mal</div>
+  <h2>Historia real de debugging</h2>
+  <div style="display: flex; gap: 2rem; margin-top: 1.5rem;">
+    <div style="flex: 1.2;">
+      <div class="card" style="background: #fef3c7; border-left: 4px solid var(--tribai-gold); border-radius: 0 var(--radius-md) var(--radius-md) 0;">
+        <div class="badge-gold" style="margin-bottom: 0.5rem;">SEPTIEMBRE 2025</div>
+        <p style="font-size: 1.05rem; line-height: 1.55;">
+          Un contador nos escribe: <em>"Tribai me respondió citando el <strong>IMAS</strong>, pero ese régimen fue derogado en 2019."</em>
+        </p>
+      </div>
+      <div style="margin-top: 1.25rem;">
+        <h3 style="font-size: 1rem; color: var(--tribai-blue); text-transform: uppercase; letter-spacing: 0.08em;">Qué había pasado</h3>
+        <ol style="margin-top: 0.5rem; font-size: 1rem; line-height: 1.6;">
+          <li>Habíamos indexado el texto histórico del artículo, sin distinguir entre "vigente" y "derogado"</li>
+          <li>Los embeddings del IMAS se parecen mucho a los de renta ordinaria (tema común)</li>
+          <li>El LLM citó el IMAS sin saber que ya no aplica</li>
+        </ol>
+      </div>
+    </div>
+    <div style="flex: 1;">
+      <div class="card" style="background: var(--tribai-navy); color: white;">
+        <div class="badge-gold" style="margin-bottom: 0.75rem;">LA SOLUCIÓN</div>
+        <ul style="line-height: 1.55; color: rgba(255,255,255,0.9); font-size: 0.95rem;">
+          <li><strong style="color: var(--tribai-gold);">Metadata</strong>: cada chunk ahora tiene <code style="color: var(--tribai-gold);">estado: vigente | derogado</code></li>
+          <li><strong style="color: var(--tribai-gold);">Penalización</strong>: el reranker resta 0.30 a los chunks derogados</li>
+          <li><strong style="color: var(--tribai-gold);">Prompt</strong>: "si citas algo derogado, márcalo explícitamente"</li>
+          <li><strong style="color: var(--tribai-gold);">Tests</strong>: 15 smoke tests nuevos cubriendo regímenes históricos</li>
+        </ul>
+      </div>
+      <p style="margin-top: 1rem; font-size: 0.9rem; color: var(--fg-muted); text-align: center; font-style: italic;">
+        Al cabo de 3 días se desplegó el fix. El contador volvió a escribir: "ahora sí."
+      </p>
+    </div>
+  </div>
+  <p style="margin-top: 1.25rem; font-size: 1.125rem; text-align: center; color: var(--fg-body);">
+    <strong>Construir RAG es iterar con feedback real.</strong> No "hay un bug": <em>hay una evolución del contexto</em>.
+  </p>
+  <aside class="notes">
+    Historia real, escalada de Tribai con Jaime y Santiago. Humaniza el trabajo.
+    Mensaje: los bugs en RAG son distintos — no fallan las funciones, falla el CONTEXTO.
+    La iteración es con usuarios reales, no con unit tests aisladas.
+  </aside>
+</section>
+
+<section class="muted">
   <div class="eyebrow">Demo #3 · en vivo</div>
   <h2>Autopsia — volvamos al cold open</h2>
   <div style="margin-top: 1rem;">
@@ -1794,6 +1920,77 @@ PREGUNTA DEL USUARIO:
   </aside>
 </section>
 
+<section>
+  <div class="eyebrow">§5 · sigan el centavo</div>
+  <h2>¿A dónde va cada centavo de un query de $0.013?</h2>
+  <p style="margin-top: 0.5rem; color: var(--fg-muted); font-size: 1.125rem;">
+    Imaginen que Juan en Cali acaba de preguntar. <strong>1.3 centavos de dólar</strong> se acaban de gastar. Los rastreamos:
+  </p>
+  <div style="display: grid; grid-template-columns: 1fr 2fr 120px; gap: 0.75rem; align-items: center; margin-top: 1rem;">
+    <div style="text-align: right;">
+      <span class="stat" style="font-size: 1.25rem;">$0.0060</span>
+      <div style="color: var(--fg-muted); font-size: 0.85rem;">46%</div>
+    </div>
+    <div>
+      <div style="background: var(--tribai-blue); height: 24px; border-radius: 4px; width: 46%;"></div>
+      <p style="margin-top: 0.25rem; font-size: 0.95rem;"><strong>Anthropic Sonnet</strong> — redacta la respuesta final (~4K tokens de salida)</p>
+    </div>
+    <span style="color: var(--fg-muted); font-size: 0.85rem;">llm</span>
+  </div>
+  <div style="display: grid; grid-template-columns: 1fr 2fr 120px; gap: 0.75rem; align-items: center; margin-top: 0.5rem;">
+    <div style="text-align: right;">
+      <span class="stat" style="font-size: 1.25rem;">$0.0025</span>
+      <div style="color: var(--fg-muted); font-size: 0.85rem;">19%</div>
+    </div>
+    <div>
+      <div style="background: var(--tribai-light-blue); height: 24px; border-radius: 4px; width: 19%;"></div>
+      <p style="margin-top: 0.25rem; font-size: 0.95rem;"><strong>Anthropic Haiku</strong> — rewrite + HyDE + routing</p>
+    </div>
+    <span style="color: var(--fg-muted); font-size: 0.85rem;">llm barato</span>
+  </div>
+  <div style="display: grid; grid-template-columns: 1fr 2fr 120px; gap: 0.75rem; align-items: center; margin-top: 0.5rem;">
+    <div style="text-align: right;">
+      <span class="stat" style="font-size: 1.25rem;">$0.0020</span>
+      <div style="color: var(--fg-muted); font-size: 0.85rem;">15%</div>
+    </div>
+    <div>
+      <div style="background: var(--tribai-gold); height: 24px; border-radius: 4px; width: 15%;"></div>
+      <p style="margin-top: 0.25rem; font-size: 0.95rem;"><strong>Cohere Rerank</strong> — reordena 60 candidatos → 15</p>
+    </div>
+    <span style="color: var(--fg-muted); font-size: 0.85rem;">rerank</span>
+  </div>
+  <div style="display: grid; grid-template-columns: 1fr 2fr 120px; gap: 0.75rem; align-items: center; margin-top: 0.5rem;">
+    <div style="text-align: right;">
+      <span class="stat" style="font-size: 1.25rem;">$0.0015</span>
+      <div style="color: var(--fg-muted); font-size: 0.85rem;">12%</div>
+    </div>
+    <div>
+      <div style="background: #9ca3af; height: 24px; border-radius: 4px; width: 12%;"></div>
+      <p style="margin-top: 0.25rem; font-size: 0.95rem;"><strong>Pinecone</strong> — busca en 36K vectores</p>
+    </div>
+    <span style="color: var(--fg-muted); font-size: 0.85rem;">vector</span>
+  </div>
+  <div style="display: grid; grid-template-columns: 1fr 2fr 120px; gap: 0.75rem; align-items: center; margin-top: 0.5rem;">
+    <div style="text-align: right;">
+      <span class="stat" style="font-size: 1.25rem;">$0.0010</span>
+      <div style="color: var(--fg-muted); font-size: 0.85rem;">8%</div>
+    </div>
+    <div>
+      <div style="background: #6b7280; height: 24px; border-radius: 4px; width: 8%;"></div>
+      <p style="margin-top: 0.25rem; font-size: 0.95rem;"><strong>Voyage</strong> — embeddings de la query y sub-queries</p>
+    </div>
+    <span style="color: var(--fg-muted); font-size: 0.85rem;">embed</span>
+  </div>
+  <p style="margin-top: 1.25rem; font-size: 1.0625rem; color: var(--fg-body); text-align: center;">
+    <strong>65% se va en LLMs</strong> (Sonnet + Haiku). Por eso el mayor ahorro está en <em>caching</em> y en <em>elegir el modelo correcto</em>.
+  </p>
+  <aside class="notes">
+    El gráfico en barras cuenta una historia: "el LLM es el gasto dominante — por eso optimizamos caching primero".
+    Números reales de telemetría de Tribai.
+    Punto: cuando cobran $10 USD/mes y el costo es $0.013/query, tienen muchísimo margen.
+  </aside>
+</section>
+
 <section class="muted">
   <div class="eyebrow">§5 · replicable</div>
   <h2>Para construir el suyo este mes necesitan:</h2>
@@ -1898,6 +2095,54 @@ async function ask(question: string) {
 </section>
 
 <section>
+  <div class="eyebrow">§5 · el día que Langfuse nos salvó</div>
+  <h2>Por qué la observabilidad no es opcional</h2>
+  <div style="display: flex; gap: 2rem; margin-top: 1.5rem;">
+    <div style="flex: 1.3;">
+      <div class="card" style="background: #fef3c7; border-left: 4px solid var(--tribai-gold); border-radius: 0 var(--radius-md) var(--radius-md) 0;">
+        <div class="badge-gold" style="margin-bottom: 0.5rem;">UN MARTES CUALQUIERA · MARZO 2026</div>
+        <p style="font-size: 1.05rem; line-height: 1.55;">
+          Lanzamos un "pequeño" cambio: subimos el top-K del retrieval de 10 a 20. "Más contexto, mejor respuesta", pensamos.
+        </p>
+      </div>
+      <p style="margin-top: 1rem; font-size: 1rem; color: var(--fg-body); line-height: 1.5;">
+        A las 4 horas, Langfuse nos muestra en el dashboard:
+      </p>
+      <ul style="margin-top: 0.5rem; font-size: 1rem; line-height: 1.7;">
+        <li><span class="stat">latencia p95</span>: 3.2s → <strong style="color: #dc2626;">7.8s</strong></li>
+        <li><span class="stat">costo por query</span>: $0.013 → <strong style="color: #dc2626;">$0.028</strong></li>
+        <li><span class="stat">calidad (LLM-as-judge)</span>: 4.2/5 → <strong style="color: #dc2626;">3.8/5</strong></li>
+      </ul>
+      <p style="margin-top: 1rem; font-size: 1rem; color: var(--fg-body); line-height: 1.5;">
+        El contexto extra estaba <em>confundiendo</em> al modelo. Más no era mejor. Rollback en 15 minutos.
+      </p>
+    </div>
+    <div style="flex: 1;">
+      <div class="card" style="background: var(--tribai-navy); color: white;">
+        <div class="badge-gold" style="margin-bottom: 0.75rem;">LA LECCIÓN</div>
+        <p style="color: rgba(255,255,255,0.9); line-height: 1.6; font-size: 0.95rem;">
+          <strong style="color: var(--tribai-gold);">Sin observabilidad, ese cambio habría vivido en producción semanas.</strong>
+        </p>
+        <p style="margin-top: 1rem; color: rgba(255,255,255,0.9); line-height: 1.6; font-size: 0.95rem;">
+          Nadie se habría quejado — las respuestas seguían saliendo. Solo que peor, más lentas y más caras.
+        </p>
+        <p style="margin-top: 1rem; color: rgba(255,255,255,0.85); line-height: 1.6; font-size: 0.95rem; font-style: italic;">
+          El problema de RAG es silencioso: degrada sin romper.
+        </p>
+      </div>
+      <div style="margin-top: 1rem; padding: 0.75rem; background: var(--bg-muted-section); border-radius: 6px; font-size: 0.85rem; color: var(--fg-muted);">
+        <strong>Alternativas:</strong> Datadog, LangSmith, Helicone, Arize. Todas tienen free tier.
+      </div>
+    </div>
+  </div>
+  <aside class="notes">
+    Historia real. Observabilidad es LO QUE MÁS se posterga y es lo primero que salva culos.
+    Mensaje: "si empiezan un RAG, instalen Langfuse el día 1, no el mes 3".
+    Free tier basta para pruebas.
+  </aside>
+</section>
+
+<section>
   <div class="eyebrow">§5 · ingeniería real</div>
   <h2>Lo que diferencia un RAG de juguete de uno productivo</h2>
   <div class="grid-2" style="margin-top: 1.5rem;">
@@ -1947,7 +2192,48 @@ async function ask(question: string) {
   </aside>
 </section>
       <!-- §6 Industria -->
-      <section class="muted">
+      <section>
+  <div class="eyebrow">§6 · el experimento de Stanford</div>
+  <h2>La historia del 43%</h2>
+  <p style="margin-top: 0.5rem; color: var(--fg-muted); font-size: 1.125rem;">
+    En 2025, un grupo de Stanford hizo algo simple: <strong>preguntarle a cada herramienta de IA legal 200 preguntas reales de abogados</strong> y contar cuántas respuestas eran inventadas.
+  </p>
+  <div class="grid-3" style="margin-top: 2rem; align-items: stretch;">
+    <div class="card" style="border-top: 4px solid #16a34a;">
+      <div class="stat" style="font-size: 3.5rem; line-height: 1;">17%</div>
+      <h3 style="margin-top: 0.5rem; font-size: 1.1rem;">Lexis+ AI</h3>
+      <p style="color: var(--fg-muted); font-size: 0.95rem;">Producto dedicado, corpus legal propio, RAG bien ajustado</p>
+    </div>
+    <div class="card" style="border-top: 4px solid var(--tribai-gold);">
+      <div class="stat" style="font-size: 3.5rem; line-height: 1;">33%</div>
+      <h3 style="margin-top: 0.5rem; font-size: 1.1rem;">Westlaw AI</h3>
+      <p style="color: var(--fg-muted); font-size: 0.95rem;">Otro producto dedicado, RAG pero peor calibrado</p>
+    </div>
+    <div class="card" style="border-top: 4px solid #dc2626;">
+      <div class="stat" style="font-size: 3.5rem; line-height: 1;">43%</div>
+      <h3 style="margin-top: 0.5rem; font-size: 1.1rem;">GPT-4 solo</h3>
+      <p style="color: var(--fg-muted); font-size: 0.95rem;">El LLM más poderoso del mundo, <strong>sin RAG</strong></p>
+    </div>
+  </div>
+  <p style="margin-top: 1.5rem; font-size: 1.125rem; color: var(--fg-body); line-height: 1.5;">
+    Los autores concluyeron algo importante: <strong>la mayoría de las "alucinaciones" que encontraron NO eran del LLM</strong>. Eran <em>fallos de retrieval</em>: el sistema no encontraba la fuente correcta y el modelo llenaba el hueco.
+  </p>
+  <div class="card" style="background: var(--tribai-navy); color: white; border: none; margin-top: 1.25rem;">
+    <p style="color: rgba(255,255,255,0.9); font-size: 1.125rem; line-height: 1.5;">
+      <strong style="color: var(--tribai-gold);">Traducción para ustedes:</strong> para reducir alucinaciones, no gasten energía "haciendo el LLM más inteligente". Gasten energía <strong>mejorando el retrieval</strong>.
+    </p>
+  </div>
+  <p style="margin-top: 1rem; font-size: 0.85rem; color: var(--fg-muted); text-align: center;">
+    Fuente: Stanford HAI, <em>"Hallucination-Free? Assessing the Reliability of Leading AI Legal Research Tools"</em> — JELS 2025.
+  </p>
+  <aside class="notes">
+    Historia narrada. "Un grupo en Stanford se puso a medir. Y esto es lo que encontraron."
+    Contraste: el modelo "dumb" con buen contexto (Lexis+) supera al modelo "genial" sin contexto (GPT-4).
+    La moraleja es MUY importante: la ingeniería de retrieval importa más que el modelo. Por eso les estoy enseñando RAG.
+  </aside>
+</section>
+
+<section class="muted">
   <div class="eyebrow">§6 · industria</div>
   <h2>Harvey.ai — el caso de estudio</h2>
   <div style="display: flex; gap: 3rem; margin-top: 2rem;">
@@ -2099,7 +2385,50 @@ async function ask(question: string) {
   </aside>
 </section>
       <!-- §7 Colombia -->
-      <section>
+      <section class="muted">
+  <div class="eyebrow">§7 · por qué desde Colombia</div>
+  <h2>Les voy a contar cómo empezó esto</h2>
+  <div style="display: flex; gap: 2.5rem; margin-top: 1.5rem; align-items: center;">
+    <div style="flex: 1;">
+      <p style="font-size: 1.15rem; line-height: 1.6;">
+        Hace un par de años, <strong>mi socio Jaime</strong> — contador público, 20 años ejerciendo — me mostraba cómo pasaba sus sábados.
+      </p>
+      <p style="margin-top: 1rem; font-size: 1.15rem; line-height: 1.6; color: var(--fg-body);">
+        Abría el PDF del Estatuto Tributario. <em>Ctrl+F</em>. Buscaba "retención". 240 matches. Scroll.
+      </p>
+      <p style="margin-top: 1rem; font-size: 1.15rem; line-height: 1.6; color: var(--fg-body);">
+        Llamaba a un colega: <em>"¿vos sabés si esto sigue vigente o lo derogaron?"</em>
+      </p>
+      <p style="margin-top: 1rem; font-size: 1.15rem; line-height: 1.6; color: var(--fg-body);">
+        Abría Excel. Calculaba a mano. <strong>4 horas después</strong>, una respuesta que podía citar.
+      </p>
+    </div>
+    <div style="flex: 1;">
+      <div class="card" style="background: var(--tribai-navy); color: white; border: none;">
+        <div class="badge-gold" style="margin-bottom: 0.75rem;">EL CLICK</div>
+        <p style="color: rgba(255,255,255,0.9); font-size: 1.1rem; line-height: 1.55;">
+          "Esto no es un problema de Jaime. Es un problema de <strong style="color: var(--tribai-gold);">los 300,000 contadores de Colombia</strong>."
+        </p>
+        <p style="margin-top: 1rem; color: rgba(255,255,255,0.85); font-size: 1rem; line-height: 1.5;">
+          Harvey.ai lo resolvió en USA para los abogados corporativos y vale $11B.
+        </p>
+        <p style="margin-top: 1rem; color: rgba(255,255,255,0.85); font-size: 1rem; line-height: 1.5;">
+          Nadie lo había hecho en español colombiano para contadores. Así nació <strong style="color: var(--tribai-gold);">Tribai</strong>.
+        </p>
+      </div>
+    </div>
+  </div>
+  <p style="margin-top: 1.25rem; font-size: 1.15rem; color: var(--fg-body); text-align: center; font-style: italic;">
+    La ventaja de construir desde Colombia no es técnica — es que <strong>conocemos el dolor específico</strong>.
+  </p>
+  <aside class="notes">
+    Historia personal real. Narrar despacio.
+    El punto: las mejores oportunidades no están en Silicon Valley — están donde uno SIENTE el problema.
+    "¿Conocen a un contador? ¿Un abogado? ¿Un médico rural? Ahí está su próxima empresa."
+  </aside>
+</section>
+
+<section>
   <div class="eyebrow">§7 · por qué aquí</div>
   <h2>La oportunidad LATAM</h2>
   <div class="grid-3" style="margin-top: 2rem;">

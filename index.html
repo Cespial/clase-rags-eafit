@@ -300,6 +300,49 @@ WHERE texto ILIKE '%retención%extranjero%';</code></pre>
   </aside>
 </section>
 
+<section class="muted">
+  <div class="eyebrow">§2 · una historia real</div>
+  <h2>Camila me escribió un domingo</h2>
+  <div style="display: flex; gap: 2rem; margin-top: 1.5rem;">
+    <div style="flex: 1.2;">
+      <div class="card" style="background: white; border-left: 4px solid var(--tribai-blue); border-radius: 0 var(--radius-md) var(--radius-md) 0;">
+        <div class="badge-gold" style="margin-bottom: 0.5rem;">WHATSAPP · DOMINGO 8:47 PM</div>
+        <p style="font-size: 1.05rem; line-height: 1.55; color: var(--fg); font-style: italic;">
+          "Cris, hola. Soy Camila, contadora en Pereira. Llevo 3 semanas usando Tribai. Mañana entrego la declaración de un cliente que viene fastidiado desde el 2022 porque nadie le ha explicado por qué tuvo que pagar tanto."
+        </p>
+        <p style="margin-top: 0.75rem; font-size: 1.05rem; line-height: 1.55; color: var(--fg); font-style: italic;">
+          "Con Tribai encontré en 20 minutos lo que no había encontrado yo en dos años. Mañana le voy a explicar con las citas exactas del ET por qué pagó de más y cómo lo vamos a corregir con una solicitud de devolución."
+        </p>
+        <p style="margin-top: 0.75rem; font-size: 1.05rem; line-height: 1.55; color: var(--fg); font-style: italic;">
+          "Gracias. Seriamente."
+        </p>
+      </div>
+    </div>
+    <div style="flex: 1;">
+      <div class="card" style="background: var(--tribai-navy); color: white; border: none;">
+        <div class="badge-gold" style="margin-bottom: 0.75rem;">POR QUÉ IMPORTA</div>
+        <p style="color: rgba(255,255,255,0.9); font-size: 1.05rem; line-height: 1.5;">
+          Camila no es "una usuaria más". Es <strong style="color: var(--tribai-gold);">una profesional que recupera dinero para un cliente real</strong>.
+        </p>
+        <p style="margin-top: 1rem; color: rgba(255,255,255,0.9); font-size: 1.05rem; line-height: 1.5;">
+          El RAG no le hizo el trabajo — le devolvió el tiempo para <em>pensar</em>.
+        </p>
+        <p style="margin-top: 1rem; color: rgba(255,255,255,0.85); font-size: 0.95rem; font-style: italic;">
+          Esa frase, "me devolvió el tiempo para pensar", la hemos oído 50 veces.
+        </p>
+      </div>
+    </div>
+  </div>
+  <p style="margin-top: 1.25rem; font-size: 1.15rem; color: var(--fg-body); text-align: center;">
+    <strong>Cuando construyan lo suyo, pregúntense: ¿a quién le devuelven el tiempo?</strong>
+  </p>
+  <aside class="notes">
+    Historia real (simplificada) de una usuaria de Tribai.
+    El insight es pedagógico: RAG no reemplaza al profesional, lo LIBERA.
+    La IA no hace el trabajo — hace el trabajo MENOR (buscar, filtrar) para que el humano haga el trabajo MAYOR (decidir, comunicar).
+  </aside>
+</section>
+
 <section>
   <div class="eyebrow">§2 · foto real #2</div>
   <h2>Kelsen — legal</h2>
@@ -428,6 +471,53 @@ WHERE texto ILIKE '%retención%extranjero%';</code></pre>
   <aside class="notes">
     La calidad de las fuentes DETERMINA la calidad del RAG.
     "Garbage in, garbage out" nunca fue más literal.
+  </aside>
+</section>
+
+<section class="muted">
+  <div class="eyebrow">§3 · basura entra, basura sale</div>
+  <h2>El 80% del trabajo no es el modelo — es la cocina</h2>
+  <div style="display: flex; gap: 2rem; margin-top: 1.5rem;">
+    <div style="flex: 1;">
+      <div class="card" style="border-top: 3px solid #dc2626; height: 100%;">
+        <h3 style="color: #dc2626;">RAG con fuentes crudas</h3>
+        <ul style="margin-top: 0.75rem; font-size: 0.95rem; line-height: 1.55;">
+          <li>PDFs escaneados sin OCR → texto sucio</li>
+          <li>Artículo partido en medio de una frase</li>
+          <li>Sin metadata de fecha / vigencia</li>
+          <li>Referencias cruzadas ("ver Art. 107") sin resolver</li>
+          <li>Tablas convertidas en texto plano ilegible</li>
+        </ul>
+        <p style="margin-top: 0.75rem; font-size: 0.95rem; color: #dc2626; font-weight: 600;">
+          Resultado: el LLM cita texto roto. Las respuestas suenan confiadas pero son basura.
+        </p>
+      </div>
+    </div>
+    <div style="flex: 1;">
+      <div class="card" style="border-top: 3px solid #16a34a; height: 100%;">
+        <h3 style="color: #16a34a;">RAG con fuentes curadas</h3>
+        <ul style="margin-top: 0.75rem; font-size: 0.95rem; line-height: 1.55;">
+          <li>OCR limpio + validación humana en muestra</li>
+          <li>Chunking por <strong>estructura legal</strong> (artículo, parágrafo)</li>
+          <li>Metadata: <code>vigente | derogado | modificado</code>, año, libro</li>
+          <li>Cross-references extraídas como edges de grafo</li>
+          <li>Tablas preservadas como JSON estructurado</li>
+        </ul>
+        <p style="margin-top: 0.75rem; font-size: 0.95rem; color: #16a34a; font-weight: 600;">
+          Resultado: el LLM recibe evidencia estructurada. Responde con cirugía.
+        </p>
+      </div>
+    </div>
+  </div>
+  <div class="card" style="background: var(--tribai-navy); color: white; border: none; margin-top: 1.25rem;">
+    <p style="color: rgba(255,255,255,0.9); font-size: 1.1rem; line-height: 1.5;">
+      <strong style="color: var(--tribai-gold);">Lección incómoda:</strong> cuando alguien dice <em>"le metimos RAG al producto"</em>, pregúntenle cómo chunkearon y qué metadata agregaron. Ahí está el producto real.
+    </p>
+  </div>
+  <aside class="notes">
+    Este slide es importante pedagógicamente: el 80% del valor NO está en el modelo de lenguaje.
+    Está en la ingeniería de datos que precede al RAG. Chunking + metadata + vigencia + cross-refs.
+    Es trabajo "aburrido" comparado con el modelo cool — pero es donde se gana o se pierde la calidad.
   </aside>
 </section>
 
@@ -1395,6 +1485,52 @@ async function ask(question: string) {
   <aside class="notes">
     No es un unicornio aislado. Es un ejemplo de qué escala es posible.
     Kelsen apunta al mismo tipo de producto pero para LATAM — precio 1/40.
+    Puente a la siguiente: "$1,200 al mes por abogado. ¿Por qué pagan eso? Veamos."
+  </aside>
+</section>
+
+<section>
+  <div class="eyebrow">§6 · la tesis del valor</div>
+  <h2>¿Por qué un abogado paga $1,200 al mes?</h2>
+  <p style="margin-top: 0.5rem; color: var(--fg-muted); font-size: 1.125rem;">
+    La cuenta que hace una firma grande (sin preguntarle al CFO, se hace sola):
+  </p>
+  <div class="grid-2" style="margin-top: 1.25rem; gap: 1.5rem;">
+    <div class="card" style="border-top: 3px solid #dc2626;">
+      <h3 style="color: #dc2626; font-size: 1.1rem;">Sin Harvey</h3>
+      <table style="width: 100%; margin-top: 0.75rem; font-size: 0.95rem;">
+        <tr style="border-bottom: 1px solid var(--border);"><td style="padding: 0.4rem 0;">Costo del abogado/hora (billable)</td><td style="text-align: right;" class="stat">$400</td></tr>
+        <tr style="border-bottom: 1px solid var(--border);"><td style="padding: 0.4rem 0;">Due diligence de un contrato</td><td style="text-align: right;" class="stat">80 h</td></tr>
+        <tr style="border-bottom: 1px solid var(--border);"><td style="padding: 0.4rem 0;">Investigación jurisprudencial</td><td style="text-align: right;" class="stat">20 h</td></tr>
+        <tr><td style="padding: 0.4rem 0;"><strong>Costo interno por caso</strong></td><td style="text-align: right;" class="stat" style="color: #dc2626;">$40,000</td></tr>
+      </table>
+    </div>
+    <div class="card" style="border-top: 3px solid #16a34a;">
+      <h3 style="color: #16a34a; font-size: 1.1rem;">Con Harvey</h3>
+      <table style="width: 100%; margin-top: 0.75rem; font-size: 0.95rem;">
+        <tr style="border-bottom: 1px solid var(--border);"><td style="padding: 0.4rem 0;">Abogado/hora</td><td style="text-align: right;" class="stat">$400</td></tr>
+        <tr style="border-bottom: 1px solid var(--border);"><td style="padding: 0.4rem 0;">Due diligence (con IA)</td><td style="text-align: right;" class="stat">15 h</td></tr>
+        <tr style="border-bottom: 1px solid var(--border);"><td style="padding: 0.4rem 0;">Investigación (con IA)</td><td style="text-align: right;" class="stat">5 h</td></tr>
+        <tr><td style="padding: 0.4rem 0;"><strong>Costo interno por caso</strong></td><td style="text-align: right;" class="stat" style="color: #16a34a;">$8,000</td></tr>
+      </table>
+    </div>
+  </div>
+  <div style="margin-top: 1.25rem; padding: 1.25rem; background: var(--tribai-navy); color: white; border-radius: var(--radius-md);">
+    <p style="font-size: 1.15rem; line-height: 1.55;">
+      <strong style="color: var(--tribai-gold);">Ahorro por caso:</strong> $32,000. Si el abogado maneja 10 casos al año: <span class="stat" style="color: var(--tribai-gold); font-size: 1.4rem;">$320,000</span> ahorrados.
+    </p>
+    <p style="margin-top: 0.5rem; font-size: 1.15rem; line-height: 1.55; color: rgba(255,255,255,0.9);">
+      <strong>Harvey cobra $14,400/año.</strong> ROI: <strong style="color: var(--tribai-gold);">22×</strong>. Por eso pagan.
+    </p>
+  </div>
+  <p style="margin-top: 1rem; font-size: 1.05rem; color: var(--fg-body); text-align: center; font-style: italic;">
+    La IA no se vende por "tener IA". Se vende por <strong>devolver tiempo y reducir costos</strong>. Esa es la tesis.
+  </p>
+  <aside class="notes">
+    Este slide es MUY importante para los estudiantes de ingeniería:
+    entender cómo se vende software empresarial no es solo "producto cool" — es ROI de 10-20×.
+    Si construyen algo que le ahorra $100K a alguien, pueden cobrar $10K. Pura matemática.
+    Ligar a §7: "en LATAM el abogado cobra menos pero igual hay 10× de margen".
   </aside>
 </section>
 
@@ -1637,7 +1773,66 @@ async function ask(question: string) {
   </aside>
 </section>
       <!-- §8 Cierre -->
-      <section class="cover">
+      <section>
+  <div class="eyebrow">§8 · honestidad intelectual</div>
+  <h2>Lo que NO les conté</h2>
+  <p style="margin-top: 0.5rem; color: var(--fg-muted); font-size: 1.125rem;">
+    Para que no se vayan pensando que ya saben todo: esto es apenas la primera capa. Temas que simplificamos hoy y que son campos enteros:
+  </p>
+  <div class="grid-2" style="margin-top: 1.25rem; gap: 1.25rem;">
+    <div class="card">
+      <h3 style="font-size: 1rem; color: var(--tribai-blue);">📚 Chunking avanzado</h3>
+      <p style="color: var(--fg-muted); font-size: 0.95rem; line-height: 1.5;">
+        Hay 10+ estrategias (fixed, semantic, hierarchical, propositional, contextual). La que escojan cambia la calidad por 20-30%.
+      </p>
+    </div>
+    <div class="card">
+      <h3 style="font-size: 1rem; color: var(--tribai-blue);">🔀 Hybrid search</h3>
+      <p style="color: var(--fg-muted); font-size: 0.95rem; line-height: 1.5;">
+        BM25 + vectores fusionados con RRF, SPLADE, ColBERT… mezclas de varios retrievers para robustez.
+      </p>
+    </div>
+    <div class="card">
+      <h3 style="font-size: 1rem; color: var(--tribai-blue);">🕸️ GraphRAG</h3>
+      <p style="color: var(--fg-muted); font-size: 0.95rem; line-height: 1.5;">
+        Convertir el corpus en un grafo de conceptos para queries que requieren razonamiento multi-hop.
+      </p>
+    </div>
+    <div class="card">
+      <h3 style="font-size: 1rem; color: var(--tribai-blue);">🧪 Evaluación rigurosa</h3>
+      <p style="color: var(--fg-muted); font-size: 0.95rem; line-height: 1.5;">
+        RAGAS, LegalBench-RAG, gold sets etiquetados por expertos, LLM-as-judge, CI gates — un campo entero.
+      </p>
+    </div>
+    <div class="card">
+      <h3 style="font-size: 1rem; color: var(--tribai-blue);">🔐 Seguridad & prompt injection</h3>
+      <p style="color: var(--fg-muted); font-size: 0.95rem; line-height: 1.5;">
+        Los usuarios pueden intentar "romper" el RAG con instrucciones dentro del prompt. Defenderse es un arte.
+      </p>
+    </div>
+    <div class="card">
+      <h3 style="font-size: 1rem; color: var(--tribai-blue);">🎓 Fine-tuning</h3>
+      <p style="color: var(--fg-muted); font-size: 0.95rem; line-height: 1.5;">
+        Entrenar embeddings o rerankers específicos de su dominio — lo que hizo Harvey con voyage-law-2-harvey.
+      </p>
+    </div>
+  </div>
+  <div class="card" style="background: var(--tribai-navy); color: white; border: none; margin-top: 1.25rem;">
+    <p style="color: rgba(255,255,255,0.9); font-size: 1.1rem; line-height: 1.55;">
+      <strong style="color: var(--tribai-gold);">Buenas noticias:</strong> nada de esto es necesario para su primer MVP. Todo esto lo aprenden <em>después</em>, iterando con usuarios reales.
+    </p>
+    <p style="margin-top: 0.75rem; color: rgba(255,255,255,0.85); font-size: 1rem; line-height: 1.55;">
+      Pero no quería que se fueran creyendo que esto termina aquí. <strong>Esto apenas empieza.</strong>
+    </p>
+  </div>
+  <aside class="notes">
+    Modestia intelectual. Los estudiantes a veces salen de una clase sintiendo que dominaron el tema.
+    Importante decirles: "esto es el 20% que les permite empezar. El otro 80% lo aprenden construyendo."
+    Les muestra que hay profundidad infinita — que hay carrera aquí.
+  </aside>
+</section>
+
+<section class="cover">
   <div style="height: 100%; display: flex; flex-direction: column; justify-content: center;">
     <div class="eyebrow">síntesis</div>
     <p class="pull-quote" style="font-size: 4rem; margin-top: 2rem;">

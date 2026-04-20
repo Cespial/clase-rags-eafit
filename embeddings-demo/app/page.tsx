@@ -11,11 +11,11 @@ const EXAMPLES: Array<[string, string]> = [
 ];
 
 const FALLBACK: Record<string, number> = {
-  "trabajador extranjero|residente no colombiano": 0.87,
-  "trabajador extranjero|deducción por arrendamiento": 0.31,
-  "IVA sobre servicios|impuesto al valor agregado por honorarios": 0.92,
-  "retención en la fuente|calcular descuento por pago anticipado": 0.38,
-  "Sentencia de la Corte Constitucional|fallo judicial de constitucionalidad": 0.85,
+  "trabajador extranjero|residente no colombiano": 0.56,
+  "trabajador extranjero|deducción por arrendamiento": 0.35,
+  "IVA sobre servicios|impuesto al valor agregado por honorarios": 0.66,
+  "retención en la fuente|calcular descuento por pago anticipado": 0.51,
+  "Sentencia de la Corte Constitucional|fallo judicial de constitucionalidad": 0.73,
 };
 
 export default function Page() {
@@ -60,9 +60,9 @@ export default function Page() {
   }
 
   function interpret(sim: number): string {
-    if (sim > 0.85) return "🎯 Muy parecidos semánticamente";
-    if (sim > 0.65) return "✓ Relacionados";
-    if (sim > 0.45) return "~ Tangencialmente conectados";
+    if (sim > 0.70) return "🎯 Muy parecidos semánticamente";
+    if (sim > 0.50) return "✓ Relacionados";
+    if (sim > 0.35) return "~ Tangencialmente conectados";
     return "✗ No relacionados";
   }
 

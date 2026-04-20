@@ -1,0 +1,124 @@
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=JetBrains+Mono:wght@500&display=swap");
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: "Inter", -apple-system, sans-serif;
+  background: #f5f8fa;
+  color: #0a1628;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+}
+
+.container {
+  max-width: 900px;
+  width: 100%;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 10px 25px -5px rgba(0,0,0,0.08);
+  padding: 3rem;
+}
+
+h1 { font-size: 2rem; font-weight: 700; letter-spacing: -0.03em; margin-bottom: 0.5rem; }
+.subtitle { color: #6b7280; font-size: 1.125rem; margin-bottom: 2rem; }
+
+.input-group {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.input-row { display: flex; gap: 1rem; align-items: center; }
+.input-row label {
+  font-weight: 600;
+  min-width: 80px;
+  color: #0066ff;
+}
+
+input {
+  flex: 1;
+  padding: 0.875rem 1.25rem;
+  font-size: 1.125rem;
+  font-family: inherit;
+  border: 1px solid #e8e8e8;
+  border-radius: 8px;
+  outline: none;
+  transition: border-color 150ms;
+}
+input:focus { border-color: #0066ff; }
+
+button {
+  padding: 0.875rem 2rem;
+  font-size: 1rem;
+  font-family: inherit;
+  font-weight: 600;
+  background: #0066ff;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 150ms;
+}
+button:hover { background: #0052cc; }
+button:disabled { background: #9ca3af; cursor: not-allowed; }
+
+.result {
+  margin-top: 2rem;
+  padding: 2rem;
+  background: #f5f8fa;
+  border-radius: 12px;
+  text-align: center;
+}
+
+.score {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 5rem;
+  font-weight: 600;
+  color: #c4952a;
+  letter-spacing: -0.02em;
+  line-height: 1;
+}
+
+.score-label { color: #6b7280; margin-top: 0.5rem; font-size: 0.95rem; text-transform: uppercase; letter-spacing: 0.08em; }
+
+.bar {
+  margin-top: 1.5rem;
+  height: 12px;
+  background: #e8e8e8;
+  border-radius: 6px;
+  overflow: hidden;
+}
+.bar-fill {
+  height: 100%;
+  background: linear-gradient(to right, #3b82b8, #c4952a);
+  transition: width 400ms ease;
+}
+
+.interpretation {
+  margin-top: 1.5rem;
+  font-size: 1.125rem;
+  color: #0a1628;
+}
+
+.examples {
+  margin-top: 2rem;
+  padding-top: 2rem;
+  border-top: 1px solid #e8e8e8;
+}
+.examples h3 { font-size: 1rem; color: #6b7280; margin-bottom: 1rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; }
+.examples button {
+  background: white;
+  color: #0066ff;
+  border: 1px solid #e8e8e8;
+  padding: 0.5rem 1rem;
+  font-size: 0.875rem;
+  margin: 0.25rem;
+  font-weight: 500;
+}
+.examples button:hover { background: #f5f8fa; border-color: #0066ff; }
+
+.error { color: #dc2626; margin-top: 1rem; font-size: 0.95rem; }

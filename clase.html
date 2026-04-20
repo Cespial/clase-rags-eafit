@@ -584,29 +584,42 @@ blockquote {
 <section>
   <div class="eyebrow">§1 · El cambio de paradigma</div>
   <h2>Lo que les enseñan en el curso</h2>
-  <div style="display: flex; gap: 3rem; align-items: center; margin-top: 2rem;">
-    <div style="flex: 1;">
-      <pre style="font-size: 1.125rem;"><code>-- la app consulta la BD
+  <div style="display: flex; gap: 2rem; align-items: start; margin-top: 1.5rem;">
+    <div style="flex: 1.1;">
+      <p style="color: var(--fg-muted); font-size: 0.95rem; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 0.5rem;">Funciona perfectamente:</p>
+      <pre style="font-size: 0.95rem;"><code>-- "¿en qué artículos aparece
+--  la palabra retención?"
+
 SELECT articulo, texto
 FROM estatuto_tributario
 WHERE texto ILIKE '%retención%'
   AND estado = 'vigente'
-ORDER BY articulo;</code></pre>
+ORDER BY articulo;
+-- → 47 filas ✓</code></pre>
     </div>
-    <div style="flex: 1;">
-      <p style="font-size: 1.375rem; line-height: 1.5;">
-        <strong>La app conversa con la base de datos.</strong><br/>
-        La BD retorna filas. La app las muestra.
-      </p>
-      <p style="color: var(--fg-muted); margin-top: 1.5rem;">
-        Funciona muy bien si la pregunta es literal.<br/>
-        ¿Qué pasa si no lo es?
-      </p>
+    <div style="flex: 1.1;">
+      <p style="color: var(--fg-muted); font-size: 0.95rem; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 0.5rem;">Se queda corto:</p>
+      <pre style="font-size: 0.95rem;"><code>-- "¿qué retención aplica a un
+--  profesional en España que
+--  nos facturó un diseño?"
+
+SELECT articulo, texto
+FROM estatuto_tributario
+WHERE texto ILIKE '%?%';
+-- → ¿qué pongo en el LIKE?
+-- → el ET no dice "profesional
+--   en España", dice "residente
+--   en el exterior"</code></pre>
+      <p style="margin-top: 0.5rem; color: #dc2626; font-size: 0.95rem; font-weight: 600;">✗ SQL literal no sabe traducir lo que el humano <em>quiso</em> decir.</p>
     </div>
   </div>
+  <p style="margin-top: 1rem; font-size: 1.125rem; color: var(--fg-body);">
+    Las preguntas <strong>literales</strong> se responden con SQL. Las <strong>humanas</strong> no caben en un <code>WHERE</code>.
+  </p>
   <aside class="notes">
-    Reconocer lo que ya saben. Validar que ese paradigma es sólido — no lo estamos tirando.
-    Pero hay preguntas que no se responden así.
+    Reconocer lo que ya saben. Validar que SQL es sólido — no lo estamos tirando.
+    Pero muestro los DOS mundos: el query que SQL resuelve vs el que no puede.
+    La incapacidad no es del motor — es del paradigma "coincidencia literal".
   </aside>
 </section>
 
@@ -666,23 +679,13 @@ WHERE texto ILIKE '%retención%extranjero%';</code></pre>
   </aside>
 </section>
 
-<section class="muted">
-  <div class="eyebrow">§1 · el insight</div>
-  <h2 style="max-width: 1100px;">El problema ya no es <em style="color: var(--tribai-blue);">cómo responder</em></h2>
-  <h2 style="max-width: 1100px; margin-top: 0.5rem;">Es <em style="color: var(--tribai-gold);">qué darle de contexto</em></h2>
-  <p style="margin-top: 3rem; font-size: 1.25rem; color: var(--fg-body); max-width: 900px;">
-    Los modelos de lenguaje ya saben escribir bien. El trabajo del ingeniero pasó de "cómo genero texto" a
-    <strong>"cómo le paso exactamente los datos correctos para que no invente"</strong>.
-  </p>
-  <aside class="notes">
-    Punto conceptual importante. Los LLMs son capaces pero no omniscientes.
-    La ingeniería ahora es de contexto — curar, buscar, filtrar, pasar los datos correctos.
-  </aside>
-</section>
-
 <section class="navy">
   <div style="display: flex; align-items: center; justify-content: center; height: 100%;">
-    <div style="max-width: 1000px; text-align: center;">
+    <div style="max-width: 1100px; text-align: center;">
+      <p style="color: rgba(255,255,255,0.7); font-size: 1.125rem; margin-bottom: 1.5rem; letter-spacing: 0.02em;">
+        El problema ya no es <em style="color: var(--tribai-light-blue);">cómo responder</em>.<br/>
+        Es <em style="color: var(--tribai-gold);">qué darle de contexto.</em>
+      </p>
       <p class="pull-quote">
         RAG = darle a la IA un cuaderno abierto<br/>
         en vez de que invente de memoria.
@@ -693,7 +696,9 @@ WHERE texto ILIKE '%retención%extranjero%';</code></pre>
     </div>
   </div>
   <aside class="notes">
-    Pausa. Que el concepto se asiente. Mirar al público. "Esa frase es la clase entera".
+    Merge del insight + pull-quote. Subo el insight como "bajada" encima de la frase-síntesis.
+    Flujo: leer la bajada primero despacio → pausa → leer la pull-quote.
+    "Esa frase de abajo es la clase entera."
   </aside>
 </section>
       <!-- §2 Galería -->
@@ -862,44 +867,36 @@ WHERE texto ILIKE '%retención%extranjero%';</code></pre>
 </section>
 
 <section class="muted">
-  <div class="eyebrow">§2 · patrón común</div>
-  <h2>Todos tienen la misma forma</h2>
-  <div class="grid-3" style="margin-top: 2rem; align-items: stretch;">
+  <div class="eyebrow">§2 · el patrón + su turno</div>
+  <h2>El patrón que acaban de ver</h2>
+  <div class="grid-3" style="margin-top: 1rem; align-items: stretch;">
     <div class="card" style="border-top: 3px solid var(--tribai-blue);">
       <h3>📚 Mucho texto</h3>
-      <p style="color: var(--fg-muted);">Documentos, PDFs, APIs con contenido largo</p>
+      <p style="color: var(--fg-muted); font-size: 0.95rem;">Documentos, PDFs, APIs con contenido largo</p>
     </div>
     <div class="card" style="border-top: 3px solid var(--tribai-gold);">
       <h3>❓ Preguntas humanas</h3>
-      <p style="color: var(--fg-muted);">Ambiguas, contextuales, cambiantes</p>
+      <p style="color: var(--fg-muted); font-size: 0.95rem;">Ambiguas, contextuales, cambiantes</p>
     </div>
     <div class="card" style="border-top: 3px solid var(--tribai-light-blue);">
       <h3>⚖️ Respuestas verificables</h3>
-      <p style="color: var(--fg-muted);">El usuario necesita saber de dónde salió</p>
+      <p style="color: var(--fg-muted); font-size: 0.95rem;">El usuario necesita saber de dónde salió</p>
     </div>
   </div>
-  <aside class="notes">
-    La receta se repite. Reconocer el patrón es 80% del trabajo de escoger qué construir.
-  </aside>
-</section>
-
-<section>
-  <div class="eyebrow">§2 · ejercicio</div>
-  <h2>Piensen en su dominio</h2>
-  <div style="margin-top: 2rem; font-size: 1.375rem; line-height: 1.6;">
-    <p>Por 30 segundos, cada uno en su cabeza:</p>
-    <ul style="margin-top: 1.5rem;">
+  <div style="margin-top: 1.5rem; padding: 1.25rem 1.5rem; background: white; border-left: 4px solid var(--tribai-gold); border-radius: 0 var(--radius-md) var(--radius-md) 0;">
+    <h3 style="color: var(--tribai-navy);">Ahora ustedes · 30 segundos en silencio</h3>
+    <ul style="margin-top: 0.75rem; font-size: 1.05rem; line-height: 1.6;">
       <li>¿En qué industria les interesaría trabajar?</li>
       <li>¿Qué documentos largos existen allí?</li>
       <li>¿Qué pregunta frustrante tendría un profesional de ese campo?</li>
     </ul>
-    <p style="margin-top: 2rem; color: var(--tribai-gold); font-weight: 600;">
+    <p style="margin-top: 0.75rem; color: var(--tribai-gold); font-weight: 600; font-size: 1.05rem;">
       Ese es un RAG posible. Guarden la idea — volveremos a ella al final.
     </p>
   </div>
   <aside class="notes">
-    Micro-ejercicio. No respuesta pública. Solo que piensen. Los activa.
-    30 segundos reales, cronometrados.
+    Merge de patrón común + ejercicio. Primero muestro el patrón (3 cards, 15 seg).
+    Luego "ahora ustedes" — cronometrar 30 segundos reales en silencio. Los activa.
   </aside>
 </section>
 
@@ -2059,38 +2056,20 @@ PREGUNTA DEL USUARIO:
 </section>
 
 <section>
-  <div class="eyebrow">§5 · cuánto cuesta</div>
-  <h2>Costo real por query</h2>
-  <div style="display: flex; gap: 3rem; align-items: center; margin-top: 2rem;">
-    <div style="flex: 1;">
-      <div style="font-size: 4.5rem; font-weight: 700; color: var(--tribai-gold); font-family: var(--font-mono);">$0.031</div>
-      <p style="color: var(--fg-muted); margin-top: 0.5rem;">por conversación inicial</p>
-      <div style="font-size: 4.5rem; font-weight: 700; color: var(--tribai-blue); font-family: var(--font-mono); margin-top: 2rem;">$0.013</div>
-      <p style="color: var(--fg-muted); margin-top: 0.5rem;">con prompt caching + query router</p>
-    </div>
-    <div style="flex: 1;">
-      <div class="card">
-        <h3>Desglose aproximado</h3>
-        <table style="width: 100%; font-size: 0.95rem; margin-top: 1rem;">
-          <tr style="border-bottom: 1px solid var(--border);"><td style="padding: 0.5rem 0;">Claude Sonnet (respuesta)</td><td style="text-align: right;" class="stat">$0.020</td></tr>
-          <tr style="border-bottom: 1px solid var(--border);"><td style="padding: 0.5rem 0;">Claude Haiku (routing/rewrite)</td><td style="text-align: right;" class="stat">$0.003</td></tr>
-          <tr style="border-bottom: 1px solid var(--border);"><td style="padding: 0.5rem 0;">Pinecone query</td><td style="text-align: right;" class="stat">$0.004</td></tr>
-          <tr style="border-bottom: 1px solid var(--border);"><td style="padding: 0.5rem 0;">Cohere rerank</td><td style="text-align: right;" class="stat">$0.002</td></tr>
-          <tr><td style="padding: 0.5rem 0;">Voyage embedding</td><td style="text-align: right;" class="stat">$0.002</td></tr>
-        </table>
-      </div>
-    </div>
-  </div>
-  <aside class="notes">
-    Los costos son reales. Con 1000 usuarios × 20 queries/mes × $0.013 = $260/mes.
-    Cobrar $10/mes por usuario = $10K/mes MRR a ese volumen.
-  </aside>
-</section>
-
-<section>
   <div class="eyebrow">§5 · sigan el centavo</div>
   <h2>¿A dónde va cada centavo de un query de $0.013?</h2>
-  <p style="margin-top: 0.5rem; color: var(--fg-muted); font-size: 1.125rem;">
+  <div style="display: flex; gap: 2rem; align-items: baseline; margin-top: 0.5rem;">
+    <div>
+      <span class="stat" style="font-size: 2.5rem; color: #dc2626;">$0.031</span>
+      <span style="color: var(--fg-muted); font-size: 0.95rem; margin-left: 0.5rem;">sin optimizar</span>
+    </div>
+    <span style="color: var(--fg-muted); font-size: 1.5rem;">→</span>
+    <div>
+      <span class="stat" style="font-size: 2.5rem; color: #16a34a;">$0.013</span>
+      <span style="color: var(--fg-muted); font-size: 0.95rem; margin-left: 0.5rem;">con prompt caching + query router (−58%)</span>
+    </div>
+  </div>
+  <p style="margin-top: 0.75rem; color: var(--fg-muted); font-size: 1.05rem;">
     Imaginen que Juan en Cali acaba de preguntar. <strong>1.3 centavos de dólar</strong> se acaban de gastar. Los rastreamos:
   </p>
   <div style="display: grid; grid-template-columns: 1fr 2fr 120px; gap: 0.75rem; align-items: center; margin-top: 1rem;">
@@ -2607,36 +2586,57 @@ async function ask(question: string) {
 <section>
   <div class="eyebrow">§6 · estrategia</div>
   <h2>Multi-model — el equipo, no el solitario</h2>
-  <div style="display: flex; gap: 3rem; margin-top: 2rem;">
-    <div style="flex: 1;">
-      <p style="font-size: 1.25rem; line-height: 1.6;">
-        Antes: "¿cuál es el mejor modelo?" — respuesta única.<br/>
-        Ahora: <strong>el modelo correcto para cada tarea.</strong>
-      </p>
-    </div>
-    <div style="flex: 1;">
-      <table style="width: 100%; font-size: 1rem;">
+  <p style="margin-top: 0.5rem; font-size: 1.125rem; color: var(--fg-body);">
+    Antes: "<em>¿cuál es el mejor modelo?</em>" → respuesta única.<br/>
+    Ahora: <strong>el modelo correcto para cada tarea</strong>, con failover automático.
+  </p>
+  <div class="grid-2" style="margin-top: 1.25rem; gap: 1.25rem; align-items: start;">
+    <div>
+      <h3 style="font-size: 1rem; color: var(--tribai-blue); text-transform: uppercase; letter-spacing: 0.08em;">Equipo Tribai</h3>
+      <table style="width: 100%; font-size: 0.95rem; margin-top: 0.5rem;">
         <thead>
           <tr style="border-bottom: 2px solid var(--tribai-navy); text-align: left;">
             <th style="padding: 0.5rem 0;">Tarea</th>
             <th style="padding: 0.5rem 0;">Modelo</th>
-            <th style="padding: 0.5rem 0;">Por qué</th>
+            <th style="padding: 0.5rem 0;">Costo/1M tok</th>
           </tr>
         </thead>
         <tbody>
-          <tr style="border-bottom: 1px solid var(--border);"><td style="padding: 0.5rem 0;">Routing</td><td class="stat">Haiku 4.5</td><td style="color: var(--fg-muted);">barato + rápido</td></tr>
-          <tr style="border-bottom: 1px solid var(--border);"><td style="padding: 0.5rem 0;">Generación</td><td class="stat">Sonnet 4.6</td><td style="color: var(--fg-muted);">calidad razonamiento</td></tr>
-          <tr style="border-bottom: 1px solid var(--border);"><td style="padding: 0.5rem 0;">Bulk</td><td class="stat">Gemini Flash</td><td style="color: var(--fg-muted);">volumen alto</td></tr>
-          <tr><td style="padding: 0.5rem 0;">Fallback</td><td class="stat">GPT-5 mini</td><td style="color: var(--fg-muted);">redundancia</td></tr>
+          <tr style="border-bottom: 1px solid var(--border);"><td style="padding: 0.4rem 0;">Routing / rewrite</td><td class="stat">Haiku 4.5</td><td class="stat">$1</td></tr>
+          <tr style="border-bottom: 1px solid var(--border);"><td style="padding: 0.4rem 0;">Generación final</td><td class="stat">Sonnet 4.6</td><td class="stat">$15</td></tr>
+          <tr style="border-bottom: 1px solid var(--border);"><td style="padding: 0.4rem 0;">Bulk eval</td><td class="stat">Gemini Flash</td><td class="stat">$0.60</td></tr>
+          <tr><td style="padding: 0.4rem 0;">Fallback</td><td class="stat">GPT-5 mini</td><td class="stat">$2</td></tr>
         </tbody>
       </table>
     </div>
+    <div>
+      <h3 style="font-size: 1rem; color: var(--tribai-gold); text-transform: uppercase; letter-spacing: 0.08em;">Decisión real de routing (ayer)</h3>
+      <div class="card" style="background: var(--bg-muted-section); margin-top: 0.5rem; padding: 1rem;">
+        <pre style="font-size: 0.75rem; margin: 0; background: transparent; color: var(--fg); padding: 0;"><code>if (query.length &lt; 50
+    &amp;&amp; isDirectArticleLookup(query)) {
+  return haiku;  // "¿qué dice el Art. 408?"
+}
+if (isComplexComparison(query)) {
+  return sonnet; // "compara IVA y consumo"
+}
+if (isGreeting(query)) {
+  return null;   // no llamamos al LLM
+}
+return sonnet;   // default</code></pre>
+      </div>
+      <p style="margin-top: 0.75rem; font-size: 0.95rem; color: var(--fg-body);">
+        El 30% de las queries acaban en Haiku (barato) en vez de Sonnet. <br/>
+        <strong>Ahorro real: <span class="stat">$0.013 → $0.009</span> por query en ese 30%.</strong>
+      </p>
+    </div>
   </div>
-  <p style="margin-top: 1.5rem; color: var(--fg-muted); font-size: 1rem;">
-    Vercel AI Gateway permite cambiar de uno a otro con una línea de config.
+  <p style="margin-top: 1.25rem; font-size: 1rem; color: var(--fg-muted); text-align: center;">
+    Vercel AI Gateway cambia entre proveedores con una línea de config. Si Anthropic se cae, Gemini responde en 200ms.
   </p>
   <aside class="notes">
-    El mercado va hacia comodificación de LLMs. Las capas alrededor (orquestación, eval) son el diferenciador.
+    Antes solo mostraba la tabla. Ahora muestro CÓDIGO REAL del router.
+    Mensaje: la commodification de LLMs es real — el diferenciador es la lógica de orquestación.
+    Los $4 ahorrados por 1K queries × 30% × 1000 users = $1,200/mes solo con routing inteligente.
   </aside>
 </section>
 

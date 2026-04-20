@@ -1,0 +1,265 @@
+/* ═══════════════════════════════════════════════════════════════
+   TRIBAI DESIGN SYSTEM — Colors & Typography
+   Source of truth: derived from tribai/src/app/globals.css
+   and brand-assets/BRAND_BIBLE_TRIBAI.md v2.0
+   ═══════════════════════════════════════════════════════════════ */
+
+/* ── Webfonts ─────────────────────────────────────────────────── */
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=DM+Serif+Display&display=swap");
+
+:root {
+  /* ═══ COLOR PALETTE ════════════════════════════════════════════ */
+
+  /* Brand — Tribai (from globals.css) */
+  --tribai-navy:        #0a1628;  /* Hero/dark section BG, navy sections   */
+  --tribai-blue:        #0066ff;  /* PRIMARY — CTAs, links, active icons   */
+  --tribai-gold:        #c4952a;  /* Accent — badges, blockquote, trust    */
+  --tribai-light-blue:  #3b82b8;  /* Secondary — hover, chart, icons       */
+
+  /* Semantic — Light mode (default surface) */
+  --bg:                 #ffffff;  /* Page background                        */
+  --bg-muted-section:   #f5f8fa;  /* Alt section (cool tint vs muted)       */
+  --fg:                 #1a1a1a;  /* Primary text / ink                     */
+  --fg-body:            #4b5563;  /* Long-form body copy                    */
+  --fg-muted:           #6b7280;  /* Captions, metadata, placeholder        */
+  --card:               #ffffff;  /* Card surface                           */
+  --muted:              #f5f5f5;  /* Muted surface — chips, code bg         */
+  --border:             #e8e8e8;  /* Default 1px hairline                   */
+  --border-soft:        rgba(0,0,0,0.08); /* Composer pill, subtle cards   */
+
+  /* Semantic feedback */
+  --primary:            var(--tribai-blue);
+  --primary-fg:         #ffffff;
+  --ring:               var(--tribai-blue);
+  --destructive:        #dc2626;
+  --success:            #16a34a;
+  --warning:            #dc7b1a;
+  --info:               var(--tribai-light-blue);
+
+  /* ═══ TYPOGRAPHY ═══════════════════════════════════════════════ */
+  /* IMPORTANT: per production globals.css and user feedback in
+     brand-assets/README: DM Serif Display is RESERVED and should NOT
+     be used for default headings. Product uses Inter 700 with tight
+     tracking (-0.03em) as the "heading-serif" class. JetBrains Mono
+     for numeric/tabular. DM Serif remains available as --font-serif
+     for editorial / hero / marketing callouts only.                */
+
+  --font-body:   "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+  --font-heading: var(--font-body);           /* default — geometric sans  */
+  --font-mono:   "JetBrains Mono", "Fira Code", "Cascadia Code", "SFMono-Regular", monospace;
+  --font-serif:  "DM Serif Display", Georgia, serif;   /* editorial only   */
+
+  /* Type scale — from BRAND_BIBLE §14 + production usage                  */
+  --type-display: 3.5rem;     /* 56px — hero on desktop                   */
+  --type-h1:      2.25rem;    /* 36px — page title                        */
+  --type-h2:      1.75rem;    /* 28px — section                           */
+  --type-h3:      1.25rem;    /* 20px — card / subsection                 */
+  --type-h4:      1rem;       /* 16px — label heading                     */
+  --type-body:    1rem;       /* 16px — body default                      */
+  --type-small:   0.875rem;   /* 14px — body small                        */
+  --type-caption: 0.75rem;    /* 12px                                     */
+  --type-mono:    0.9375rem;  /* 15px — tabular numeric                   */
+
+  /* Leading + tracking */
+  --lead-tight:   1.1;
+  --lead-snug:    1.3;
+  --lead-body:    1.6;
+  --track-tight:  -0.03em;    /* headings                                 */
+  --track-mono:   -0.01em;    /* monospace values                         */
+  --track-label:  0.1em;      /* uppercase eyebrow                        */
+
+  /* ═══ SPACING / RADII / SHADOWS ════════════════════════════════ */
+  --radius-xs: 0.25rem;   /*  4px — buttons, inputs                       */
+  --radius-sm: 0.375rem;  /*  6px                                         */
+  --radius-md: 0.5rem;    /*  8px — cards, callouts                       */
+  --radius-lg: 0.75rem;   /* 12px — modals                                */
+  --radius-xl: 1rem;      /* 16px — app card                              */
+  --radius-pill: 9999px;  /*        chips, badges                         */
+  --radius-composer: 1.5rem; /* 24px — chat composer pill                 */
+
+  --shadow-xs: 0 1px 2px rgba(0,0,0,0.04);
+  --shadow-sm: 0 1px 3px rgba(0,0,0,0.06);
+  --shadow-md: 0 4px 12px rgba(0,0,0,0.08);
+  --shadow-lg: 0 10px 25px -5px rgba(0,0,0,0.08), 0 4px 10px -6px rgba(0,0,0,0.04);
+  --shadow-composer-focus: 0 0 0 1px rgba(0,0,0,0.08), 0 2px 8px -2px rgba(0,0,0,0.08);
+
+  /* ═══ MOTION ═══════════════════════════════════════════════════ */
+  --ease-in:      cubic-bezier(0.7, 0, 1, 0.3);
+  --ease-out:     cubic-bezier(0, 0.7, 0.3, 1);
+  --ease-in-out:  cubic-bezier(0.7, 0, 0.3, 1);
+  --ease-smooth:  cubic-bezier(0.4, 0, 0.2, 1);
+  --dur-fast:     150ms;
+  --dur-normal:   300ms;
+  --dur-slow:     500ms;
+
+  --app-header-h: 3.5rem;
+}
+
+/* ── Dark mode ────────────────────────────────────────────────── */
+.dark,
+[data-theme="dark"] {
+  --bg:                 #0a0f1a;
+  --bg-muted-section:   #0f1629;
+  --fg:                 #e8e6e3;
+  --fg-body:            #b0ada8;
+  --fg-muted:           #9ca3af;
+  --card:               #131b2e;
+  --muted:              #1b2540;
+  --border:             #1f2937;
+  --border-soft:        rgba(255,255,255,0.08);
+
+  --tribai-navy:        #0a0f1a;
+  --tribai-blue:        #3b82f6;
+  --tribai-gold:        #d4a83a;
+  --tribai-light-blue:  #6bb5e8;
+  --primary:            var(--tribai-blue);
+  --destructive:        #ef4444;
+  --success:            #22c55e;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   SEMANTIC ELEMENT STYLES (drop-in defaults)
+   ═══════════════════════════════════════════════════════════════ */
+
+body {
+  font-family: var(--font-body);
+  color: var(--fg);
+  background: var(--bg);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  line-height: var(--lead-body);
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-heading);
+  font-weight: 700;
+  letter-spacing: var(--track-tight);
+  line-height: var(--lead-tight);
+  color: var(--fg);
+  text-wrap: pretty;
+}
+
+h1 { font-size: var(--type-h1); }
+h2 { font-size: var(--type-h2); }
+h3 { font-size: var(--type-h3); letter-spacing: -0.01em; line-height: 1.2; }
+h4 { font-size: var(--type-h4); }
+
+p  { font-size: var(--type-body); line-height: var(--lead-body); color: var(--fg-body); }
+small { font-size: var(--type-small); color: var(--fg-muted); }
+
+/* Utility — the "heading-serif" class mirrored from production */
+.heading-serif {
+  font-family: var(--font-heading);
+  font-weight: 700;
+  letter-spacing: var(--track-tight);
+  line-height: var(--lead-tight);
+}
+
+/* Editorial serif (DM Serif) — opt-in only */
+.heading-editorial {
+  font-family: var(--font-serif);
+  font-weight: 400;
+  letter-spacing: -0.02em;
+  line-height: var(--lead-tight);
+}
+
+/* Monospace tabular values — financial precision */
+.font-values,
+.numeric,
+code, kbd, samp {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: var(--track-mono);
+}
+
+/* Eyebrow label — uppercase, blue, wide tracking */
+.eyebrow-label {
+  font-size: 0.8125rem;
+  font-weight: 600;
+  letter-spacing: var(--track-label);
+  text-transform: uppercase;
+  color: var(--tribai-blue);
+  line-height: 1;
+}
+
+/* Links — blue, underline on hover */
+a {
+  color: var(--primary);
+  text-decoration: none;
+  text-underline-offset: 2px;
+  transition: color var(--dur-fast) var(--ease-smooth);
+}
+a:hover { text-decoration: underline; }
+
+/* Focus ring */
+:focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: 2px;
+}
+
+/* ── Button system ────────────────────────────────────────────── */
+.btn-primary,
+.btn-secondary,
+.btn-ghost {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  border-radius: var(--radius-md);
+  padding: 0.875rem 1.75rem;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  line-height: 1;
+  transition: background var(--dur-fast) var(--ease-smooth),
+              border-color var(--dur-fast) var(--ease-smooth);
+  cursor: pointer;
+  border: 1px solid transparent;
+}
+.btn-primary   { background: var(--tribai-blue); color: var(--primary-fg); }
+.btn-primary:hover { background: color-mix(in srgb, var(--tribai-blue) 90%, black); }
+.btn-secondary { background: transparent; color: var(--fg); border-color: var(--border); }
+.btn-secondary:hover { background: var(--muted); border-color: var(--fg-muted); }
+.btn-ghost     { background: transparent; color: var(--tribai-blue); }
+.btn-ghost:hover { background: color-mix(in srgb, var(--tribai-blue) 8%, transparent); }
+
+/* ── Badges / Pills ───────────────────────────────────────────── */
+.badge-accent,
+.badge-gold {
+  font-size: 0.6875rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  padding: 0.25rem 0.75rem;
+  border-radius: var(--radius-pill);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+}
+.badge-accent { background: color-mix(in srgb, var(--tribai-blue) 10%, transparent); color: var(--tribai-blue); }
+.badge-gold   { background: color-mix(in srgb, var(--tribai-gold) 12%, transparent); color: var(--tribai-gold); }
+
+/* ── Surface card ─────────────────────────────────────────────── */
+.surface-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+}
+
+/* ── Callout — for "no source, no statement" inline notes ─────── */
+.callout-info {
+  background: var(--muted);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 1rem 1.25rem;
+  font-size: var(--type-small);
+  line-height: var(--lead-body);
+}
+
+/* Blockquote with gold accent — editorial device */
+blockquote {
+  border-left: 3px solid var(--tribai-gold);
+  padding: 0.5rem 1rem;
+  margin: 0.75rem 0;
+  background: color-mix(in srgb, var(--muted), transparent 50%);
+  border-radius: 0 var(--radius-xs) var(--radius-xs) 0;
+}

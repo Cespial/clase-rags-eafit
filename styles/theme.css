@@ -1,0 +1,173 @@
+/* theme.css — overrides de Reveal para identidad Tribai */
+@import "tokens.css";
+
+.reveal {
+  font-family: var(--font-body);
+  color: var(--fg);
+  background: var(--bg);
+}
+
+.reveal .slides {
+  text-align: left;
+}
+
+.reveal h1, .reveal h2, .reveal h3, .reveal h4 {
+  font-family: var(--font-heading);
+  font-weight: 700;
+  letter-spacing: var(--track-tight);
+  line-height: var(--lead-tight);
+  color: var(--fg);
+  text-transform: none;
+  margin-bottom: 1rem;
+}
+
+.reveal h1 { font-size: 3.5rem; }
+.reveal h2 { font-size: 2.25rem; }
+.reveal h3 { font-size: 1.5rem; }
+
+.reveal p,
+.reveal li {
+  font-size: 1.5rem;
+  line-height: 1.5;
+  color: var(--fg-body);
+}
+
+.reveal section.cover {
+  background: var(--tribai-navy);
+  color: white;
+  padding: 4rem;
+}
+.reveal section.cover h1,
+.reveal section.cover h2,
+.reveal section.cover p { color: white; }
+
+.reveal section.navy {
+  background: var(--tribai-navy);
+  color: white;
+}
+.reveal section.navy h1,
+.reveal section.navy h2,
+.reveal section.navy h3,
+.reveal section.navy p,
+.reveal section.navy li { color: white; }
+
+.reveal section.muted {
+  background: var(--bg-muted-section);
+}
+
+.reveal .eyebrow {
+  font-size: 1rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--tribai-blue);
+  margin-bottom: 0.5rem;
+}
+.reveal section.navy .eyebrow,
+.reveal section.cover .eyebrow {
+  color: var(--tribai-gold);
+}
+
+.reveal .stat {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  color: var(--tribai-gold);
+  font-weight: 600;
+}
+
+.reveal .pull-quote {
+  font-family: var(--font-serif);
+  font-size: 3rem;
+  font-weight: 400;
+  line-height: 1.2;
+  letter-spacing: -0.01em;
+  text-align: center;
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.reveal .tribai-logo {
+  position: fixed;
+  top: 1.25rem;
+  left: 1.25rem;
+  width: 32px;
+  height: 32px;
+  z-index: 100;
+  opacity: 0.8;
+}
+
+.reveal .slide-footer {
+  position: fixed;
+  bottom: 0.75rem;
+  right: 1.25rem;
+  font-size: 0.75rem;
+  color: var(--fg-muted);
+  font-family: var(--font-mono);
+}
+.reveal section.navy .slide-footer,
+.reveal section.cover .slide-footer { color: rgba(255,255,255,0.5); }
+
+.reveal .demo-frame {
+  border: 2px solid var(--tribai-gold);
+  border-radius: var(--radius-md);
+  width: 100%;
+  aspect-ratio: 16 / 9;
+}
+
+.reveal .demo-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: var(--tribai-gold);
+  color: var(--tribai-navy);
+  padding: 0.25rem 0.75rem;
+  border-radius: var(--radius-pill);
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-bottom: 0.5rem;
+}
+.reveal .demo-label::before {
+  content: "●";
+  color: #dc2626;
+  animation: pulse 1.5s infinite;
+}
+@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
+
+.reveal .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; }
+.reveal .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1.5rem; }
+.reveal .grid-4 { display: grid; grid-template-columns: repeat(4,1fr); gap: 1rem; }
+
+.reveal .card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 1.25rem;
+}
+.reveal .card h3 { font-size: 1.25rem; margin-bottom: 0.5rem; }
+.reveal .card p { font-size: 1rem; }
+
+.reveal .badge-gold {
+  display: inline-block;
+  background: color-mix(in srgb, var(--tribai-gold) 15%, transparent);
+  color: var(--tribai-gold);
+  padding: 0.25rem 0.75rem;
+  border-radius: var(--radius-pill);
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
+.reveal pre {
+  background: #131b2e;
+  color: #e8e6e3;
+  padding: 1.25rem;
+  border-radius: var(--radius-md);
+  font-size: 0.875rem;
+  font-family: var(--font-mono);
+}
+.reveal code { font-family: var(--font-mono); }
+
+@media (prefers-reduced-motion: reduce) {
+  .reveal .demo-label::before { animation: none; }
+}

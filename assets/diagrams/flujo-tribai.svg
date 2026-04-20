@@ -1,0 +1,78 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1400 500">
+  <style>
+    .stage { fill: #fff; stroke: #0066FF; stroke-width: 2; }
+    .stage-final { fill: #0066FF; }
+    .label { font-family: Inter, sans-serif; font-size: 16px; font-weight: 600; fill: #0A1628; }
+    .label-light { fill: #fff; }
+    .sub { font-family: Inter, sans-serif; font-size: 12px; fill: #6B7280; }
+    .arrow { stroke: #C4952A; stroke-width: 3; fill: none; marker-end: url(#arr3); }
+    .bubble { font-family: 'JetBrains Mono'; font-size: 13px; fill: #C4952A; }
+  </style>
+  <defs>
+    <marker id="arr3" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+      <path d="M0,0 L10,5 L0,10 z" fill="#C4952A"/>
+    </marker>
+  </defs>
+  <g transform="translate(40,220)">
+    <rect x="0" y="0" width="180" height="80" rx="40" class="stage"/>
+    <text class="label" x="90" y="35" text-anchor="middle">Pregunta</text>
+    <text class="sub" x="90" y="55" text-anchor="middle">del usuario</text>
+  </g>
+  <g transform="translate(260,220)">
+    <rect x="0" y="0" width="160" height="80" rx="8" class="stage"/>
+    <text class="label" x="80" y="32" text-anchor="middle">Entender</text>
+    <text class="sub" x="80" y="52" text-anchor="middle">rewrite · HyDE</text>
+    <text class="sub" x="80" y="68" text-anchor="middle">decompose</text>
+    <text class="bubble" x="80" y="-12" text-anchor="middle">Haiku 4.5</text>
+  </g>
+  <g transform="translate(460,220)">
+    <rect x="0" y="0" width="160" height="80" rx="8" class="stage"/>
+    <text class="label" x="80" y="32" text-anchor="middle">Buscar</text>
+    <text class="sub" x="80" y="52" text-anchor="middle">6 namespaces</text>
+    <text class="sub" x="80" y="68" text-anchor="middle">hybrid search</text>
+    <text class="bubble" x="80" y="-12" text-anchor="middle">Pinecone</text>
+  </g>
+  <g transform="translate(660,220)">
+    <rect x="0" y="0" width="160" height="80" rx="8" class="stage"/>
+    <text class="label" x="80" y="32" text-anchor="middle">Filtrar</text>
+    <text class="sub" x="80" y="52" text-anchor="middle">heurístico +</text>
+    <text class="sub" x="80" y="68" text-anchor="middle">cross-encoder</text>
+    <text class="bubble" x="80" y="-12" text-anchor="middle">Cloud Run</text>
+  </g>
+  <g transform="translate(860,220)">
+    <rect x="0" y="0" width="160" height="80" rx="8" class="stage"/>
+    <text class="label" x="80" y="32" text-anchor="middle">Armar</text>
+    <text class="sub" x="80" y="52" text-anchor="middle">cuaderno con</text>
+    <text class="sub" x="80" y="68" text-anchor="middle">evidencia</text>
+    <text class="bubble" x="80" y="-12" text-anchor="middle">12K tokens</text>
+  </g>
+  <g transform="translate(1060,220)">
+    <rect x="0" y="0" width="160" height="80" rx="8" class="stage-final"/>
+    <text class="label label-light" x="80" y="32" text-anchor="middle">Redactar</text>
+    <text class="sub" x="80" y="52" text-anchor="middle" fill="#fff" opacity="0.8">streaming +</text>
+    <text class="sub" x="80" y="68" text-anchor="middle" fill="#fff" opacity="0.8">citas</text>
+    <text class="bubble" x="80" y="-12" text-anchor="middle">Sonnet 4.6</text>
+  </g>
+  <g transform="translate(1260,220)">
+    <rect x="0" y="0" width="120" height="80" rx="40" stroke="#C4952A" stroke-width="3" fill="#fff"/>
+    <text class="label" x="60" y="35" text-anchor="middle" fill="#C4952A">Respuesta</text>
+    <text class="sub" x="60" y="55" text-anchor="middle" fill="#C4952A">con fuentes</text>
+  </g>
+  <g>
+    <path class="arrow" d="M 225 260 L 255 260"/>
+    <path class="arrow" d="M 425 260 L 455 260"/>
+    <path class="arrow" d="M 625 260 L 655 260"/>
+    <path class="arrow" d="M 825 260 L 855 260"/>
+    <path class="arrow" d="M 1025 260 L 1055 260"/>
+    <path class="arrow" d="M 1225 260 L 1255 260"/>
+  </g>
+  <text x="700" y="60" font-family="Inter" font-size="24" font-weight="700" fill="#0A1628" text-anchor="middle">
+    Tribai — flujo lineal de 6 etapas
+  </text>
+  <text x="700" y="90" font-family="Inter" font-size="16" fill="#6B7280" text-anchor="middle">
+    Cada etapa agrega contexto para que el modelo no tenga que inventar
+  </text>
+  <text x="700" y="400" font-family="JetBrains Mono" font-size="14" fill="#C4952A" text-anchor="middle" font-weight="600">
+    ~3 segundos · ~12 APIs por query · 36,000 vectores indexados
+  </text>
+</svg>

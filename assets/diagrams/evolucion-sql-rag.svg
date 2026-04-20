@@ -1,0 +1,51 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1400 300" fill="none">
+  <style>
+    .node { fill: #fff; stroke: #0066FF; stroke-width: 2; }
+    .node-current { fill: #0066FF; }
+    .label { font-family: Inter, sans-serif; font-size: 18px; font-weight: 600; fill: #0A1628; }
+    .label-light { fill: #fff; }
+    .year { font-family: 'JetBrains Mono', monospace; font-size: 14px; fill: #6B7280; }
+    .axis { stroke: #E8E8E8; stroke-width: 2; }
+    .arrow { stroke: #0066FF; stroke-width: 3; marker-end: url(#arr); }
+  </style>
+  <defs>
+    <marker id="arr" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+      <path d="M0,0 L10,5 L0,10 z" fill="#0066FF"/>
+    </marker>
+  </defs>
+  <line class="axis" x1="80" y1="180" x2="1320" y2="180"/>
+  <g transform="translate(140,180)">
+    <circle class="node" r="30"/>
+    <text class="label" text-anchor="middle" y="6">SQL</text>
+    <text class="year" text-anchor="middle" y="60">1970s</text>
+    <text class="label" text-anchor="middle" y="-50" font-size="14" fill="#6B7280">Coincidencia literal</text>
+  </g>
+  <g transform="translate(380,180)">
+    <circle class="node" r="30"/>
+    <text class="label" text-anchor="middle" y="6" font-size="14">FTS</text>
+    <text class="year" text-anchor="middle" y="60">1990s</text>
+    <text class="label" text-anchor="middle" y="-50" font-size="14" fill="#6B7280">Tokens + stemming</text>
+  </g>
+  <g transform="translate(620,180)">
+    <circle class="node" r="30"/>
+    <text class="label" text-anchor="middle" y="6" font-size="13">Embed</text>
+    <text class="year" text-anchor="middle" y="60">2018</text>
+    <text class="label" text-anchor="middle" y="-50" font-size="14" fill="#6B7280">Significado</text>
+  </g>
+  <g transform="translate(860,180)">
+    <circle class="node node-current" r="34"/>
+    <text class="label label-light" text-anchor="middle" y="6" font-size="15">RAG</text>
+    <text class="year" text-anchor="middle" y="62">2023</text>
+    <text class="label" text-anchor="middle" y="-54" font-size="14" fill="#0066FF" font-weight="700">Contexto + generación</text>
+  </g>
+  <g transform="translate(1120,180)">
+    <circle class="node" r="30" stroke="#C4952A"/>
+    <text class="label" text-anchor="middle" y="6" font-size="13" fill="#C4952A">Agentic</text>
+    <text class="year" text-anchor="middle" y="60">2025+</text>
+    <text class="label" text-anchor="middle" y="-50" font-size="14" fill="#C4952A">Decisión autónoma</text>
+  </g>
+  <path class="arrow" d="M 175 180 L 345 180"/>
+  <path class="arrow" d="M 415 180 L 585 180"/>
+  <path class="arrow" d="M 655 180 L 825 180"/>
+  <path class="arrow" d="M 898 180 L 1085 180"/>
+</svg>

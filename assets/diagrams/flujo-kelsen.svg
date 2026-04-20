@@ -1,0 +1,60 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1400 600">
+  <style>
+    .agent { fill: #0A1628; }
+    .tool { fill: #fff; stroke: #C4952A; stroke-width: 2; }
+    .label { font-family: Inter, sans-serif; font-size: 16px; font-weight: 600; fill: #0A1628; }
+    .label-light { fill: #fff; }
+    .sub { font-family: Inter, sans-serif; font-size: 13px; fill: #6B7280; }
+    .arrow { stroke: #0066FF; stroke-width: 2; stroke-dasharray: 6 4; fill: none; marker-end: url(#arr4); }
+  </style>
+  <defs>
+    <marker id="arr4" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto">
+      <path d="M0,0 L10,5 L0,10 z" fill="#0066FF"/>
+    </marker>
+  </defs>
+  <text x="700" y="60" font-family="Inter" font-size="24" font-weight="700" fill="#0A1628" text-anchor="middle">
+    Kelsen — agente autónomo con herramientas
+  </text>
+  <text x="700" y="90" font-family="Inter" font-size="16" fill="#6B7280" text-anchor="middle">
+    El agente decide qué herramienta usar — no sigue un guión fijo
+  </text>
+  <g transform="translate(570,230)">
+    <rect x="0" y="0" width="260" height="120" rx="16" class="agent"/>
+    <text class="label label-light" x="130" y="50" text-anchor="middle" font-size="22">Agente Kelsen</text>
+    <text class="sub" x="130" y="80" text-anchor="middle" fill="#C4952A" font-weight="600">Claude Sonnet 4.6</text>
+    <text class="sub" x="130" y="100" text-anchor="middle" fill="rgba(255,255,255,0.7)">decide y actúa</text>
+  </g>
+  <g transform="translate(100,100)">
+    <rect x="0" y="0" width="200" height="80" rx="8" class="tool"/>
+    <text class="label" x="100" y="32" text-anchor="middle">🔍 buscar_normas</text>
+    <text class="sub" x="100" y="52" text-anchor="middle">88K normas SUIN</text>
+    <text class="sub" x="100" y="68" text-anchor="middle">hybrid BM25 + vector</text>
+  </g>
+  <g transform="translate(1100,100)">
+    <rect x="0" y="0" width="230" height="80" rx="8" class="tool"/>
+    <text class="label" x="115" y="32" text-anchor="middle">⚖️ buscar_jurisprudencia</text>
+    <text class="sub" x="115" y="52" text-anchor="middle">29K sentencias CC</text>
+    <text class="sub" x="115" y="68" text-anchor="middle">T- · C- · SU-</text>
+  </g>
+  <g transform="translate(100,420)">
+    <rect x="0" y="0" width="220" height="80" rx="8" class="tool"/>
+    <text class="label" x="110" y="32" text-anchor="middle">📄 consultar_articulo</text>
+    <text class="sub" x="110" y="52" text-anchor="middle">Lectura dirigida</text>
+    <text class="sub" x="110" y="68" text-anchor="middle">de un artículo específico</text>
+  </g>
+  <g transform="translate(1100,420)">
+    <rect x="0" y="0" width="220" height="80" rx="8" class="tool"/>
+    <text class="label" x="110" y="32" text-anchor="middle">🔬 investigar_tema</text>
+    <text class="sub" x="110" y="52" text-anchor="middle">Búsqueda multi-paso</text>
+    <text class="sub" x="110" y="68" text-anchor="middle">cross-reference</text>
+  </g>
+  <g>
+    <path class="arrow" d="M 300 140 Q 430 180 580 240"/>
+    <path class="arrow" d="M 1100 140 Q 970 180 830 240"/>
+    <path class="arrow" d="M 320 440 Q 450 400 580 340"/>
+    <path class="arrow" d="M 1100 440 Q 960 400 830 340"/>
+  </g>
+  <text x="700" y="560" font-family="JetBrains Mono" font-size="14" fill="#C4952A" text-anchor="middle" font-weight="600">
+    1.69M documentos · 2.6M chunks · 22 GB Neon Postgres (pgvector + ParadeDB)
+  </text>
+</svg>

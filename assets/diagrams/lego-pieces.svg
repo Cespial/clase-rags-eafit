@@ -1,0 +1,71 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1400 500" fill="none">
+  <style>
+    .lego-1 { fill: #0066FF; }
+    .lego-2 { fill: #3B82B8; }
+    .lego-3 { fill: #0A1628; }
+    .lego-4 { fill: #C4952A; }
+    .lego-5 { fill: #1a4fb8; }
+    .stud { fill: rgba(255,255,255,0.2); stroke: rgba(0,0,0,0.15); }
+    .title { font-family: Inter, sans-serif; font-size: 22px; font-weight: 700; fill: #fff; }
+    .sub { font-family: Inter, sans-serif; font-size: 14px; fill: rgba(255,255,255,0.85); }
+  </style>
+  <g transform="translate(40,80)">
+    <rect width="240" height="160" rx="12" class="lego-1"/>
+    <circle cx="60" cy="20" r="14" class="stud"/>
+    <circle cx="120" cy="20" r="14" class="stud"/>
+    <circle cx="180" cy="20" r="14" class="stud"/>
+    <text class="title" x="20" y="86">1 · Fuentes</text>
+    <text class="sub" x="20" y="118">Los libros de la biblioteca</text>
+    <text class="sub" x="20" y="138" opacity="0.7">PDFs · APIs · DBs · docs</text>
+  </g>
+  <g transform="translate(320,80)">
+    <rect width="240" height="160" rx="12" class="lego-2"/>
+    <circle cx="60" cy="20" r="14" class="stud"/>
+    <circle cx="120" cy="20" r="14" class="stud"/>
+    <circle cx="180" cy="20" r="14" class="stud"/>
+    <text class="title" x="20" y="86">2 · Embeddings</text>
+    <text class="sub" x="20" y="118">Coordenadas de significado</text>
+    <text class="sub" x="20" y="138" opacity="0.7">voyage · cohere · openai</text>
+  </g>
+  <g transform="translate(600,80)">
+    <rect width="240" height="160" rx="12" class="lego-3"/>
+    <circle cx="60" cy="20" r="14" class="stud"/>
+    <circle cx="120" cy="20" r="14" class="stud"/>
+    <circle cx="180" cy="20" r="14" class="stud"/>
+    <text class="title" x="20" y="86">3 · Vector DB</text>
+    <text class="sub" x="20" y="118">El estante de coordenadas</text>
+    <text class="sub" x="20" y="138" opacity="0.7">pinecone · pgvector · neon</text>
+  </g>
+  <g transform="translate(880,80)">
+    <rect width="240" height="160" rx="12" class="lego-4"/>
+    <circle cx="60" cy="20" r="14" class="stud"/>
+    <circle cx="120" cy="20" r="14" class="stud"/>
+    <circle cx="180" cy="20" r="14" class="stud"/>
+    <text class="title" x="20" y="86">4 · Reranker</text>
+    <text class="sub" x="20" y="118">Filtro de relevancia</text>
+    <text class="sub" x="20" y="138" opacity="0.7">cohere · voyage · cross-encoder</text>
+  </g>
+  <g transform="translate(1160,80)">
+    <rect width="200" height="160" rx="12" class="lego-5"/>
+    <circle cx="50" cy="20" r="14" class="stud"/>
+    <circle cx="100" cy="20" r="14" class="stud"/>
+    <circle cx="150" cy="20" r="14" class="stud"/>
+    <text class="title" x="20" y="86">5 · LLM</text>
+    <text class="sub" x="20" y="118">El escritor</text>
+    <text class="sub" x="20" y="138" opacity="0.7">claude · gpt · gemini</text>
+  </g>
+  <g stroke="#6B7280" stroke-width="3" fill="none" marker-end="url(#arr2)">
+    <path d="M 290 160 L 315 160"/>
+    <path d="M 570 160 L 595 160"/>
+    <path d="M 850 160 L 875 160"/>
+    <path d="M 1130 160 L 1155 160"/>
+  </g>
+  <defs>
+    <marker id="arr2" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto">
+      <path d="M0,0 L10,5 L0,10 z" fill="#6B7280"/>
+    </marker>
+  </defs>
+  <text x="700" y="340" text-anchor="middle" font-family="Inter" font-size="18" font-weight="600" fill="#0A1628">
+    Orquestar estas 5 piezas = construir un RAG
+  </text>
+</svg>

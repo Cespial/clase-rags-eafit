@@ -1,0 +1,89 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 900">
+  <style>
+    .center { fill: #0066FF; }
+    .orbit { fill: none; stroke: #e8e8e8; stroke-width: 1; stroke-dasharray: 3 3; }
+    .api { fill: #fff; stroke: #C4952A; stroke-width: 2; }
+    .api-label { font-family: Inter, sans-serif; font-size: 13px; font-weight: 600; fill: #0A1628; text-anchor: middle; }
+    .api-sub { font-family: Inter, sans-serif; font-size: 10px; fill: #6B7280; text-anchor: middle; }
+    .center-label { font-family: Inter, sans-serif; font-size: 22px; font-weight: 700; fill: #fff; text-anchor: middle; }
+    .ray { stroke: #C4952A; stroke-width: 1; opacity: 0.4; }
+  </style>
+  <circle cx="600" cy="450" r="100" class="center"/>
+  <text x="600" y="440" class="center-label">Tribai</text>
+  <text x="600" y="465" class="center-label" font-size="14">tu .app</text>
+  <text x="600" y="485" class="api-sub" fill="rgba(255,255,255,0.7)">(la BD es 1 de 12)</text>
+  <circle cx="600" cy="450" r="320" class="orbit"/>
+  <g transform="translate(600,130)">
+    <rect x="-80" y="-28" width="160" height="56" rx="8" class="api"/>
+    <text class="api-label" y="-4">Anthropic</text>
+    <text class="api-sub" y="14">Claude Sonnet/Haiku</text>
+  </g>
+  <g transform="translate(870,290)">
+    <rect x="-70" y="-28" width="140" height="56" rx="8" class="api"/>
+    <text class="api-label" y="-4">Voyage AI</text>
+    <text class="api-sub" y="14">Embeddings</text>
+  </g>
+  <g transform="translate(870,610)">
+    <rect x="-70" y="-28" width="140" height="56" rx="8" class="api"/>
+    <text class="api-label" y="-4">Pinecone</text>
+    <text class="api-sub" y="14">Vector DB</text>
+  </g>
+  <g transform="translate(600,770)">
+    <rect x="-70" y="-28" width="140" height="56" rx="8" class="api"/>
+    <text class="api-label" y="-4">Cohere</text>
+    <text class="api-sub" y="14">Reranker</text>
+  </g>
+  <g transform="translate(330,610)">
+    <rect x="-85" y="-28" width="170" height="56" rx="8" class="api"/>
+    <text class="api-label" y="-4">Vercel AI Gateway</text>
+    <text class="api-sub" y="14">Routing · Failover</text>
+  </g>
+  <g transform="translate(330,290)">
+    <rect x="-75" y="-28" width="150" height="56" rx="8" class="api"/>
+    <text class="api-label" y="-4">Vercel</text>
+    <text class="api-sub" y="14">Hosting · Edge</text>
+  </g>
+  <g transform="translate(170,450)">
+    <rect x="-70" y="-28" width="140" height="56" rx="8" class="api"/>
+    <text class="api-label" y="-4">Langfuse</text>
+    <text class="api-sub" y="14">Observability</text>
+  </g>
+  <g transform="translate(1030,450)">
+    <rect x="-70" y="-28" width="140" height="56" rx="8" class="api"/>
+    <text class="api-label" y="-4">Clerk</text>
+    <text class="api-sub" y="14">Auth</text>
+  </g>
+  <g transform="translate(480,40)">
+    <rect x="-70" y="-24" width="140" height="48" rx="8" class="api"/>
+    <text class="api-label" y="-2">Stripe</text>
+    <text class="api-sub" y="14">Billing</text>
+  </g>
+  <g transform="translate(720,40)">
+    <rect x="-70" y="-24" width="140" height="48" rx="8" class="api"/>
+    <text class="api-label" y="-2">Upstash Redis</text>
+    <text class="api-sub" y="14">Cache · Rate-limit</text>
+  </g>
+  <g transform="translate(480,860)">
+    <rect x="-70" y="-24" width="140" height="48" rx="8" class="api"/>
+    <text class="api-label" y="-2">Supabase</text>
+    <text class="api-sub" y="14">Grafo normograma</text>
+  </g>
+  <g transform="translate(720,860)">
+    <rect x="-70" y="-24" width="140" height="48" rx="8" class="api"/>
+    <text class="api-label" y="-2">Cloud Run</text>
+    <text class="api-sub" y="14">ML reranker</text>
+  </g>
+  <g>
+    <line class="ray" x1="600" y1="350" x2="600" y2="160"/>
+    <line class="ray" x1="685" y1="399" x2="830" y2="313"/>
+    <line class="ray" x1="685" y1="500" x2="830" y2="587"/>
+    <line class="ray" x1="600" y1="549" x2="600" y2="742"/>
+    <line class="ray" x1="515" y1="500" x2="370" y2="587"/>
+    <line class="ray" x1="515" y1="399" x2="370" y2="313"/>
+    <line class="ray" x1="500" y1="450" x2="240" y2="450"/>
+    <line class="ray" x1="700" y1="450" x2="960" y2="450"/>
+  </g>
+  <text x="600" y="890" font-family="Inter" font-size="14" fill="#6B7280" text-anchor="middle" font-style="italic">
+    La base de datos es 1 de 12 · Orquestar todas es la ingeniería
+  </text>
+</svg>

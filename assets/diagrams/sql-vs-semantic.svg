@@ -1,0 +1,44 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1400 600" fill="none">
+  <style>
+    .title { font-family: Inter, sans-serif; font-size: 24px; font-weight: 700; fill: #0A1628; }
+    .sub { font-family: Inter, sans-serif; font-size: 16px; fill: #6B7280; }
+    .code { font-family: 'JetBrains Mono', monospace; font-size: 15px; fill: #0A1628; }
+    .row { stroke: #E8E8E8; fill: #fff; }
+    .dot { fill: #0066FF; }
+    .dot-gold { fill: #C4952A; }
+    .cluster { stroke: #0066FF; stroke-dasharray: 4 4; fill: none; opacity: 0.4; }
+  </style>
+  <g transform="translate(80,40)">
+    <text class="title">Mundo SQL</text>
+    <text class="sub" y="26">Tabla → filas → match literal</text>
+    <g transform="translate(0,60)">
+      <rect x="0" y="0" width="520" height="40" class="row"/>
+      <text class="code" x="12" y="26">SELECT * FROM articulos</text>
+    </g>
+    <g transform="translate(0,108)">
+      <rect x="0" y="0" width="520" height="40" class="row"/>
+      <text class="code" x="12" y="26">WHERE texto ILIKE '%extranjero%'</text>
+    </g>
+    <text class="sub" y="200" fill="#dc2626">✗ "residente no colombiano" → 0 resultados</text>
+    <text class="sub" y="226" fill="#dc2626">✗ "foráneo" → 0 resultados</text>
+    <text class="sub" y="252" fill="#dc2626">✗ "sin residencia nacional" → 0 resultados</text>
+  </g>
+  <g transform="translate(760,40)">
+    <text class="title">Mundo Semántico</text>
+    <text class="sub" y="26">Texto → vector 1024D → vecinos cercanos</text>
+    <g transform="translate(0,80)">
+      <ellipse cx="260" cy="200" rx="220" ry="140" class="cluster"/>
+      <circle cx="260" cy="200" r="10" class="dot-gold"/>
+      <text class="sub" x="280" y="204" fill="#C4952A" font-weight="700">trabajador extranjero</text>
+      <circle cx="180" cy="160" r="6" class="dot"/>
+      <text class="sub" x="120" y="140">residente no colombiano</text>
+      <circle cx="340" cy="170" r="6" class="dot"/>
+      <text class="sub" x="300" y="140">ingeniero foráneo</text>
+      <circle cx="170" cy="250" r="6" class="dot"/>
+      <text class="sub" x="60" y="258">sin residencia nacional</text>
+      <circle cx="370" cy="250" r="6" class="dot"/>
+      <text class="sub" x="330" y="280">persona del exterior</text>
+    </g>
+    <text class="sub" y="500" fill="#16a34a" font-weight="600">✓ Todos se agrupan — el significado es la coordenada</text>
+  </g>
+</svg>

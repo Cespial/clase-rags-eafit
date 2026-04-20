@@ -491,7 +491,6 @@ blockquote {
       </div>
     </div>
   </div>
-  <div class="slide-footer">1 / 44</div>
   <aside class="notes">
     Saludo corto. "Hoy vamos a ver RAG desde dos ángulos: qué es, y cómo construir uno.
     Vamos a empezar haciéndole una pregunta difícil a una IA real. Ojo a cómo responde."
@@ -515,7 +514,6 @@ blockquote {
     → Google no sabe qué es "residente".<br/>
     → Veamos qué hace Tribai.
   </p>
-  <div class="slide-footer">2 / 44</div>
   <aside class="notes">
     Abrir tribai.co/asistente en otra pestaña. Copiar-pegar la query desde demo-script.md.
     Mientras carga, decir: "fíjense en dos cosas: la respuesta y las fuentes que cita".
@@ -547,7 +545,6 @@ ORDER BY articulo;</code></pre>
       </p>
     </div>
   </div>
-  <div class="slide-footer">3 / 44</div>
   <aside class="notes">
     Reconocer lo que ya saben. Validar que ese paradigma es sólido — no lo estamos tirando.
     Pero hay preguntas que no se responden así.
@@ -565,10 +562,48 @@ ORDER BY articulo;</code></pre>
       <li style="margin-bottom: 0.75rem;"><span style="color: var(--tribai-gold); font-weight: 700;">→</span> No filas, sino una respuesta redactada con citas</li>
     </ul>
   </div>
-  <div class="slide-footer">4 / 44</div>
   <aside class="notes">
     Aquí es donde queremos hacerles click: la forma de la ingeniería cambió.
     Ya no es "query → filas → UI". Es "pregunta → orquestación → respuesta conversacional".
+  </aside>
+</section>
+
+<section>
+  <div class="eyebrow">§1 · la prueba del problema</div>
+  <h2>Una pregunta de contador real</h2>
+  <div class="card" style="background: #f5f8fa; border-left: 4px solid var(--tribai-gold); padding: 1.25rem; max-width: 1100px; margin-top: 1.5rem;">
+    <p style="font-size: 1.25rem; font-style: italic; color: var(--fg); line-height: 1.5;">
+      "Estoy haciendo la declaración de una empresa que le pagó honorarios a un profesional residente en España. ¿Qué retención aplico?"
+    </p>
+  </div>
+  <div class="grid-2" style="margin-top: 2rem; align-items: stretch;">
+    <div class="card" style="border-top: 3px solid #dc2626;">
+      <h3 style="color: #dc2626;">Con SQL sobre el ET</h3>
+      <pre style="font-size: 0.85rem; margin-top: 0.75rem;"><code>SELECT articulo, texto
+FROM estatuto_tributario
+WHERE texto ILIKE '%retención%extranjero%';</code></pre>
+      <p style="margin-top: 0.75rem; color: var(--fg-muted); font-size: 0.95rem;">
+        <strong>Resultado:</strong> 0 filas. El Art. 408 no dice "extranjero". Dice "residente en el exterior".
+      </p>
+      <p style="margin-top: 0.5rem; color: #dc2626; font-weight: 600; font-size: 0.95rem;">
+        ✗ SQL no ve que son sinónimos.
+      </p>
+    </div>
+    <div class="card" style="border-top: 3px solid #16a34a;">
+      <h3 style="color: #16a34a;">Con RAG sobre el ET</h3>
+      <ol style="font-size: 1rem; line-height: 1.5; margin-top: 0.75rem;">
+        <li>Embeddings agrupan "extranjero" ≈ "residente en el exterior" ≈ "no domiciliado"</li>
+        <li>Retrieval trae los 5 artículos que tocan el tema: 406-417 del ET</li>
+        <li>El LLM redacta: "Aplica Art. 408 del ET, tarifa del 20%…"</li>
+      </ol>
+      <p style="margin-top: 0.75rem; color: #16a34a; font-weight: 600; font-size: 0.95rem;">
+        ✓ Responde con fuentes verificables.
+      </p>
+    </div>
+  </div>
+  <aside class="notes">
+    Pedagógicamente clave: sentir el dolor del SQL fallando en algo concreto ANTES de introducir el insight.
+    "Contador preguntando. SQL da cero. RAG responde."
   </aside>
 </section>
 
@@ -580,7 +615,6 @@ ORDER BY articulo;</code></pre>
     Los modelos de lenguaje ya saben escribir bien. El trabajo del ingeniero pasó de "cómo genero texto" a
     <strong>"cómo le paso exactamente los datos correctos para que no invente"</strong>.
   </p>
-  <div class="slide-footer">5 / 44</div>
   <aside class="notes">
     Punto conceptual importante. Los LLMs son capaces pero no omniscientes.
     La ingeniería ahora es de contexto — curar, buscar, filtrar, pasar los datos correctos.
@@ -599,7 +633,6 @@ ORDER BY articulo;</code></pre>
       </p>
     </div>
   </div>
-  <div class="slide-footer">6 / 44</div>
   <aside class="notes">
     Pausa. Que el concepto se asiente. Mirar al público. "Esa frase es la clase entera".
   </aside>
@@ -628,7 +661,6 @@ ORDER BY articulo;</code></pre>
       <p style="color: var(--fg-muted); font-size: 0.95rem;">La documentación de la empresa como fuente, 24/7</p>
     </div>
   </div>
-  <div class="slide-footer">7 / 44</div>
   <aside class="notes">
     Intro a la galería. Vamos a ver 7 en total en dos slides.
     La idea: cualquier dominio con mucho texto es candidato.
@@ -660,7 +692,6 @@ ORDER BY articulo;</code></pre>
       <p style="color: var(--fg-muted); font-size: 0.9rem;">Búsqueda conversacional de catálogos</p>
     </div>
   </div>
-  <div class="slide-footer">8 / 44</div>
   <aside class="notes">
     Seguir el tour. Cada uno representa una oportunidad de mercado real.
   </aside>
@@ -692,7 +723,6 @@ ORDER BY articulo;</code></pre>
       </p>
     </div>
   </div>
-  <div class="slide-footer">9 / 44</div>
   <aside class="notes">
     Aquí muestro el producto de verdad. Si hay tiempo y la red colabora, volver a tribai.co.
   </aside>
@@ -724,7 +754,6 @@ ORDER BY articulo;</code></pre>
       </p>
     </div>
   </div>
-  <div class="slide-footer">10 / 44</div>
   <aside class="notes">
     Tamaño y ambición. Harvey.ai hace esto para USA, nosotros para Colombia.
   </aside>
@@ -747,7 +776,6 @@ ORDER BY articulo;</code></pre>
       <p style="color: var(--fg-muted);">El usuario necesita saber de dónde salió</p>
     </div>
   </div>
-  <div class="slide-footer">11 / 44</div>
   <aside class="notes">
     La receta se repite. Reconocer el patrón es 80% del trabajo de escoger qué construir.
   </aside>
@@ -767,7 +795,6 @@ ORDER BY articulo;</code></pre>
       Ese es un RAG posible. Guarden la idea — volveremos a ella al final.
     </p>
   </div>
-  <div class="slide-footer">12 / 44</div>
   <aside class="notes">
     Micro-ejercicio. No respuesta pública. Solo que piensen. Los activa.
     30 segundos reales, cronometrados.
@@ -782,7 +809,6 @@ ORDER BY articulo;</code></pre>
       <span style="color: var(--tribai-gold);">= oportunidad de RAG</span>
     </p>
   </div>
-  <div class="slide-footer">13 / 44</div>
   <aside class="notes">
     Fin del §2. Transición al §3: "ok, ya vieron qué HACE. Ahora cómo ESTÁ HECHO."
   </aside>
@@ -871,7 +897,6 @@ ORDER BY articulo;</code></pre>
   <text class="title" x="860" y="470" text-anchor="middle">Máquina de escribir</text>
   <text class="sub" x="860" y="500" text-anchor="middle">LLM que redacta la respuesta</text>
 </svg>
-  <div class="slide-footer">14 / 44</div>
   <aside class="notes">
     La metáfora dominante de la clase. Volvemos a ella en los siguientes 7 slides.
     Biblioteca = fuentes. Bibliotecario = retrieval + reranking. Máquina = LLM.
@@ -907,7 +932,6 @@ ORDER BY articulo;</code></pre>
       </div>
     </div>
   </div>
-  <div class="slide-footer">15 / 44</div>
   <aside class="notes">
     La calidad de las fuentes DETERMINA la calidad del RAG.
     "Garbage in, garbage out" nunca fue más literal.
@@ -979,7 +1003,6 @@ ORDER BY articulo;</code></pre>
 </svg>
     </div>
   </div>
-  <div class="slide-footer">16 / 44</div>
   <aside class="notes">
     Este es el momento "aha". Sin matemática: solo "cada frase es un punto; cosas parecidas están cerca".
     El demo #2 viene enseguida — prepararlo mental.
@@ -1010,7 +1033,6 @@ ORDER BY articulo;</code></pre>
       PostgreSQL con LIKE no ve ninguna diferencia entre los dos casos.
     </p>
   </div>
-  <div class="slide-footer">17 / 44</div>
   <aside class="notes">
     Voy a localhost:3001 y escribo las dos frases.
     Backup: este slide ya tiene los números pre-calculados.
@@ -1046,12 +1068,56 @@ ORDER BY articulo;</code></pre>
       </p>
     </div>
   </div>
-  <div class="slide-footer">18 / 44</div>
   <aside class="notes">
     La decisión "Pinecone vs pgvector" es arquitectural, no técnica.
     Pinecone: SaaS, rápido de arrancar.
     pgvector: control total, mismo Postgres que la app.
     Ambas son válidas — Tribai y Kelsen eligieron distinto.
+  </aside>
+</section>
+
+<section class="muted">
+  <div class="eyebrow">§3 · el estante por significado</div>
+  <h2>¿Cómo se ordena un estante "por significado"?</h2>
+  <div class="grid-2" style="margin-top: 1.5rem; align-items: stretch;">
+    <div class="card" style="border-top: 3px solid #dc2626;">
+      <h3 style="color: #dc2626;">Buscar en SQL</h3>
+      <p style="margin-top: 0.75rem; font-family: var(--font-mono); font-size: 0.95rem; color: var(--fg);">
+        <code>WHERE texto ILIKE '%perro%'</code>
+      </p>
+      <div style="margin-top: 1rem; padding: 0.75rem; background: #fef2f2; border-radius: 6px; font-size: 0.95rem;">
+        <strong>Encuentra:</strong><br/>
+        • "el perro ladra"<br/>
+        • "perro policía"<br/>
+        <br/>
+        <strong>NO encuentra:</strong><br/>
+        <span style="color: #dc2626;">✗ "mi canino"</span><br/>
+        <span style="color: #dc2626;">✗ "la mascota"</span><br/>
+        <span style="color: #dc2626;">✗ "lobo doméstico"</span>
+      </div>
+    </div>
+    <div class="card" style="border-top: 3px solid #16a34a;">
+      <h3 style="color: #16a34a;">Buscar en vector DB</h3>
+      <p style="margin-top: 0.75rem; font-family: var(--font-mono); font-size: 0.95rem; color: var(--fg);">
+        <code>ORDER BY embedding &lt;=&gt; query_emb LIMIT 10</code>
+      </p>
+      <div style="margin-top: 1rem; padding: 0.75rem; background: #f0fdf4; border-radius: 6px; font-size: 0.95rem;">
+        <strong>Encuentra a TODOS:</strong><br/>
+        <span style="color: #16a34a;">✓ "el perro ladra"</span> (0.91)<br/>
+        <span style="color: #16a34a;">✓ "mi canino"</span> (0.78)<br/>
+        <span style="color: #16a34a;">✓ "la mascota"</span> (0.64)<br/>
+        <span style="color: #16a34a;">✓ "lobo doméstico"</span> (0.58)<br/>
+        <span style="color: var(--fg-muted);">~ "un animal grande"</span> (0.41)<br/>
+        <span style="color: var(--fg-muted);">✗ "un carro rojo"</span> (0.12)
+      </div>
+    </div>
+  </div>
+  <p style="margin-top: 1.5rem; font-size: 1.125rem; color: var(--fg-body); text-align: center;">
+    <strong>El estante no ordena por letra, ordena por significado.</strong> Los sinónimos quedan juntos automáticamente.
+  </p>
+  <aside class="notes">
+    Analogía clave. Biblioteca tradicional = ordenada por título/autor (Dewey).
+    Vector DB = ordenada por tema/significado. Si buscas "perro", te salen todos los libros sobre caninos.
   </aside>
 </section>
 
@@ -1079,10 +1145,57 @@ ORDER BY articulo;</code></pre>
       </div>
     </div>
   </div>
-  <div class="slide-footer">19 / 44</div>
   <aside class="notes">
     Sin reranker el retrieval es ruidoso — salen 20 resultados similares pero solo 5 son realmente relevantes.
     Stanford midió: +33-40% accuracy con reranker, costa 120ms extra.
+  </aside>
+</section>
+
+<section class="muted">
+  <div class="eyebrow">§3 · reranker en acción</div>
+  <h2>Lo que cambia el reranker</h2>
+  <p style="margin-top: 0.5rem; color: var(--fg-muted); font-size: 1.125rem;">
+    Query del contador: <em>"¿retención a residentes en el exterior?"</em>
+  </p>
+  <div class="grid-2" style="margin-top: 1.25rem; align-items: stretch; gap: 1.5rem;">
+    <div class="card">
+      <h3 style="font-size: 1.1rem;">Top-5 del vector DB (rápido)</h3>
+      <p style="color: var(--fg-muted); font-size: 0.9rem;">Ordenado por cercanía en embeddings</p>
+      <ol style="margin-top: 0.75rem; font-size: 0.95rem; line-height: 1.7; padding-left: 1.25rem;">
+        <li>Art. 407 — Retenciones diversas <span class="stat" style="font-size: 0.85rem;">0.82</span></li>
+        <li>Art. 300 — Ganancias ocasionales <span class="stat" style="font-size: 0.85rem;">0.79</span></li>
+        <li>Art. 415 — Retención sobre arrendamientos <span class="stat" style="font-size: 0.85rem;">0.77</span></li>
+        <li style="background: #fef3c7; padding: 0.25rem; border-radius: 4px;"><strong>Art. 408</strong> — Pagos al exterior <span class="stat" style="font-size: 0.85rem;">0.76</span></li>
+        <li>Art. 125 — Deducciones por donaciones <span class="stat" style="font-size: 0.85rem;">0.74</span></li>
+      </ol>
+      <p style="margin-top: 0.75rem; color: #dc2626; font-size: 0.9rem;">
+        ✗ Art. 408 (el correcto) está en la <strong>posición #4</strong>.<br/>
+        Tres resultados irrelevantes están arriba.
+      </p>
+    </div>
+    <div class="card" style="border-top: 3px solid var(--tribai-gold);">
+      <h3 style="font-size: 1.1rem;">Top-5 después de rerank (preciso)</h3>
+      <p style="color: var(--fg-muted); font-size: 0.9rem;">Reordenado por un modelo que "lee" cada candidato</p>
+      <ol style="margin-top: 0.75rem; font-size: 0.95rem; line-height: 1.7; padding-left: 1.25rem;">
+        <li style="background: #d1fae5; padding: 0.25rem; border-radius: 4px;"><strong>Art. 408</strong> — Pagos al exterior <span class="stat" style="font-size: 0.85rem;">0.94</span></li>
+        <li>Art. 415 — Arrendamientos al exterior <span class="stat" style="font-size: 0.85rem;">0.71</span></li>
+        <li>Art. 406 — Casos en que se debe retener <span class="stat" style="font-size: 0.85rem;">0.68</span></li>
+        <li>Art. 417 — Agentes de retención <span class="stat" style="font-size: 0.85rem;">0.62</span></li>
+        <li>Art. 407 — Retenciones diversas <span class="stat" style="font-size: 0.85rem;">0.54</span></li>
+      </ol>
+      <p style="margin-top: 0.75rem; color: #16a34a; font-size: 0.9rem;">
+        ✓ Art. 408 escaló a <strong>posición #1</strong>.<br/>
+        Los 5 resultados ahora son relevantes.
+      </p>
+    </div>
+  </div>
+  <p style="margin-top: 1rem; font-size: 1rem; color: var(--fg-muted); text-align: center;">
+    Costo: 120 ms extra. Ganancia: el LLM recibe el contexto correcto, no ruido.
+  </p>
+  <aside class="notes">
+    Este ejemplo es real — lo pueden ver en el panel de evidencia de Tribai.
+    Vector similarity es el "primer filtro barato"; reranker es el "segundo filtro caro que importa".
+    +33-40% accuracy según Stanford. El costo en UX es 120 ms, casi invisible.
   </aside>
 </section>
 
@@ -1112,10 +1225,82 @@ ORDER BY articulo;</code></pre>
       </div>
     </div>
   </div>
-  <div class="slide-footer">20 / 44</div>
   <aside class="notes">
     Romper el mito: el LLM no "sabe" tributario. Nosotros se lo pasamos.
     Por eso se llama RAG — Retrieval-Augmented Generation.
+  </aside>
+</section>
+
+<section class="muted">
+  <div class="eyebrow">§3 · el contrato con el escritor</div>
+  <h2>Así se le habla al LLM</h2>
+  <p style="margin-top: 0.5rem; color: var(--fg-muted); font-size: 1.125rem;">
+    Esto es literalmente lo que Tribai le pasa al modelo en cada pregunta:
+  </p>
+  <pre style="font-size: 0.8rem; margin-top: 1rem;"><code>Sos un asistente tributario colombiano experto.
+
+REGLAS ESTRICTAS:
+1. Responde ÚNICAMENTE con base en el &lt;context&gt; que te paso.
+2. Cita cada afirmación con el artículo del ET entre corchetes: [Art. 408].
+3. Si la respuesta NO está en el contexto, di: "No tengo evidencia suficiente".
+4. Nunca inventes números, fechas ni artículos que no estén en el contexto.
+
+&lt;context&gt;
+&lt;article id="Art. 408"&gt;
+  Los pagos o abonos en cuenta por concepto de... (texto completo)
+&lt;/article&gt;
+&lt;article id="Art. 415"&gt;...&lt;/article&gt;
+...
+&lt;/context&gt;
+
+PREGUNTA DEL USUARIO:
+¿Qué retención aplica a un pago a un residente en España por honorarios?</code></pre>
+  <p style="margin-top: 1rem; font-size: 1rem; color: var(--fg-body);">
+    <strong>El "secret sauce" no es el modelo — es el contrato.</strong> Las reglas 3 y 4 son las que evitan las alucinaciones.
+  </p>
+  <aside class="notes">
+    Este es el "prompt" real (simplificado). No es magia — es un template con reglas y contexto XML.
+    La regla "di que no sabes" es lo que convierte un LLM en un asistente honesto.
+    Sin esa regla, inventaría.
+  </aside>
+</section>
+
+<section>
+  <div class="eyebrow">§3 · contraste dramático</div>
+  <h2>La misma pregunta · dos respuestas</h2>
+  <div class="grid-2" style="margin-top: 1.5rem; align-items: stretch;">
+    <div class="card" style="border-top: 3px solid #dc2626;">
+      <div class="badge-gold" style="margin-bottom: 0.75rem; background: color-mix(in srgb, #dc2626 15%, transparent); color: #dc2626;">LLM SOLO</div>
+      <h3 style="font-size: 1.1rem;">ChatGPT / Claude sin contexto</h3>
+      <p style="margin-top: 0.75rem; font-style: italic; color: var(--fg); line-height: 1.5;">
+        "En Colombia, a los pagos por honorarios a residentes en el exterior se les aplica una retención del 33% sobre el valor bruto, conforme al Art. 415 del Estatuto Tributario…"
+      </p>
+      <p style="margin-top: 0.75rem; color: #dc2626; font-size: 0.95rem;">
+        ✗ La tarifa correcta es 20%, no 33%.<br/>
+        ✗ El artículo correcto es el 408, no el 415.<br/>
+        ✗ Suena muy seguro. Es un invento plausible.
+      </p>
+    </div>
+    <div class="card" style="border-top: 3px solid #16a34a;">
+      <div class="badge-gold" style="margin-bottom: 0.75rem; background: color-mix(in srgb, #16a34a 15%, transparent); color: #16a34a;">LLM + RAG</div>
+      <h3 style="font-size: 1.1rem;">Claude con contexto de 5 artículos</h3>
+      <p style="margin-top: 0.75rem; font-style: italic; color: var(--fg); line-height: 1.5;">
+        "Aplica retención del 20% sobre el valor bruto del pago por honorarios técnicos, según el <strong>Art. 408 del ET</strong>. Si existe convenio de doble imposición con España, puede reducirse; consultar Concepto DIAN 12345/2022."
+      </p>
+      <p style="margin-top: 0.75rem; color: #16a34a; font-size: 0.95rem;">
+        ✓ Tarifa correcta (20%).<br/>
+        ✓ Artículo correcto (408).<br/>
+        ✓ Cita verificable. Incluye el matiz del convenio.
+      </p>
+    </div>
+  </div>
+  <p style="margin-top: 1.25rem; font-size: 1.25rem; text-align: center; color: var(--fg-body);">
+    <strong>Alucina</strong> vs. <strong>cita</strong>. Esa diferencia es el trabajo del ingeniero de RAG.
+  </p>
+  <aside class="notes">
+    Momento dramático de la clase. Decirles: "esto es lo que pasa cuando un abogado o contador confía en ChatGPT directo — inventa con confianza".
+    RAG no hace al modelo más inteligente. Lo hace HONESTO al darle evidencia.
+    Stanford midió: Lexis+ AI 17%, Westlaw 33%, GPT-4 solo 43% de alucinaciones en preguntas legales.
   </aside>
 </section>
 
@@ -1197,7 +1382,6 @@ ORDER BY articulo;</code></pre>
     <strong>Orquestar estas 5 piezas = construir un RAG.</strong><br/>
     <span style="color: var(--fg-muted);">El cómo las conectas es donde está la creatividad.</span>
   </p>
-  <div class="slide-footer">21 / 44</div>
   <aside class="notes">
     Cierre de §3. Transición: "ahora miremos el flujo real — cómo las conectó Tribai, cómo las conectó Kelsen".
   </aside>
@@ -1284,7 +1468,6 @@ ORDER BY articulo;</code></pre>
     ~3 segundos · ~12 APIs por query · 36,000 vectores indexados
   </text>
 </svg>
-  <div class="slide-footer">22 / 44</div>
   <aside class="notes">
     Cada caja es una capa que agrega valor. No todas son LLM — solo dos lo son.
     Resto: código imperativo, cache, filtros.
@@ -1315,7 +1498,6 @@ ORDER BY articulo;</code></pre>
       </p>
     </div>
   </div>
-  <div class="slide-footer">23 / 44</div>
   <aside class="notes">
     El iframe puede cargar o no. Backup: abrir tribai.co/asistente directamente en el browser externo
     (que ya tengo en otra pestaña desde el rehearsal).
@@ -1385,7 +1567,6 @@ ORDER BY articulo;</code></pre>
     1.69M documentos · 2.6M chunks · 22 GB Neon Postgres (pgvector + ParadeDB)
   </text>
 </svg>
-  <div class="slide-footer">24 / 44</div>
   <aside class="notes">
     Kelsen hace distinto. El agente (Sonnet) decide qué herramienta invocar en cada turno.
     Es como un equipo: el abogado decide a quién preguntarle primero.
@@ -1406,7 +1587,6 @@ ORDER BY articulo;</code></pre>
   <p style="margin-top: 2rem; color: var(--fg-body); font-size: 1.125rem;">
     Observen cómo Kelsen invoca <code>buscar_jurisprudencia</code> y recorre 29,000 sentencias antes de responder.
   </p>
-  <div class="slide-footer">25 / 44</div>
   <aside class="notes">
     Dejar tiempo para que el agente corra — son ~10 segundos.
     Señalar en voz alta: "ven que está 'pensando' — está ejecutando la tool".
@@ -1442,7 +1622,6 @@ ORDER BY articulo;</code></pre>
       </p>
     </div>
   </div>
-  <div class="slide-footer">26 / 44</div>
   <aside class="notes">
     No hay ganador. Depende del dominio, el usuario, el presupuesto de latencia.
     Ambos funcionan. Ambos son válidos.
@@ -1459,7 +1638,6 @@ ORDER BY articulo;</code></pre>
       Por eso la ingeniería moderna es creativa.
     </p>
   </div>
-  <div class="slide-footer">27 / 44</div>
   <aside class="notes">
     Fin del §4. Pausa conceptual antes de §5 (el mensaje central de la clase).
   </aside>
@@ -1557,7 +1735,6 @@ ORDER BY articulo;</code></pre>
     La base de datos es 1 de 12 · Orquestar todas es la ingeniería
   </text>
 </svg>
-  <div class="slide-footer">28 / 44</div>
   <aside class="notes">
     Mensaje clave de la clase. Respiro aquí. Que cuenten: 12 orbitales.
     "La base de datos es el cimiento — pero es UNO de doce."
@@ -1582,7 +1759,6 @@ ORDER BY articulo;</code></pre>
     <div class="card"><h3 style="font-size: 1rem;">🐘 Supabase</h3><p>Grafo de normograma (pgvector)</p></div>
     <div class="card"><h3 style="font-size: 1rem;">🧠 Cloud Run</h3><p>ML models self-hosted</p></div>
   </div>
-  <div class="slide-footer">29 / 44</div>
   <aside class="notes">
     12 proveedores. Cada uno es una decisión. Cada uno tiene alternativas.
     Esto es la realidad de construir software hoy.
@@ -1612,7 +1788,6 @@ ORDER BY articulo;</code></pre>
       </div>
     </div>
   </div>
-  <div class="slide-footer">30 / 44</div>
   <aside class="notes">
     Los costos son reales. Con 1000 usuarios × 20 queries/mes × $0.013 = $260/mes.
     Cobrar $10/mes por usuario = $10K/mes MRR a ese volumen.
@@ -1666,7 +1841,6 @@ ORDER BY articulo;</code></pre>
   <p style="margin-top: 2rem; text-align: center; font-size: 1.375rem; color: var(--tribai-gold); font-weight: 700;">
     Todo lo anterior cabe en $0. Esta noche pueden tener un RAG corriendo.
   </p>
-  <div class="slide-footer">31 / 44</div>
   <aside class="notes">
     Mensaje accionable. No es aspiracional, es hoy.
     Si alguien me dice después "hice uno", se gana tinto gratis 😁
@@ -1716,7 +1890,6 @@ async function ask(question: string) {
   <p style="margin-top: 1rem; color: var(--fg-muted); font-size: 1rem;">
     Pseudocódigo. Funciona. Cabe en una pantalla. Lo pueden escribir en 2 horas.
   </p>
-  <div class="slide-footer">32 / 44</div>
   <aside class="notes">
     Si hay proyector secundario, abrir VSCode con este código real.
     Enfatizar: 5 funciones. Eso es TODO.
@@ -1754,7 +1927,6 @@ async function ask(question: string) {
   <p style="margin-top: 1.5rem; color: var(--fg-muted); font-size: 1rem;">
     El salto no es tecnológico — es de disciplina.
   </p>
-  <div class="slide-footer">33 / 44</div>
   <aside class="notes">
     Honestidad. Un RAG de demo se hace en 1 día. Uno de producción toma meses.
     La diferencia es evaluación + observability + iteración.
@@ -1769,7 +1941,6 @@ async function ask(question: string) {
       <span style="color: var(--tribai-gold);">Ambas son ingeniería.</span>
     </p>
   </div>
-  <div class="slide-footer">34 / 44</div>
   <aside class="notes">
     Punchline central de la clase. Repetir la frase despacio.
     Fin del §5.
@@ -1807,7 +1978,6 @@ async function ask(question: string) {
       </p>
     </div>
   </div>
-  <div class="slide-footer">35 / 44</div>
   <aside class="notes">
     No es un unicornio aislado. Es un ejemplo de qué escala es posible.
     Kelsen apunta al mismo tipo de producto pero para LATAM — precio 1/40.
@@ -1842,7 +2012,6 @@ async function ask(question: string) {
       </div>
     </div>
   </div>
-  <div class="slide-footer">36 / 44</div>
   <aside class="notes">
     La IA ya no es un pipeline, es un colega que razona.
     Debugear agentic es más difícil — por eso observability es crítica.
@@ -1876,7 +2045,6 @@ async function ask(question: string) {
       </div>
     </div>
   </div>
-  <div class="slide-footer">37 / 44</div>
   <aside class="notes">
     Esto es MUY nuevo (finales 2024-2025). Los que lo adopten temprano ganan.
     Les va a tocar implementar MCP servers en su carrera.
@@ -1914,7 +2082,6 @@ async function ask(question: string) {
   <p style="margin-top: 1.5rem; color: var(--fg-muted); font-size: 1rem;">
     Vercel AI Gateway permite cambiar de uno a otro con una línea de config.
   </p>
-  <div class="slide-footer">38 / 44</div>
   <aside class="notes">
     El mercado va hacia comodificación de LLMs. Las capas alrededor (orquestación, eval) son el diferenciador.
   </aside>
@@ -1927,7 +2094,6 @@ async function ask(question: string) {
       ingeniería de software.
     </p>
   </div>
-  <div class="slide-footer">39 / 44</div>
   <aside class="notes">
     Cierre del §6. La frase se queda. Transición: "¿y por qué les cuento esto a ustedes, en Medellín?"
   </aside>
@@ -1956,7 +2122,6 @@ async function ask(question: string) {
   <p style="margin-top: 2rem; font-size: 1.25rem; text-align: center; color: var(--fg-body);">
     Y eso es <strong>solo Colombia</strong>. LATAM tiene 650M habitantes en la misma situación.
   </p>
-  <div class="slide-footer">40 / 44</div>
   <aside class="notes">
     Contextualizar la oportunidad. No es "algún día" — es ahora.
     El mercado está desatendido. La infra técnica ya existe. Falta construir.
@@ -1977,7 +2142,6 @@ async function ask(question: string) {
   <p style="margin-top: 2rem; font-size: 1.125rem; text-align: center; color: var(--tribai-gold); font-weight: 600;">
     Ninguno tiene un producto dominante aún.
   </p>
-  <div class="slide-footer">41 / 44</div>
   <aside class="notes">
     Escoger un dominio cercano a ustedes. Pregúntense: ¿conocen a alguien que sufra este problema?
     Ese es el primer usuario.
@@ -2010,7 +2174,6 @@ async function ask(question: string) {
       Si arman el MVP, me escriben. Yo los ayudo.
     </p>
   </div>
-  <div class="slide-footer">42 / 44</div>
   <aside class="notes">
     Cierre accionable. Plan de 4 semanas concreto. Oferta de mentoría.
     Aquí se convierte la clase en algo útil — no solo inspirador.
@@ -2076,7 +2239,6 @@ async function ask(question: string) {
   <path class="arrow" d="M 898 180 L 1085 180"/>
 </svg>
   </div>
-  <div class="slide-footer">43 / 44</div>
   <aside class="notes">
     Una imagen resume la clase entera. Repetir la frase.
   </aside>
@@ -2104,7 +2266,6 @@ async function ask(question: string) {
       </div>
     </div>
   </div>
-  <div class="slide-footer">44 / 44</div>
   <aside class="notes">
     Q&A abierto. 5 min. Si no hay preguntas, cerrar con invitación a acercarse al escritorio.
   </aside>

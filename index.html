@@ -65,6 +65,37 @@
     Cliffhanger: "¿cómo hizo eso? Vamos a desmontarlo en 90 minutos, sin código."
   </aside>
 </section>
+
+<section class="navy">
+  <div style="padding: 1rem 2rem;">
+    <div class="eyebrow" style="color: var(--tribai-gold);">el mapa de hoy</div>
+    <h2 style="color: white; margin-top: 0.5rem;">90 minutos · 7 paradas</h2>
+    <div style="display: grid; grid-template-columns: 60px 1fr; gap: 0.75rem 1.25rem; margin-top: 1.5rem; align-items: center; font-size: 1.125rem;">
+      <span class="stat" style="font-size: 1.4rem; text-align: right;">10'</span>
+      <span style="color: rgba(255,255,255,0.9);"><strong>Cambio de paradigma</strong> — del SQL a la conversación</span>
+      <span class="stat" style="font-size: 1.4rem; text-align: right;">12'</span>
+      <span style="color: rgba(255,255,255,0.9);"><strong>Galería de capacidades</strong> — 7 casos reales</span>
+      <span class="stat" style="font-size: 1.4rem; text-align: right;">20'</span>
+      <span style="color: rgba(255,255,255,0.9);"><strong>Las 5 piezas Lego</strong> — cómo está hecho un RAG</span>
+      <span class="stat" style="font-size: 1.4rem; text-align: right;">15'</span>
+      <span style="color: rgba(255,255,255,0.9);"><strong>El flujo real</strong> — cámara lenta de una query</span>
+      <span class="stat" style="font-size: 1.4rem; text-align: right;">15'</span>
+      <span style="color: rgba(255,255,255,0.9);"><strong>El ecosistema de APIs</strong> — orquestación real</span>
+      <span class="stat" style="font-size: 1.4rem; text-align: right;">10'</span>
+      <span style="color: rgba(255,255,255,0.9);"><strong>A dónde va esto</strong> — Harvey, agentic, MCP</span>
+      <span class="stat" style="font-size: 1.4rem; text-align: right;">8'</span>
+      <span style="color: rgba(255,255,255,0.9);"><strong>Ustedes + Colombia</strong> — qué construir este mes</span>
+    </div>
+    <p style="margin-top: 1.5rem; color: var(--tribai-gold); font-size: 1rem; font-style: italic;">
+      Pregunten cuando quieran. Lo único prohibido: "¿nos pasas las slides?" — el repo queda público.
+    </p>
+  </div>
+  <aside class="notes">
+    Orientación. Mapa para que no se pierdan.
+    "Estos son los siete bloques. Si en algún momento se sienten perdidos, miren este mapa mental."
+    Chiste del final para relajar y anunciar que el repo es público.
+  </aside>
+</section>
       <!-- §1 Paradigma -->
       <section class="muted">
   <div class="eyebrow">§1 · antes de empezar</div>
@@ -844,6 +875,52 @@ PREGUNTA DEL USUARIO:
   </aside>
 </section>
 
+<section>
+  <div class="eyebrow">§3 · los 5 momentos de decisión</div>
+  <h2>Donde realmente se juega el diseño</h2>
+  <p style="margin-top: 0.5rem; color: var(--fg-muted); font-size: 1.125rem;">
+    Por cada pieza Lego, <strong>hay una decisión arquitectural</strong>. Esto es lo que separa un buen RAG de uno mediocre:
+  </p>
+  <div style="margin-top: 1.25rem; display: grid; grid-template-columns: 1fr; gap: 0.75rem;">
+    <div style="display: grid; grid-template-columns: 60px 180px 1fr; gap: 1rem; align-items: center; padding: 0.75rem 1rem; background: var(--bg-muted-section); border-left: 3px solid var(--tribai-blue); border-radius: 6px;">
+      <span class="stat" style="font-size: 1.5rem;">1</span>
+      <span style="font-weight: 700;">¿Qué fuentes?</span>
+      <span style="color: var(--fg-body); font-size: 0.95rem;">¿Todo el ET o solo los 50 artículos más consultados? Más no siempre es mejor — ver Langfuse.</span>
+    </div>
+    <div style="display: grid; grid-template-columns: 60px 180px 1fr; gap: 1rem; align-items: center; padding: 0.75rem 1rem; background: var(--bg-muted-section); border-left: 3px solid var(--tribai-blue); border-radius: 6px;">
+      <span class="stat" style="font-size: 1.5rem;">2</span>
+      <span style="font-weight: 700;">¿Cómo chunkear?</span>
+      <span style="color: var(--fg-body); font-size: 0.95rem;">¿Por artículo? ¿512 tokens fijos? ¿Jerárquico padre-hijo? Determina qué tan quirúrgicas son las respuestas.</span>
+    </div>
+    <div style="display: grid; grid-template-columns: 60px 180px 1fr; gap: 1rem; align-items: center; padding: 0.75rem 1rem; background: var(--bg-muted-section); border-left: 3px solid var(--tribai-blue); border-radius: 6px;">
+      <span class="stat" style="font-size: 1.5rem;">3</span>
+      <span style="font-weight: 700;">¿Qué embedding?</span>
+      <span style="color: var(--fg-body); font-size: 0.95rem;">voyage-3-large · openai · cohere · jina · BGE-M3. En legal hay diferencias de +10% accuracy entre unos y otros.</span>
+    </div>
+    <div style="display: grid; grid-template-columns: 60px 180px 1fr; gap: 1rem; align-items: center; padding: 0.75rem 1rem; background: var(--bg-muted-section); border-left: 3px solid var(--tribai-blue); border-radius: 6px;">
+      <span class="stat" style="font-size: 1.5rem;">4</span>
+      <span style="font-weight: 700;">¿Pipeline o agente?</span>
+      <span style="color: var(--fg-body); font-size: 0.95rem;">Tribai: pipeline fijo (rápido, predecible). Kelsen: agente con tools (flexible, multi-paso). Ambos válidos.</span>
+    </div>
+    <div style="display: grid; grid-template-columns: 60px 180px 1fr; gap: 1rem; align-items: center; padding: 0.75rem 1rem; background: var(--bg-muted-section); border-left: 3px solid var(--tribai-blue); border-radius: 6px;">
+      <span class="stat" style="font-size: 1.5rem;">5</span>
+      <span style="font-weight: 700;">¿Cómo medir?</span>
+      <span style="color: var(--fg-body); font-size: 0.95rem;">Sin eval framework, cada cambio es un rezo. Con eval, es una hipótesis medible. Esta es <em>la</em> decisión.</span>
+    </div>
+  </div>
+  <div class="card" style="background: var(--tribai-navy); color: white; border: none; margin-top: 1.25rem;">
+    <p style="color: rgba(255,255,255,0.9); font-size: 1.1rem; line-height: 1.55;">
+      <strong style="color: var(--tribai-gold);">Si alguien les dice "mi RAG no funciona bien"</strong>, pregúntenle por estas 5 decisiones.
+      La respuesta les dirá dónde está la falla.
+    </p>
+  </div>
+  <aside class="notes">
+    Meta-slide importantísimo. Aquí les damos el framework mental para diagnosticar CUALQUIER RAG.
+    "Si algún día alguien les dice 'mi RAG da respuestas malas', ya tienen las 5 preguntas para diagnosticar."
+    Decisión 5 (eval) es la que más se descuida y la que más importa.
+  </aside>
+</section>
+
 <section class="muted">
   <div class="eyebrow">§3 · síntesis</div>
   <h2>Las 5 piezas juntas</h2>
@@ -1357,6 +1434,60 @@ async function ask(question: string) {
     Historia real. Observabilidad es LO QUE MÁS se posterga y es lo primero que salva culos.
     Mensaje: "si empiezan un RAG, instalen Langfuse el día 1, no el mes 3".
     Free tier basta para pruebas.
+  </aside>
+</section>
+
+<section class="muted">
+  <div class="eyebrow">§5 · la letra chiquita</div>
+  <h2>Costos ocultos que nadie les cuenta</h2>
+  <p style="margin-top: 0.5rem; color: var(--fg-muted); font-size: 1.125rem;">
+    Dije "cabe en $0". Es cierto para empezar — pero hay costos que llegan al mes 2-3 y les pegan fuerte:
+  </p>
+  <div class="grid-2" style="margin-top: 1.25rem; gap: 1.25rem;">
+    <div class="card">
+      <h3 style="font-size: 1rem; color: var(--tribai-gold);">♻️ Re-embedding cuando cambian el modelo</h3>
+      <p style="color: var(--fg-body); font-size: 0.95rem; line-height: 1.55;">
+        Cambiar de voyage-3 a voyage-law-2 implica <strong>re-procesar TODOS los vectores</strong>. Con 2.6M chunks a $0.12/M tokens = <span class="stat">~$62</span> y 6-8 horas de proceso.
+      </p>
+    </div>
+    <div class="card">
+      <h3 style="font-size: 1rem; color: var(--tribai-gold);">⏱️ Rate limits inesperados</h3>
+      <p style="color: var(--fg-body); font-size: 0.95rem; line-height: 1.55;">
+        Pinecone free tier: 5 RPS. Voyage free: 1M tokens/día. El día que tengan <em>un pico</em> de usuarios, empiezan a fallar queries silenciosamente.
+      </p>
+    </div>
+    <div class="card">
+      <h3 style="font-size: 1rem; color: var(--tribai-gold);">📈 Crecimiento del corpus</h3>
+      <p style="color: var(--fg-body); font-size: 0.95rem; line-height: 1.55;">
+        Cada nueva ley / doctrina / actualización requiere re-ingestar. Si su corpus crece 10% al mes, su pipeline de ingesta tiene que ser <strong>idempotente y rápido</strong>.
+      </p>
+    </div>
+    <div class="card">
+      <h3 style="font-size: 1rem; color: var(--tribai-gold);">🎭 Drift del contenido</h3>
+      <p style="color: var(--fg-body); font-size: 0.95rem; line-height: 1.55;">
+        Una reforma tributaria deroga 40 artículos. Sin alertas, su RAG seguirá citándolos por meses. Necesitan un <strong>proceso humano</strong> de revisión de vigencia.
+      </p>
+    </div>
+    <div class="card">
+      <h3 style="font-size: 1rem; color: var(--tribai-gold);">😵 Usuarios que rompen el modelo mental</h3>
+      <p style="color: var(--fg-body); font-size: 0.95rem; line-height: 1.55;">
+        "Hola, ¿cómo estás?" no es una pregunta tributaria. Si no filtran small-talk, cada saludo consume $0.013. Con 10K usuarios diarios, son $130/día en saludos.
+      </p>
+    </div>
+    <div class="card">
+      <h3 style="font-size: 1rem; color: var(--tribai-gold);">🔎 Deuda técnica en los tests</h3>
+      <p style="color: var(--fg-body); font-size: 0.95rem; line-height: 1.55;">
+        Cada release que no sea regression-tested puede degradar la calidad en 20%. Construir ese <strong>gold set</strong> de 200+ queries etiquetadas por un experto es costoso (USD $500-$2K).
+      </p>
+    </div>
+  </div>
+  <p style="margin-top: 1.25rem; font-size: 1.05rem; color: var(--fg-body); text-align: center;">
+    Ninguno de estos es un <em>show-stopper</em> — pero súmenlos y <strong>pueden gastar fácil $500/mes</strong> al llegar a 1,000 usuarios.
+  </p>
+  <aside class="notes">
+    Honestidad. Después del slide "todo cabe en $0", venir con realidad.
+    Si un estudiante va a construir algo, debe saber qué viene.
+    No asustar — el margen sigue siendo enorme — pero que no se sorprendan.
   </aside>
 </section>
 

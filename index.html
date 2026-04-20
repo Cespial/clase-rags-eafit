@@ -13,24 +13,1180 @@
   <div class="reveal">
     <img src="assets/logos/logo-tribai-isotipo-white.svg" alt="Tribai" class="tribai-logo" />
     <div class="slides">
-      <!-- §0 Cold open — content inlined by Task 4 -->
-      <section id="s00"><!-- 00-cold-open --></section>
-      <!-- §1 Paradigma — content inlined by Task 5 -->
-      <section id="s01"><!-- 01-paradigma --></section>
-      <!-- §2 Galería — content inlined by Task 6 -->
-      <section id="s02"><!-- 02-galeria --></section>
-      <!-- §3 Lego — content inlined by Task 7 -->
-      <section id="s03"><!-- 03-lego --></section>
-      <!-- §4 Flujo — content inlined by Task 8 -->
-      <section id="s04"><!-- 04-flujo --></section>
-      <!-- §5 Ecosistema — content inlined by Task 9 -->
-      <section id="s05"><!-- 05-ecosistema --></section>
-      <!-- §6 Industria — content inlined by Task 10 -->
-      <section id="s06"><!-- 06-industria --></section>
-      <!-- §7 Colombia — content inlined by Task 11 -->
-      <section id="s07"><!-- 07-colombia --></section>
-      <!-- §8 Cierre — content inlined by Task 12 -->
-      <section id="s08"><!-- 08-cierre --></section>
+      <!-- §0 Cold open -->
+      <section class="cover" data-state="cover">
+  <div style="height: 100%; display: flex; flex-direction: column; justify-content: center;">
+    <div class="eyebrow">EAFIT · ingeniería de datos · 20 abril 2026</div>
+    <h1 style="font-size: 5rem; margin-top: 1.5rem; margin-bottom: 1rem;">
+      RAG en producción
+    </h1>
+    <h2 style="font-size: 2rem; font-weight: 400; opacity: 0.8; margin-bottom: 3rem;">
+      Un paseo por dos sistemas reales: Tribai + Kelsen
+    </h2>
+    <div style="display: flex; gap: 2rem; align-items: center; font-size: 1.25rem;">
+      <div>
+        <div style="opacity: 0.6; font-size: 0.875rem; text-transform: uppercase; letter-spacing: 0.08em;">Invitado</div>
+        <div style="margin-top: 0.25rem; font-weight: 600;">Cristián Espinal</div>
+      </div>
+      <div style="width: 1px; height: 50px; background: rgba(255,255,255,0.3);"></div>
+      <div>
+        <div style="opacity: 0.6; font-size: 0.875rem; text-transform: uppercase; letter-spacing: 0.08em;">Anfitrión</div>
+        <div style="margin-top: 0.25rem; font-weight: 600;">Santiago Jiménez Londoño</div>
+      </div>
+    </div>
+  </div>
+  <div class="slide-footer">1 / 44</div>
+  <aside class="notes">
+    Saludo corto. "Hoy vamos a ver RAG desde dos ángulos: qué es, y cómo construir uno.
+    Vamos a empezar haciéndole una pregunta difícil a una IA real. Ojo a cómo responde."
+  </aside>
+</section>
+
+<section>
+  <div class="eyebrow">Demo #1 · en vivo · tributario</div>
+  <h2 style="margin-bottom: 1.5rem;">Pregunta real de un contador</h2>
+  <div class="card" style="background: #f5f8fa; border-left: 4px solid var(--tribai-blue); padding: 1.5rem; max-width: 1100px;">
+    <p style="font-size: 1.5rem; line-height: 1.4; font-style: italic; color: var(--fg);">
+      "Una empresa colombiana paga honorarios a un ingeniero residente en España por un diseño mecánico.
+      ¿Qué retención en la fuente aplica y qué artículos del ET la soportan?"
+    </p>
+  </div>
+  <div style="margin-top: 2rem;">
+    <span class="demo-label">EN VIVO · tribai.co/asistente</span>
+  </div>
+  <p style="margin-top: 2rem; color: var(--fg-muted); font-size: 1.125rem;">
+    → ChatGPT sin contexto esto lo inventa.<br/>
+    → Google no sabe qué es "residente".<br/>
+    → Veamos qué hace Tribai.
+  </p>
+  <div class="slide-footer">2 / 44</div>
+  <aside class="notes">
+    Abrir tribai.co/asistente en otra pestaña. Copiar-pegar la query desde demo-script.md.
+    Mientras carga, decir: "fíjense en dos cosas: la respuesta y las fuentes que cita".
+    Si falla red: botón "▶ ver sin red" (video backup).
+    Cliffhanger: "¿cómo hizo eso? Vamos a desmontarlo en 90 minutos, sin código."
+  </aside>
+</section>
+      <!-- §1 Paradigma -->
+      <section>
+  <div class="eyebrow">§1 · El cambio de paradigma</div>
+  <h2>Lo que les enseñan en el curso</h2>
+  <div style="display: flex; gap: 3rem; align-items: center; margin-top: 2rem;">
+    <div style="flex: 1;">
+      <pre style="font-size: 1.125rem;"><code>-- la app consulta la BD
+SELECT articulo, texto
+FROM estatuto_tributario
+WHERE texto ILIKE '%retención%'
+  AND estado = 'vigente'
+ORDER BY articulo;</code></pre>
+    </div>
+    <div style="flex: 1;">
+      <p style="font-size: 1.375rem; line-height: 1.5;">
+        <strong>La app conversa con la base de datos.</strong><br/>
+        La BD retorna filas. La app las muestra.
+      </p>
+      <p style="color: var(--fg-muted); margin-top: 1.5rem;">
+        Funciona muy bien si la pregunta es literal.<br/>
+        ¿Qué pasa si no lo es?
+      </p>
+    </div>
+  </div>
+  <div class="slide-footer">3 / 44</div>
+  <aside class="notes">
+    Reconocer lo que ya saben. Validar que ese paradigma es sólido — no lo estamos tirando.
+    Pero hay preguntas que no se responden así.
+  </aside>
+</section>
+
+<section>
+  <div class="eyebrow">§1 · el cambio</div>
+  <h2>Lo que hace una app moderna</h2>
+  <div style="margin-top: 2rem; font-size: 1.5rem; line-height: 1.6;">
+    <p><strong>La app conversa con la persona</strong>, consultando <strong>muchas fuentes</strong> a la vez.</p>
+    <ul style="margin-top: 1.5rem; list-style: none; padding-left: 0;">
+      <li style="margin-bottom: 0.75rem;"><span style="color: var(--tribai-gold); font-weight: 700;">→</span> No una tabla, sino decenas</li>
+      <li style="margin-bottom: 0.75rem;"><span style="color: var(--tribai-gold); font-weight: 700;">→</span> No coincidencia literal, sino significado</li>
+      <li style="margin-bottom: 0.75rem;"><span style="color: var(--tribai-gold); font-weight: 700;">→</span> No filas, sino una respuesta redactada con citas</li>
+    </ul>
+  </div>
+  <div class="slide-footer">4 / 44</div>
+  <aside class="notes">
+    Aquí es donde queremos hacerles click: la forma de la ingeniería cambió.
+    Ya no es "query → filas → UI". Es "pregunta → orquestación → respuesta conversacional".
+  </aside>
+</section>
+
+<section class="muted">
+  <div class="eyebrow">§1 · el insight</div>
+  <h2 style="max-width: 1100px;">El problema ya no es <em style="color: var(--tribai-blue);">cómo responder</em></h2>
+  <h2 style="max-width: 1100px; margin-top: 0.5rem;">Es <em style="color: var(--tribai-gold);">qué darle de contexto</em></h2>
+  <p style="margin-top: 3rem; font-size: 1.25rem; color: var(--fg-body); max-width: 900px;">
+    Los modelos de lenguaje ya saben escribir bien. El trabajo del ingeniero pasó de "cómo genero texto" a
+    <strong>"cómo le paso exactamente los datos correctos para que no invente"</strong>.
+  </p>
+  <div class="slide-footer">5 / 44</div>
+  <aside class="notes">
+    Punto conceptual importante. Los LLMs son capaces pero no omniscientes.
+    La ingeniería ahora es de contexto — curar, buscar, filtrar, pasar los datos correctos.
+  </aside>
+</section>
+
+<section class="navy">
+  <div style="display: flex; align-items: center; justify-content: center; height: 100%;">
+    <div style="max-width: 1000px; text-align: center;">
+      <p class="pull-quote">
+        RAG = darle a la IA un cuaderno abierto<br/>
+        en vez de que invente de memoria.
+      </p>
+      <p style="margin-top: 2rem; color: var(--tribai-gold); font-family: var(--font-mono); font-size: 1rem; letter-spacing: 0.08em;">
+        RETRIEVAL-AUGMENTED GENERATION
+      </p>
+    </div>
+  </div>
+  <div class="slide-footer">6 / 44</div>
+  <aside class="notes">
+    Pausa. Que el concepto se asiente. Mirar al público. "Esa frase es la clase entera".
+  </aside>
+</section>
+      <!-- §2 Galería -->
+      <section>
+  <div class="eyebrow">§2 · qué puede hacer un RAG</div>
+  <h2>7 ejemplos reales — busquen el suyo</h2>
+  <p style="margin-top: 1rem; color: var(--fg-body); font-size: 1.25rem;">
+    Regla: cualquier dominio con <strong>mucho texto + preguntas humanas</strong> es candidato.
+  </p>
+  <div class="grid-3" style="margin-top: 2rem;">
+    <div class="card">
+      <div class="badge-gold" style="margin-bottom: 0.75rem;">TRIBUTARIO</div>
+      <h3>Tribai</h3>
+      <p style="color: var(--fg-muted); font-size: 0.95rem;">4 horas de búsqueda manual → 10 segundos con citas al ET</p>
+    </div>
+    <div class="card">
+      <div class="badge-gold" style="margin-bottom: 0.75rem;">LEGAL</div>
+      <h3>Kelsen</h3>
+      <p style="color: var(--fg-muted); font-size: 0.95rem;">1.7M documentos colombianos recorridos en ~3 segundos</p>
+    </div>
+    <div class="card">
+      <div class="badge-gold" style="margin-bottom: 0.75rem;">SOPORTE</div>
+      <h3>Intercom / Zendesk AI</h3>
+      <p style="color: var(--fg-muted); font-size: 0.95rem;">La documentación de la empresa como fuente, 24/7</p>
+    </div>
+  </div>
+  <div class="slide-footer">7 / 44</div>
+  <aside class="notes">
+    Intro a la galería. Vamos a ver 7 en total en dos slides.
+    La idea: cualquier dominio con mucho texto es candidato.
+  </aside>
+</section>
+
+<section>
+  <div class="eyebrow">§2 · galería</div>
+  <h2>Casos por dominio</h2>
+  <div class="grid-4" style="margin-top: 2rem;">
+    <div class="card">
+      <div class="badge-gold" style="margin-bottom: 0.75rem;">M&A</div>
+      <h3 style="font-size: 1.1rem;">Due diligence</h3>
+      <p style="color: var(--fg-muted); font-size: 0.9rem;">80 h → 2 h revisando contratos</p>
+    </div>
+    <div class="card">
+      <div class="badge-gold" style="margin-bottom: 0.75rem;">SALUD</div>
+      <h3 style="font-size: 1.1rem;">Protocolos clínicos</h3>
+      <p style="color: var(--fg-muted); font-size: 0.9rem;">Literatura médica + historia del paciente</p>
+    </div>
+    <div class="card">
+      <div class="badge-gold" style="margin-bottom: 0.75rem;">RRHH</div>
+      <h3 style="font-size: 1.1rem;">Onboarding corporativo</h3>
+      <p style="color: var(--fg-muted); font-size: 0.9rem;">La wiki interna viva y conversacional</p>
+    </div>
+    <div class="card">
+      <div class="badge-gold" style="margin-bottom: 0.75rem;">RETAIL</div>
+      <h3 style="font-size: 1.1rem;">E-commerce</h3>
+      <p style="color: var(--fg-muted); font-size: 0.9rem;">Búsqueda conversacional de catálogos</p>
+    </div>
+  </div>
+  <div class="slide-footer">8 / 44</div>
+  <aside class="notes">
+    Seguir el tour. Cada uno representa una oportunidad de mercado real.
+  </aside>
+</section>
+
+<section>
+  <div class="eyebrow">§2 · foto real #1</div>
+  <h2>Tribai — tributario</h2>
+  <div style="display: flex; gap: 2rem; margin-top: 1.5rem;">
+    <div style="flex: 1;">
+      <img src="assets/screenshots/tribai-asistente.png" alt="Tribai asistente"
+           style="width: 100%; border-radius: var(--radius-md); border: 1px solid var(--border);"
+           onerror="this.style.display='none'; this.nextElementSibling.style.display='block';" />
+      <div style="display: none; padding: 3rem; background: var(--bg-muted-section); border-radius: var(--radius-md); text-align: center;">
+        <div class="badge-gold" style="margin-bottom: 1rem;">SCREENSHOT</div>
+        <p>tribai.co/asistente</p>
+      </div>
+    </div>
+    <div style="flex: 1;">
+      <h3>Lo que hace</h3>
+      <ul style="font-size: 1.125rem; line-height: 1.6;">
+        <li>Indexa los 1,301 artículos del Estatuto Tributario</li>
+        <li>+ 15K conceptos DIAN</li>
+        <li>+ 175 sentencias Corte Constitucional</li>
+        <li>+ DUR 1625, resoluciones, leyes</li>
+      </ul>
+      <p style="margin-top: 1.5rem;">
+        <span class="stat">36,000 vectores · 6 namespaces</span>
+      </p>
+    </div>
+  </div>
+  <div class="slide-footer">9 / 44</div>
+  <aside class="notes">
+    Aquí muestro el producto de verdad. Si hay tiempo y la red colabora, volver a tribai.co.
+  </aside>
+</section>
+
+<section>
+  <div class="eyebrow">§2 · foto real #2</div>
+  <h2>Kelsen — legal</h2>
+  <div style="display: flex; gap: 2rem; margin-top: 1.5rem;">
+    <div style="flex: 1;">
+      <img src="assets/screenshots/kelsen-chat.png" alt="Kelsen chat"
+           style="width: 100%; border-radius: var(--radius-md); border: 1px solid var(--border);"
+           onerror="this.style.display='none'; this.nextElementSibling.style.display='block';" />
+      <div style="display: none; padding: 3rem; background: var(--bg-muted-section); border-radius: var(--radius-md); text-align: center;">
+        <div class="badge-gold" style="margin-bottom: 1rem;">SCREENSHOT</div>
+        <p>kelsen-psi.vercel.app</p>
+      </div>
+    </div>
+    <div style="flex: 1;">
+      <h3>Escala del corpus colombiano</h3>
+      <ul style="font-size: 1.125rem; line-height: 1.6;">
+        <li><span class="stat">1,690,083</span> documentos</li>
+        <li><span class="stat">2,601,419</span> chunks vectorizados</li>
+        <li><span class="stat">22 GB</span> en Neon Postgres</li>
+        <li>SUIN + Corte Constitucional + CE SAMAI + DIAN + más</li>
+      </ul>
+      <p style="margin-top: 1rem; color: var(--fg-muted);">
+        Para los 410K abogados de Colombia.
+      </p>
+    </div>
+  </div>
+  <div class="slide-footer">10 / 44</div>
+  <aside class="notes">
+    Tamaño y ambición. Harvey.ai hace esto para USA, nosotros para Colombia.
+  </aside>
+</section>
+
+<section class="muted">
+  <div class="eyebrow">§2 · patrón común</div>
+  <h2>Todos tienen la misma forma</h2>
+  <div class="grid-3" style="margin-top: 2rem; align-items: stretch;">
+    <div class="card" style="border-top: 3px solid var(--tribai-blue);">
+      <h3>📚 Mucho texto</h3>
+      <p style="color: var(--fg-muted);">Documentos, PDFs, APIs con contenido largo</p>
+    </div>
+    <div class="card" style="border-top: 3px solid var(--tribai-gold);">
+      <h3>❓ Preguntas humanas</h3>
+      <p style="color: var(--fg-muted);">Ambiguas, contextuales, cambiantes</p>
+    </div>
+    <div class="card" style="border-top: 3px solid var(--tribai-light-blue);">
+      <h3>⚖️ Respuestas verificables</h3>
+      <p style="color: var(--fg-muted);">El usuario necesita saber de dónde salió</p>
+    </div>
+  </div>
+  <div class="slide-footer">11 / 44</div>
+  <aside class="notes">
+    La receta se repite. Reconocer el patrón es 80% del trabajo de escoger qué construir.
+  </aside>
+</section>
+
+<section>
+  <div class="eyebrow">§2 · ejercicio</div>
+  <h2>Piensen en su dominio</h2>
+  <div style="margin-top: 2rem; font-size: 1.375rem; line-height: 1.6;">
+    <p>Por 30 segundos, cada uno en su cabeza:</p>
+    <ul style="margin-top: 1.5rem;">
+      <li>¿En qué industria les interesaría trabajar?</li>
+      <li>¿Qué documentos largos existen allí?</li>
+      <li>¿Qué pregunta frustrante tendría un profesional de ese campo?</li>
+    </ul>
+    <p style="margin-top: 2rem; color: var(--tribai-gold); font-weight: 600;">
+      Ese es un RAG posible. Guarden la idea — volveremos a ella al final.
+    </p>
+  </div>
+  <div class="slide-footer">12 / 44</div>
+  <aside class="notes">
+    Micro-ejercicio. No respuesta pública. Solo que piensen. Los activa.
+    30 segundos reales, cronometrados.
+  </aside>
+</section>
+
+<section class="navy">
+  <div style="text-align: center; height: 100%; display: flex; flex-direction: column; justify-content: center;">
+    <p class="pull-quote">
+      Cualquier dominio con mucho texto<br/>
+      + preguntas humanas<br/>
+      <span style="color: var(--tribai-gold);">= oportunidad de RAG</span>
+    </p>
+  </div>
+  <div class="slide-footer">13 / 44</div>
+  <aside class="notes">
+    Fin del §2. Transición al §3: "ok, ya vieron qué HACE. Ahora cómo ESTÁ HECHO."
+  </aside>
+</section>
+      <!-- §3 Lego -->
+      <section class="muted">
+  <div class="eyebrow">§3 · las piezas</div>
+  <h2>Imaginen un bibliotecario con máquina de escribir</h2>
+  <img src="assets/diagrams/bibliotecario.svg" alt="Bibliotecario" style="width: 100%; max-width: 1100px; margin-top: 1.5rem;" />
+  <div class="slide-footer">14 / 44</div>
+  <aside class="notes">
+    La metáfora dominante de la clase. Volvemos a ella en los siguientes 7 slides.
+    Biblioteca = fuentes. Bibliotecario = retrieval + reranking. Máquina = LLM.
+  </aside>
+</section>
+
+<section>
+  <div class="eyebrow">§3 · pieza 1 de 5</div>
+  <h2>1 · Las fuentes = los libros</h2>
+  <div style="display: flex; gap: 3rem; margin-top: 2rem;">
+    <div style="flex: 1;">
+      <p style="font-size: 1.25rem; line-height: 1.6;">
+        Todo texto del que el sistema puede aprender.
+      </p>
+      <ul style="margin-top: 1.5rem; font-size: 1.125rem; line-height: 1.6;">
+        <li>PDFs escaneados (Docling, LlamaParse)</li>
+        <li>Páginas web (scrapers)</li>
+        <li>Bases de datos relacionales</li>
+        <li>APIs externas (SUIN, datos.gov.co)</li>
+        <li>Archivos Markdown, CSVs, JSONs</li>
+      </ul>
+    </div>
+    <div style="flex: 1;">
+      <div class="card" style="background: var(--tribai-navy); color: white;">
+        <div class="badge-gold" style="margin-bottom: 1rem;">En Tribai</div>
+        <ul style="color: rgba(255,255,255,0.9); font-size: 1rem;">
+          <li>1,294 artículos del ET (estatuto.co)</li>
+          <li>15,495 conceptos DIAN</li>
+          <li>175 sentencias Corte Constitucional</li>
+          <li>DUR 1625/2016 — 2,793 artículos</li>
+          <li>626 resoluciones DIAN</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+  <div class="slide-footer">15 / 44</div>
+  <aside class="notes">
+    La calidad de las fuentes DETERMINA la calidad del RAG.
+    "Garbage in, garbage out" nunca fue más literal.
+  </aside>
+</section>
+
+<section>
+  <div class="eyebrow">§3 · pieza 2 de 5</div>
+  <h2>2 · Embeddings = coordenadas de significado</h2>
+  <div style="display: flex; gap: 2rem; margin-top: 1.5rem;">
+    <div style="flex: 1;">
+      <p style="font-size: 1.25rem; line-height: 1.6;">
+        Un embedding es una lista de números. <br/>Palabras parecidas producen números parecidos.
+      </p>
+      <p style="margin-top: 1rem; color: var(--fg-muted);">
+        No es magia — es geometría. Cada texto se convierte en un punto en un espacio de ~1000 dimensiones.
+      </p>
+      <div class="card" style="margin-top: 1.5rem; background: var(--bg-muted-section);">
+        <code style="font-size: 0.95rem; line-height: 1.6; display: block;">
+          "trabajador extranjero"<br/>
+          → [0.12, -0.34, 0.88, ..., 0.07] (1024 números)
+        </code>
+      </div>
+    </div>
+    <div style="flex: 1;">
+      <img src="assets/diagrams/sql-vs-semantic.svg" alt="SQL vs semantic" style="width: 100%;" />
+    </div>
+  </div>
+  <div class="slide-footer">16 / 44</div>
+  <aside class="notes">
+    Este es el momento "aha". Sin matemática: solo "cada frase es un punto; cosas parecidas están cerca".
+    El demo #2 viene enseguida — prepararlo mental.
+  </aside>
+</section>
+
+<section class="muted">
+  <div class="eyebrow">Demo #2 · en vivo</div>
+  <h2>¿"trabajador extranjero" y "residente no colombiano" son parecidos?</h2>
+  <div style="margin-top: 1.5rem;">
+    <span class="demo-label">EN VIVO · localhost:3001</span>
+  </div>
+  <div class="card" style="background: #f5f8fa; padding: 2rem; margin-top: 1.5rem; max-width: 900px;">
+    <p style="font-size: 1.25rem; margin-bottom: 1rem; color: var(--fg-muted);">
+      Input 1: <strong style="color: var(--fg);">trabajador extranjero</strong>
+    </p>
+    <p style="font-size: 1.25rem; margin-bottom: 1.5rem; color: var(--fg-muted);">
+      Input 2: <strong style="color: var(--fg);">residente no colombiano</strong>
+    </p>
+    <div style="display: flex; align-items: center; gap: 1rem;">
+      <div style="flex: 1; height: 8px; background: var(--border); border-radius: 4px; position: relative;">
+        <div style="width: 87%; height: 100%; background: linear-gradient(to right, #3B82B8, #C4952A); border-radius: 4px;"></div>
+      </div>
+      <span class="stat" style="font-size: 1.75rem;">0.87</span>
+    </div>
+    <p style="margin-top: 1rem; color: var(--fg-muted); font-size: 0.95rem;">
+      PostgreSQL con LIKE diría que no tienen nada que ver.<br/>
+      El embedding entiende que significan casi lo mismo.
+    </p>
+  </div>
+  <div class="slide-footer">17 / 44</div>
+  <aside class="notes">
+    Voy a localhost:3001 y escribo las dos frases.
+    Backup: este slide ya tiene los números pre-calculados.
+    Insight: "esto no lo hace SQL. No lo hace ningún índice tradicional."
+  </aside>
+</section>
+
+<section>
+  <div class="eyebrow">§3 · pieza 3 de 5</div>
+  <h2>3 · Vector DB = el estante de coordenadas</h2>
+  <div style="display: flex; gap: 3rem; margin-top: 2rem;">
+    <div style="flex: 1;">
+      <p style="font-size: 1.25rem; line-height: 1.6;">
+        Donde guardamos millones de embeddings y buscamos los más cercanos rápido.
+      </p>
+      <p style="margin-top: 1.5rem; color: var(--fg-muted);">
+        No es una BD tradicional. Usa <strong>HNSW</strong> o <strong>IVF</strong>: estructuras optimizadas para "dame los 100 puntos más cercanos a este" en milisegundos sobre millones.
+      </p>
+    </div>
+    <div style="flex: 1;">
+      <div class="card">
+        <h3>Opciones populares</h3>
+        <table style="width: 100%; margin-top: 1rem; font-size: 1rem;">
+          <tr style="border-bottom: 1px solid var(--border);"><td style="padding: 0.5rem 0;"><strong>Pinecone</strong></td><td>SaaS, free tier</td></tr>
+          <tr style="border-bottom: 1px solid var(--border);"><td style="padding: 0.5rem 0;"><strong>pgvector</strong></td><td>Postgres extension</td></tr>
+          <tr style="border-bottom: 1px solid var(--border);"><td style="padding: 0.5rem 0;"><strong>Neon</strong></td><td>Postgres serverless</td></tr>
+          <tr style="border-bottom: 1px solid var(--border);"><td style="padding: 0.5rem 0;"><strong>Supabase</strong></td><td>Postgres + auth</td></tr>
+          <tr><td style="padding: 0.5rem 0;"><strong>LanceDB</strong></td><td>Embedded, rápido</td></tr>
+        </table>
+      </div>
+      <p style="margin-top: 1rem; font-size: 0.95rem; color: var(--fg-muted);">
+        Tribai usa Pinecone. Kelsen usa Neon (pgvector + ParadeDB).
+      </p>
+    </div>
+  </div>
+  <div class="slide-footer">18 / 44</div>
+  <aside class="notes">
+    La decisión "Pinecone vs pgvector" es arquitectural, no técnica.
+    Pinecone: SaaS, rápido de arrancar.
+    pgvector: control total, mismo Postgres que la app.
+    Ambas son válidas — Tribai y Kelsen eligieron distinto.
+  </aside>
+</section>
+
+<section>
+  <div class="eyebrow">§3 · pieza 4 de 5</div>
+  <h2>4 · Reranker = el segundo filtro</h2>
+  <div style="display: flex; gap: 3rem; margin-top: 2rem;">
+    <div style="flex: 1;">
+      <p style="font-size: 1.25rem; line-height: 1.6;">
+        El vector DB te da 50 candidatos en 10 ms. El reranker escoge los 5-10 mejores con un modelo más pesado (pero más preciso).
+      </p>
+      <ul style="margin-top: 1.5rem; font-size: 1.125rem;">
+        <li>Cohere Rerank 3.5 / 4.0</li>
+        <li>Voyage Reranker</li>
+        <li>Cross-encoder open source (mDeBERTa)</li>
+      </ul>
+    </div>
+    <div style="flex: 1;">
+      <div class="card" style="background: var(--tribai-navy); color: white;">
+        <div class="badge-gold" style="margin-bottom: 1rem;">Analogía</div>
+        <p style="color: rgba(255,255,255,0.9); line-height: 1.6;">
+          El bibliotecario baja 20 libros del estante (retrieval rápido).<br/><br/>
+          Los ojea uno por uno y te entrega los 3 que mejor responden tu pregunta (rerank preciso).
+        </p>
+      </div>
+    </div>
+  </div>
+  <div class="slide-footer">19 / 44</div>
+  <aside class="notes">
+    Sin reranker el retrieval es ruidoso — salen 20 resultados similares pero solo 5 son realmente relevantes.
+    Stanford midió: +33-40% accuracy con reranker, costa 120ms extra.
+  </aside>
+</section>
+
+<section>
+  <div class="eyebrow">§3 · pieza 5 de 5</div>
+  <h2>5 · LLM = el escritor</h2>
+  <div style="display: flex; gap: 3rem; margin-top: 2rem;">
+    <div style="flex: 1;">
+      <p style="font-size: 1.25rem; line-height: 1.6;">
+        Recibe tu pregunta + los 5 fragmentos seleccionados + instrucciones.<br/>Redacta la respuesta citando las fuentes.
+      </p>
+      <p style="margin-top: 1.5rem; color: var(--fg-muted);">
+        No inventa. No "recuerda de entrenamiento". Solo <strong>reorganiza</strong> lo que le pasaste.
+      </p>
+    </div>
+    <div style="flex: 1;">
+      <div class="card">
+        <h3>Qué usan Tribai y Kelsen</h3>
+        <ul style="margin-top: 1rem; font-size: 1.0625rem; line-height: 1.6;">
+          <li><strong>Claude Sonnet 4.6</strong> — generación principal</li>
+          <li><strong>Claude Haiku 4.5</strong> — routing/barato</li>
+          <li><strong>Gemini 2.5 Flash</strong> — fallback bulk</li>
+        </ul>
+        <p style="margin-top: 1rem; color: var(--fg-muted); font-size: 0.95rem;">
+          El modelo correcto para cada tarea, no el más caro para todo.
+        </p>
+      </div>
+    </div>
+  </div>
+  <div class="slide-footer">20 / 44</div>
+  <aside class="notes">
+    Romper el mito: el LLM no "sabe" tributario. Nosotros se lo pasamos.
+    Por eso se llama RAG — Retrieval-Augmented Generation.
+  </aside>
+</section>
+
+<section class="muted">
+  <div class="eyebrow">§3 · síntesis</div>
+  <h2>Las 5 piezas juntas</h2>
+  <img src="assets/diagrams/lego-pieces.svg" alt="5 piezas Lego" style="width: 100%; max-width: 1300px; margin-top: 1rem;" />
+  <p style="margin-top: 1.5rem; font-size: 1.25rem; text-align: center; color: var(--fg-body);">
+    <strong>Orquestar estas 5 piezas = construir un RAG.</strong><br/>
+    <span style="color: var(--fg-muted);">El cómo las conectas es donde está la creatividad.</span>
+  </p>
+  <div class="slide-footer">21 / 44</div>
+  <aside class="notes">
+    Cierre de §3. Transición: "ahora miremos el flujo real — cómo las conectó Tribai, cómo las conectó Kelsen".
+  </aside>
+</section>
+      <!-- §4 Flujo -->
+      <section>
+  <div class="eyebrow">§4 · flujo real</div>
+  <h2>Tribai — pipeline lineal</h2>
+  <img src="assets/diagrams/flujo-tribai.svg" alt="Flujo Tribai" style="width: 100%; max-width: 1300px; margin-top: 1rem;" />
+  <div class="slide-footer">22 / 44</div>
+  <aside class="notes">
+    Cada caja es una capa que agrega valor. No todas son LLM — solo dos lo son.
+    Resto: código imperativo, cache, filtros.
+  </aside>
+</section>
+
+<section class="muted">
+  <div class="eyebrow">Demo #3 · en vivo</div>
+  <h2>Autopsia — volvamos al cold open</h2>
+  <div style="margin-top: 1rem;">
+    <span class="demo-label">EN VIVO · tribai.co/asistente</span>
+  </div>
+  <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 2rem; margin-top: 1.5rem;">
+    <div>
+      <iframe src="about:blank" class="demo-frame" data-src="https://tribai.co/asistente"
+              title="Tribai asistente" style="background: white;"></iframe>
+    </div>
+    <div>
+      <h3>Qué voy a mostrar</h3>
+      <ol style="font-size: 1rem; line-height: 1.6;">
+        <li>Misma query del cold open</li>
+        <li>Panel de evidencia abierto</li>
+        <li>Los 5 artículos que citó</li>
+        <li>Confidence level (alto/medio/bajo)</li>
+      </ol>
+      <p style="margin-top: 1rem; color: var(--tribai-gold); font-weight: 600; font-size: 1rem;">
+        Insight: el cuaderno está abierto. Nada se inventa.
+      </p>
+    </div>
+  </div>
+  <div class="slide-footer">23 / 44</div>
+  <aside class="notes">
+    El iframe puede cargar o no. Backup: abrir tribai.co/asistente directamente en el browser externo
+    (que ya tengo en otra pestaña desde el rehearsal).
+  </aside>
+</section>
+
+<section>
+  <div class="eyebrow">§4 · otro diseño</div>
+  <h2>Kelsen — agente con herramientas</h2>
+  <img src="assets/diagrams/flujo-kelsen.svg" alt="Flujo Kelsen" style="width: 100%; max-width: 1300px; margin-top: 1rem;" />
+  <div class="slide-footer">24 / 44</div>
+  <aside class="notes">
+    Kelsen hace distinto. El agente (Sonnet) decide qué herramienta invocar en cada turno.
+    Es como un equipo: el abogado decide a quién preguntarle primero.
+  </aside>
+</section>
+
+<section class="muted">
+  <div class="eyebrow">Demo #4 · en vivo</div>
+  <h2>Kelsen — misma receta, arquitectura distinta</h2>
+  <div style="margin-top: 1rem;">
+    <span class="demo-label">EN VIVO · kelsen-psi.vercel.app</span>
+  </div>
+  <div class="card" style="margin-top: 1.5rem; background: #f5f8fa; border-left: 4px solid var(--tribai-blue); padding: 1.5rem; max-width: 1100px;">
+    <p style="font-size: 1.375rem; font-style: italic; color: var(--fg);">
+      "¿Qué ha dicho la Corte Constitucional sobre el mínimo vital en pensiones?"
+    </p>
+  </div>
+  <p style="margin-top: 2rem; color: var(--fg-body); font-size: 1.125rem;">
+    Observen cómo Kelsen invoca <code>buscar_jurisprudencia</code> y recorre 29,000 sentencias antes de responder.
+  </p>
+  <div class="slide-footer">25 / 44</div>
+  <aside class="notes">
+    Dejar tiempo para que el agente corra — son ~10 segundos.
+    Señalar en voz alta: "ven que está 'pensando' — está ejecutando la tool".
+  </aside>
+</section>
+
+<section>
+  <div class="eyebrow">§4 · contraste</div>
+  <h2>Dos arquitecturas, misma ecuación</h2>
+  <div class="grid-2" style="margin-top: 1.5rem; align-items: stretch;">
+    <div class="card" style="border-top: 3px solid var(--tribai-blue);">
+      <h3>Tribai — Pipeline</h3>
+      <ul style="line-height: 1.6;">
+        <li>Flujo lineal fijo de 6 etapas</li>
+        <li>Cada query pasa por las mismas etapas</li>
+        <li>Latencia predecible (~3s)</li>
+        <li>Más simple de debuggear</li>
+      </ul>
+      <p style="margin-top: 1rem; color: var(--fg-muted); font-size: 0.95rem;">
+        Ideal cuando el dominio es estable.
+      </p>
+    </div>
+    <div class="card" style="border-top: 3px solid var(--tribai-gold);">
+      <h3>Kelsen — Agente</h3>
+      <ul style="line-height: 1.6;">
+        <li>Agente decide qué hacer en cada turno</li>
+        <li>Puede llamar 0, 1 o N tools</li>
+        <li>Latencia variable (1-15s)</li>
+        <li>Razonamiento multi-paso emergente</li>
+      </ul>
+      <p style="margin-top: 1rem; color: var(--fg-muted); font-size: 0.95rem;">
+        Ideal cuando las preguntas son abiertas.
+      </p>
+    </div>
+  </div>
+  <div class="slide-footer">26 / 44</div>
+  <aside class="notes">
+    No hay ganador. Depende del dominio, el usuario, el presupuesto de latencia.
+    Ambos funcionan. Ambos son válidos.
+  </aside>
+</section>
+
+<section class="navy">
+  <div style="text-align: center; height: 100%; display: flex; flex-direction: column; justify-content: center;">
+    <p class="pull-quote">
+      No hay UN RAG.<br/>
+      Hay <span style="color: var(--tribai-gold);">decisiones de diseño.</span>
+    </p>
+    <p style="margin-top: 2rem; color: rgba(255,255,255,0.7); font-size: 1.25rem;">
+      Por eso la ingeniería moderna es creativa.
+    </p>
+  </div>
+  <div class="slide-footer">27 / 44</div>
+  <aside class="notes">
+    Fin del §4. Pausa conceptual antes de §5 (el mensaje central de la clase).
+  </aside>
+</section>
+      <!-- §5 Ecosistema -->
+      <section>
+  <div class="eyebrow">§5 · el ecosistema</div>
+  <h2>La BD es 1 de 12 servicios</h2>
+  <img src="assets/diagrams/mapa-apis.svg" alt="Mapa de APIs" style="width: 100%; max-width: 1100px; margin-top: 1rem;" />
+  <div class="slide-footer">28 / 44</div>
+  <aside class="notes">
+    Mensaje clave de la clase. Respiro aquí. Que cuenten: 12 orbitales.
+    "La base de datos es el cimiento — pero es UNO de doce."
+    La creatividad es DECIDIR cuáles, cómo conectarlos, cómo manejar fallas.
+  </aside>
+</section>
+
+<section class="muted">
+  <div class="eyebrow">§5 · desglose</div>
+  <h2>Qué hace cada uno</h2>
+  <div class="grid-3" style="margin-top: 1.5rem; font-size: 0.95rem;">
+    <div class="card"><h3 style="font-size: 1rem;">🤖 Anthropic</h3><p>Claude Sonnet (calidad) y Haiku (barato)</p></div>
+    <div class="card"><h3 style="font-size: 1rem;">🧭 Voyage AI</h3><p>Embeddings optimizados para texto largo</p></div>
+    <div class="card"><h3 style="font-size: 1rem;">📍 Pinecone</h3><p>Vector DB SaaS, 36K vectores</p></div>
+    <div class="card"><h3 style="font-size: 1rem;">🔎 Cohere</h3><p>Reranker preciso</p></div>
+    <div class="card"><h3 style="font-size: 1rem;">🚪 Vercel AI Gateway</h3><p>Routing entre proveedores, failover</p></div>
+    <div class="card"><h3 style="font-size: 1rem;">☁️ Vercel</h3><p>Hosting + Edge + Blob</p></div>
+    <div class="card"><h3 style="font-size: 1rem;">🔭 Langfuse</h3><p>Observability de LLM calls</p></div>
+    <div class="card"><h3 style="font-size: 1rem;">🔐 Clerk</h3><p>Autenticación</p></div>
+    <div class="card"><h3 style="font-size: 1rem;">💳 Stripe</h3><p>Billing de planes</p></div>
+    <div class="card"><h3 style="font-size: 1rem;">⚡ Upstash Redis</h3><p>Cache + rate limit</p></div>
+    <div class="card"><h3 style="font-size: 1rem;">🐘 Supabase</h3><p>Grafo de normograma (pgvector)</p></div>
+    <div class="card"><h3 style="font-size: 1rem;">🧠 Cloud Run</h3><p>ML models self-hosted</p></div>
+  </div>
+  <div class="slide-footer">29 / 44</div>
+  <aside class="notes">
+    12 proveedores. Cada uno es una decisión. Cada uno tiene alternativas.
+    Esto es la realidad de construir software hoy.
+  </aside>
+</section>
+
+<section>
+  <div class="eyebrow">§5 · cuánto cuesta</div>
+  <h2>Costo real por query</h2>
+  <div style="display: flex; gap: 3rem; align-items: center; margin-top: 2rem;">
+    <div style="flex: 1;">
+      <div style="font-size: 4.5rem; font-weight: 700; color: var(--tribai-gold); font-family: var(--font-mono);">$0.031</div>
+      <p style="color: var(--fg-muted); margin-top: 0.5rem;">por conversación inicial</p>
+      <div style="font-size: 4.5rem; font-weight: 700; color: var(--tribai-blue); font-family: var(--font-mono); margin-top: 2rem;">$0.013</div>
+      <p style="color: var(--fg-muted); margin-top: 0.5rem;">con prompt caching + query router</p>
+    </div>
+    <div style="flex: 1;">
+      <div class="card">
+        <h3>Desglose aproximado</h3>
+        <table style="width: 100%; font-size: 0.95rem; margin-top: 1rem;">
+          <tr style="border-bottom: 1px solid var(--border);"><td style="padding: 0.5rem 0;">Claude Sonnet (respuesta)</td><td style="text-align: right;" class="stat">$0.020</td></tr>
+          <tr style="border-bottom: 1px solid var(--border);"><td style="padding: 0.5rem 0;">Claude Haiku (routing/rewrite)</td><td style="text-align: right;" class="stat">$0.003</td></tr>
+          <tr style="border-bottom: 1px solid var(--border);"><td style="padding: 0.5rem 0;">Pinecone query</td><td style="text-align: right;" class="stat">$0.004</td></tr>
+          <tr style="border-bottom: 1px solid var(--border);"><td style="padding: 0.5rem 0;">Cohere rerank</td><td style="text-align: right;" class="stat">$0.002</td></tr>
+          <tr><td style="padding: 0.5rem 0;">Voyage embedding</td><td style="text-align: right;" class="stat">$0.002</td></tr>
+        </table>
+      </div>
+    </div>
+  </div>
+  <div class="slide-footer">30 / 44</div>
+  <aside class="notes">
+    Los costos son reales. Con 1000 usuarios × 20 queries/mes × $0.013 = $260/mes.
+    Cobrar $10/mes por usuario = $10K/mes MRR a ese volumen.
+  </aside>
+</section>
+
+<section class="muted">
+  <div class="eyebrow">§5 · replicable</div>
+  <h2>Para construir el suyo este mes necesitan:</h2>
+  <table style="width: 100%; margin-top: 1.5rem; font-size: 1rem;">
+    <thead>
+      <tr style="border-bottom: 2px solid var(--tribai-navy); text-align: left;">
+        <th style="padding: 0.75rem;">Pieza</th>
+        <th style="padding: 0.75rem;">Opción gratuita</th>
+        <th style="padding: 0.75rem;">Opción pro</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr style="border-bottom: 1px solid var(--border);">
+        <td style="padding: 0.75rem; font-weight: 600;">LLM</td>
+        <td style="padding: 0.75rem;">Anthropic $5 crédito + Gemini / Groq free</td>
+        <td style="padding: 0.75rem;" class="stat">Claude Sonnet, GPT-5</td>
+      </tr>
+      <tr style="border-bottom: 1px solid var(--border);">
+        <td style="padding: 0.75rem; font-weight: 600;">Embeddings</td>
+        <td style="padding: 0.75rem;">Voyage free (200M tok/mes) · Cohere free</td>
+        <td style="padding: 0.75rem;" class="stat">voyage-3-large</td>
+      </tr>
+      <tr style="border-bottom: 1px solid var(--border);">
+        <td style="padding: 0.75rem; font-weight: 600;">Vector DB</td>
+        <td style="padding: 0.75rem;">Supabase (pgvector)</td>
+        <td style="padding: 0.75rem;" class="stat">Pinecone, Neon</td>
+      </tr>
+      <tr style="border-bottom: 1px solid var(--border);">
+        <td style="padding: 0.75rem; font-weight: 600;">Framework</td>
+        <td style="padding: 0.75rem;">Next.js / FastAPI</td>
+        <td style="padding: 0.75rem;" class="stat">+ Vercel AI SDK v6</td>
+      </tr>
+      <tr style="border-bottom: 1px solid var(--border);">
+        <td style="padding: 0.75rem; font-weight: 600;">Deploy</td>
+        <td style="padding: 0.75rem;">Vercel hobby</td>
+        <td style="padding: 0.75rem;" class="stat">Vercel Pro</td>
+      </tr>
+      <tr>
+        <td style="padding: 0.75rem; font-weight: 600;">Observability</td>
+        <td style="padding: 0.75rem;">Langfuse cloud free</td>
+        <td style="padding: 0.75rem;" class="stat">Datadog, LangSmith</td>
+      </tr>
+    </tbody>
+  </table>
+  <p style="margin-top: 2rem; text-align: center; font-size: 1.375rem; color: var(--tribai-gold); font-weight: 700;">
+    Todo lo anterior cabe en $0. Esta noche pueden tener un RAG corriendo.
+  </p>
+  <div class="slide-footer">31 / 44</div>
+  <aside class="notes">
+    Mensaje accionable. No es aspiracional, es hoy.
+    Si alguien me dice después "hice uno", se gana tinto gratis 😁
+  </aside>
+</section>
+
+<section>
+  <div class="eyebrow">Demo #5</div>
+  <h2>Receta mínima — ~60 líneas</h2>
+  <pre style="font-size: 0.85rem;"><code class="language-typescript">// 1. Conexión a Postgres con pgvector
+const db = postgres(process.env.DATABASE_URL!);
+
+// 2. Función de ingestión (corres una vez por doc)
+async function ingest(doc: string) {
+  const chunks = splitIntoChunks(doc, 512);
+  for (const chunk of chunks) {
+    const [embedding] = await voyage.embed([chunk]);
+    await db`INSERT INTO docs (text, embedding)
+             VALUES (${chunk}, ${embedding})`;
+  }
+}
+
+// 3. Función de búsqueda
+async function search(query: string, k = 5) {
+  const [qEmbed] = await voyage.embed([query]);
+  return await db`
+    SELECT text, 1 - (embedding &lt;=&gt; ${qEmbed}) as similarity
+    FROM docs
+    ORDER BY embedding &lt;=&gt; ${qEmbed}
+    LIMIT ${k}
+  `;
+}
+
+// 4. Función RAG: retrieve + generate
+async function ask(question: string) {
+  const docs = await search(question);
+  const context = docs.map(d =&gt; d.text).join('\n---\n');
+  return await anthropic.messages.create({
+    model: 'claude-sonnet-4-6',
+    messages: [{ role: 'user', content:
+      `Responde usando solo este contexto. Cita fragmentos exactos.\n\n${context}\n\nPregunta: ${question}`
+    }]
+  });
+}
+
+// 5. Listo. Conectá a un endpoint HTTP y tenés un RAG.</code></pre>
+  <p style="margin-top: 1rem; color: var(--fg-muted); font-size: 1rem;">
+    Pseudocódigo. Funciona. Cabe en una pantalla. Lo pueden escribir en 2 horas.
+  </p>
+  <div class="slide-footer">32 / 44</div>
+  <aside class="notes">
+    Si hay proyector secundario, abrir VSCode con este código real.
+    Enfatizar: 5 funciones. Eso es TODO.
+    El resto del trabajo es ingestión (calidad de chunks), evaluación, UX.
+  </aside>
+</section>
+
+<section>
+  <div class="eyebrow">§5 · ingeniería real</div>
+  <h2>Lo que diferencia un RAG de juguete de uno productivo</h2>
+  <div class="grid-2" style="margin-top: 1.5rem;">
+    <div class="card">
+      <h3 style="color: var(--tribai-blue);">RAG de juguete (1 día)</h3>
+      <ul style="line-height: 1.6;">
+        <li>Una sola fuente, chunks random</li>
+        <li>Embeddings off-the-shelf</li>
+        <li>Top-5 literal</li>
+        <li>Sin evaluación</li>
+        <li>Cache ninguno</li>
+      </ul>
+    </div>
+    <div class="card" style="background: var(--tribai-navy); color: white; border: none;">
+      <h3 style="color: var(--tribai-gold);">RAG productivo (3-6 meses)</h3>
+      <ul style="line-height: 1.6; color: rgba(255,255,255,0.9);">
+        <li>Chunking con metadata legal/semántica</li>
+        <li>Hybrid search (BM25 + vector)</li>
+        <li>Query rewriting, HyDE, multi-hop</li>
+        <li>Reranker, evidence checker</li>
+        <li>Eval framework (340 queries, CI gate)</li>
+        <li>Observability + cost tracking</li>
+        <li>Fallbacks, rate-limit, auth</li>
+      </ul>
+    </div>
+  </div>
+  <p style="margin-top: 1.5rem; color: var(--fg-muted); font-size: 1rem;">
+    El salto no es tecnológico — es de disciplina.
+  </p>
+  <div class="slide-footer">33 / 44</div>
+  <aside class="notes">
+    Honestidad. Un RAG de demo se hace en 1 día. Uno de producción toma meses.
+    La diferencia es evaluación + observability + iteración.
+  </aside>
+</section>
+
+<section class="navy">
+  <div style="text-align: center; height: 100%; display: flex; flex-direction: column; justify-content: center;">
+    <p class="pull-quote">
+      La BD es el cimiento.<br/>
+      La orquestación es la arquitectura.<br/>
+      <span style="color: var(--tribai-gold);">Ambas son ingeniería.</span>
+    </p>
+  </div>
+  <div class="slide-footer">34 / 44</div>
+  <aside class="notes">
+    Punchline central de la clase. Repetir la frase despacio.
+    Fin del §5.
+  </aside>
+</section>
+      <!-- §6 Industria -->
+      <section class="muted">
+  <div class="eyebrow">§6 · industria</div>
+  <h2>Harvey.ai — el caso de estudio</h2>
+  <div style="display: flex; gap: 3rem; margin-top: 2rem;">
+    <div style="flex: 1;">
+      <div style="font-size: 6rem; font-weight: 700; color: var(--tribai-gold); font-family: var(--font-mono); line-height: 1;">$11B</div>
+      <p style="color: var(--fg-muted); margin-top: 0.5rem;">valoración Serie G (marzo 2026)</p>
+      <ul style="margin-top: 2rem; font-size: 1.125rem; line-height: 1.6;">
+        <li><span class="stat">$190M</span> ARR · <span class="stat">100K+</span> abogados</li>
+        <li><span class="stat">1,300+</span> firmas · <span class="stat">60</span> países</li>
+        <li>Equipo completo de OpenAI contratado 3 meses para modelo custom de case law</li>
+        <li>Modelo custom: 97% preferencia vs base</li>
+      </ul>
+    </div>
+    <div style="flex: 1;">
+      <div class="card">
+        <h3>Lo que hacen</h3>
+        <ul style="line-height: 1.6; font-size: 1rem;">
+          <li>Assistant (chat legal)</li>
+          <li>Vault (análisis bulk de docs)</li>
+          <li>Knowledge (200+ fuentes legales)</li>
+          <li>Workflow Agents (25,000+)</li>
+          <li>Shared Spaces (colaboración)</li>
+        </ul>
+      </div>
+      <p style="margin-top: 1rem; color: var(--fg-muted); font-size: 1rem;">
+        Pricing: ~$1,000-1,200/abogado/mes, mínimo 20 asientos.<br/>
+        Entry point: ~$240K/año.
+      </p>
+    </div>
+  </div>
+  <div class="slide-footer">35 / 44</div>
+  <aside class="notes">
+    No es un unicornio aislado. Es un ejemplo de qué escala es posible.
+    Kelsen apunta al mismo tipo de producto pero para LATAM — precio 1/40.
+  </aside>
+</section>
+
+<section>
+  <div class="eyebrow">§6 · frontera actual</div>
+  <h2>Agentic RAG — la siguiente capa</h2>
+  <div style="display: flex; gap: 3rem; margin-top: 2rem;">
+    <div style="flex: 1;">
+      <p style="font-size: 1.25rem; line-height: 1.6;">
+        RAG tradicional: <strong>un retrieval fijo</strong>, una respuesta.
+      </p>
+      <p style="font-size: 1.25rem; line-height: 1.6; margin-top: 1.5rem;">
+        Agentic RAG: <strong>la IA decide</strong> cuándo buscar, cuándo escribir, cuándo pedir ayuda.
+      </p>
+      <p style="margin-top: 1.5rem; color: var(--fg-muted);">
+        Stanford midió: <span class="stat">+50%</span> retrieval accuracy, <span class="stat">-35%</span> tiempo para queries multi-paso.
+      </p>
+    </div>
+    <div style="flex: 1;">
+      <div class="card" style="background: var(--tribai-navy); color: white;">
+        <div class="badge-gold" style="margin-bottom: 1rem;">Ejemplo concreto</div>
+        <p style="color: rgba(255,255,255,0.9); line-height: 1.6;">
+          Kelsen cuando le preguntas "¿evolución de la jurisprudencia sobre X?":<br/><br/>
+          1. Invoca <code style="color: var(--tribai-gold);">buscar_jurisprudencia</code><br/>
+          2. Lee 10 sentencias<br/>
+          3. Decide: "necesito más contexto" → <code style="color: var(--tribai-gold);">consultar_articulo</code><br/>
+          4. Armoniza y redacta
+        </p>
+      </div>
+    </div>
+  </div>
+  <div class="slide-footer">36 / 44</div>
+  <aside class="notes">
+    La IA ya no es un pipeline, es un colega que razona.
+    Debugear agentic es más difícil — por eso observability es crítica.
+  </aside>
+</section>
+
+<section>
+  <div class="eyebrow">§6 · protocolo nuevo</div>
+  <h2>MCP — el USB-C de las IAs</h2>
+  <div style="display: flex; gap: 3rem; margin-top: 2rem;">
+    <div style="flex: 1;">
+      <p style="font-size: 1.25rem; line-height: 1.6;">
+        <strong>Model Context Protocol</strong> (Anthropic, abierto).<br/>
+        Un estándar para que cualquier IA hable con cualquier herramienta.
+      </p>
+      <p style="margin-top: 1.5rem; color: var(--fg-muted);">
+        Igual que USB-C unificó carga/datos, MCP unifica cómo las IAs invocan herramientas externas.
+      </p>
+    </div>
+    <div style="flex: 1;">
+      <div class="card">
+        <h3>Ejemplos de MCP servers</h3>
+        <ul style="line-height: 1.6; font-size: 1rem;">
+          <li>Filesystem (leer/escribir archivos)</li>
+          <li>GitHub (issues, PRs, código)</li>
+          <li>Slack (mensajes, canales)</li>
+          <li>Google Drive, Gmail, Calendar</li>
+          <li>Bases de datos Postgres/MySQL</li>
+          <li><strong>Tribai y Kelsen</strong> como servers MCP (próximo paso)</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+  <div class="slide-footer">37 / 44</div>
+  <aside class="notes">
+    Esto es MUY nuevo (finales 2024-2025). Los que lo adopten temprano ganan.
+    Les va a tocar implementar MCP servers en su carrera.
+  </aside>
+</section>
+
+<section>
+  <div class="eyebrow">§6 · estrategia</div>
+  <h2>Multi-model — el equipo, no el solitario</h2>
+  <div style="display: flex; gap: 3rem; margin-top: 2rem;">
+    <div style="flex: 1;">
+      <p style="font-size: 1.25rem; line-height: 1.6;">
+        Antes: "¿cuál es el mejor modelo?" — respuesta única.<br/>
+        Ahora: <strong>el modelo correcto para cada tarea.</strong>
+      </p>
+    </div>
+    <div style="flex: 1;">
+      <table style="width: 100%; font-size: 1rem;">
+        <thead>
+          <tr style="border-bottom: 2px solid var(--tribai-navy); text-align: left;">
+            <th style="padding: 0.5rem 0;">Tarea</th>
+            <th style="padding: 0.5rem 0;">Modelo</th>
+            <th style="padding: 0.5rem 0;">Por qué</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr style="border-bottom: 1px solid var(--border);"><td style="padding: 0.5rem 0;">Routing</td><td class="stat">Haiku 4.5</td><td style="color: var(--fg-muted);">barato + rápido</td></tr>
+          <tr style="border-bottom: 1px solid var(--border);"><td style="padding: 0.5rem 0;">Generación</td><td class="stat">Sonnet 4.6</td><td style="color: var(--fg-muted);">calidad razonamiento</td></tr>
+          <tr style="border-bottom: 1px solid var(--border);"><td style="padding: 0.5rem 0;">Bulk</td><td class="stat">Gemini Flash</td><td style="color: var(--fg-muted);">volumen alto</td></tr>
+          <tr><td style="padding: 0.5rem 0;">Fallback</td><td class="stat">GPT-5 mini</td><td style="color: var(--fg-muted);">redundancia</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+  <p style="margin-top: 1.5rem; color: var(--fg-muted); font-size: 1rem;">
+    Vercel AI Gateway permite cambiar de uno a otro con una línea de config.
+  </p>
+  <div class="slide-footer">38 / 44</div>
+  <aside class="notes">
+    El mercado va hacia comodificación de LLMs. Las capas alrededor (orquestación, eval) son el diferenciador.
+  </aside>
+</section>
+
+<section class="navy">
+  <div style="text-align: center; height: 100%; display: flex; flex-direction: column; justify-content: center;">
+    <p class="pull-quote" style="font-size: 3.5rem;">
+      Orquestar es la nueva<br/>
+      ingeniería de software.
+    </p>
+  </div>
+  <div class="slide-footer">39 / 44</div>
+  <aside class="notes">
+    Cierre del §6. La frase se queda. Transición: "¿y por qué les cuento esto a ustedes, en Medellín?"
+  </aside>
+</section>
+      <!-- §7 Colombia -->
+      <section>
+  <div class="eyebrow">§7 · por qué aquí</div>
+  <h2>La oportunidad LATAM</h2>
+  <div class="grid-3" style="margin-top: 2rem;">
+    <div class="card" style="border-top: 3px solid var(--tribai-blue);">
+      <div class="stat" style="font-size: 3.5rem; line-height: 1;">300K</div>
+      <h3 style="margin-top: 0.5rem;">Contadores</h3>
+      <p style="color: var(--fg-muted);">activos en Colombia, con demanda de productividad</p>
+    </div>
+    <div class="card" style="border-top: 3px solid var(--tribai-gold);">
+      <div class="stat" style="font-size: 3.5rem; line-height: 1;">410K</div>
+      <h3 style="margin-top: 0.5rem;">Abogados</h3>
+      <p style="color: var(--fg-muted);">2ª densidad mundial per cápita</p>
+    </div>
+    <div class="card" style="border-top: 3px solid var(--tribai-light-blue);">
+      <div class="stat" style="font-size: 3.5rem; line-height: 1;">50M+</div>
+      <h3 style="margin-top: 0.5rem;">Habitantes</h3>
+      <p style="color: var(--fg-muted);">sin acceso a especialistas en muchos temas</p>
+    </div>
+  </div>
+  <p style="margin-top: 2rem; font-size: 1.25rem; text-align: center; color: var(--fg-body);">
+    Y eso es <strong>solo Colombia</strong>. LATAM tiene 650M habitantes en la misma situación.
+  </p>
+  <div class="slide-footer">40 / 44</div>
+  <aside class="notes">
+    Contextualizar la oportunidad. No es "algún día" — es ahora.
+    El mercado está desatendido. La infra técnica ya existe. Falta construir.
+  </aside>
+</section>
+
+<section class="muted">
+  <div class="eyebrow">§7 · dominios con oportunidad</div>
+  <h2>Si fueran ustedes, yo atacaría...</h2>
+  <div class="grid-3" style="margin-top: 1.5rem;">
+    <div class="card"><h3>🏥 Salud rural</h3><p style="color: var(--fg-muted);">Protocolos + historia del paciente, en regiones sin especialistas</p></div>
+    <div class="card"><h3>📚 Educación</h3><p style="color: var(--fg-muted);">Tutor contextual por materia, basado en el pensum real</p></div>
+    <div class="card"><h3>🏛️ Gobierno digital</h3><p style="color: var(--fg-muted);">Normativa + trámites: hay miles de decretos sin indexar</p></div>
+    <div class="card"><h3>🏭 PyMEs</h3><p style="color: var(--fg-muted);">Asesor financiero/legal para 2M empresas sin contador propio</p></div>
+    <div class="card"><h3>🌱 Agrotech</h3><p style="color: var(--fg-muted);">Mejores prácticas agronómicas por región, clima, cultivo</p></div>
+    <div class="card"><h3>🚓 Justicia</h3><p style="color: var(--fg-muted);">952K tutelas/año — triage asistido para despachos judiciales</p></div>
+  </div>
+  <p style="margin-top: 2rem; font-size: 1.125rem; text-align: center; color: var(--tribai-gold); font-weight: 600;">
+    Ninguno tiene un producto dominante aún.
+  </p>
+  <div class="slide-footer">41 / 44</div>
+  <aside class="notes">
+    Escoger un dominio cercano a ustedes. Pregúntense: ¿conocen a alguien que sufra este problema?
+    Ese es el primer usuario.
+  </aside>
+</section>
+
+<section class="navy">
+  <div style="padding: 2rem;">
+    <div class="eyebrow">§7 · invitación</div>
+    <h2 style="color: white; margin-top: 1rem;">Escojan un dominio. Construyan el MVP este mes.</h2>
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-top: 2rem;">
+      <div>
+        <h3 style="color: var(--tribai-gold);">Semana 1</h3>
+        <p style="color: rgba(255,255,255,0.85);">Escoger dominio + recolectar 100 docs reales</p>
+      </div>
+      <div>
+        <h3 style="color: var(--tribai-gold);">Semana 2</h3>
+        <p style="color: rgba(255,255,255,0.85);">Chunking + embeddings + pgvector</p>
+      </div>
+      <div>
+        <h3 style="color: var(--tribai-gold);">Semana 3</h3>
+        <p style="color: rgba(255,255,255,0.85);">UI Next.js + Claude API + streaming</p>
+      </div>
+      <div>
+        <h3 style="color: var(--tribai-gold);">Semana 4</h3>
+        <p style="color: rgba(255,255,255,0.85);">Deploy Vercel + 20 testers reales + iterar</p>
+      </div>
+    </div>
+    <p style="margin-top: 2rem; color: var(--tribai-gold); font-weight: 600; font-size: 1.375rem;">
+      Si arman el MVP, me escriben. Yo los ayudo.
+    </p>
+  </div>
+  <div class="slide-footer">42 / 44</div>
+  <aside class="notes">
+    Cierre accionable. Plan de 4 semanas concreto. Oferta de mentoría.
+    Aquí se convierte la clase en algo útil — no solo inspirador.
+  </aside>
+</section>
+      <!-- §8 Cierre -->
+      <section class="cover">
+  <div style="height: 100%; display: flex; flex-direction: column; justify-content: center;">
+    <div class="eyebrow">síntesis</div>
+    <p class="pull-quote" style="font-size: 4rem; margin-top: 2rem;">
+      De SELECT a orquestación —<br/>
+      <span style="color: var(--tribai-gold);">la ingeniería cambió de forma.</span>
+    </p>
+    <img src="assets/diagrams/evolucion-sql-rag.svg" alt="Evolución" style="width: 100%; max-width: 1200px; margin-top: 3rem; opacity: 0.9;" />
+  </div>
+  <div class="slide-footer">43 / 44</div>
+  <aside class="notes">
+    Una imagen resume la clase entera. Repetir la frase.
+  </aside>
+</section>
+
+<section class="cover">
+  <div style="height: 100%; display: flex; flex-direction: column; justify-content: center;">
+    <h1 style="font-size: 4rem;">Gracias</h1>
+    <p style="font-size: 1.5rem; opacity: 0.8; margin-top: 0.5rem;">Preguntas, críticas, ideas — todas bienvenidas.</p>
+    <div style="margin-top: 4rem; display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; max-width: 1000px;">
+      <div>
+        <div class="eyebrow" style="color: var(--tribai-gold);">contacto</div>
+        <p style="margin-top: 0.5rem; font-size: 1.25rem;">
+          <strong>Cristián Espinal</strong><br/>
+          <span style="opacity: 0.8;">inpluxia@gmail.com</span>
+        </p>
+      </div>
+      <div>
+        <div class="eyebrow" style="color: var(--tribai-gold);">enlaces</div>
+        <ul style="margin-top: 0.5rem; list-style: none; padding: 0; font-size: 1.125rem;">
+          <li>→ <a href="https://tribai.co" style="color: var(--tribai-gold);">tribai.co</a></li>
+          <li>→ <a href="https://kelsen-psi.vercel.app" style="color: var(--tribai-gold);">kelsen-psi.vercel.app</a></li>
+          <li>→ <a href="https://github.com/Cespial/clase-rags-eafit" style="color: var(--tribai-gold);">github.com/Cespial/clase-rags-eafit</a></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+  <div class="slide-footer">44 / 44</div>
+  <aside class="notes">
+    Q&A abierto. 5 min. Si no hay preguntas, cerrar con invitación a acercarse al escritorio.
+  </aside>
+</section>
     </div>
   </div>
 
